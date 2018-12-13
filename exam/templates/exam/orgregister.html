@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}ユーザ情報登録{% endblock %}
+
+{% block container-header %}<h1>ユーザ情報登録</h1>{% endblock %}
+
+{% block main %}
+<p>{{ message }}</p>
+<form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="u_id">User ID</label>
+        <input type="text" class="form-control" id="u_id" placeholder="20文字以内でIDを決めてください。" name="u_id">
+
+        <label for="u_pass">Password</label>
+        <input type="password" class="form-control" id="u_pass" placeholder="20文字以内でパスワードを決めてください。" name="u_pass">
+
+        <label for="u_name">管理者名</label>
+        <input type="text" class="form-control" id="u_name" placeholder="管理者名（ユーザ名）を入力してください。" name="u_name">
+
+        <label for="o_name">組織名</label>
+        <input type="text" class="form-control" id="o_name" placeholder="組織名を入力してください。" name="o_name">
+
+        <label for="u_email">登録したメールアドレスを入力してください</label>
+        <input type="email" class="form-control" id="u_email" placeholder="メールアドレスを入力してください。" name="u_email">
+
+        <input type="hidden" class="form_control" name="auth_key" value="{{ auth_key }}">
+
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}

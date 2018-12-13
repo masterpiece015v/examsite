@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}ユーザ登録{% endblock %}
+{% block header %}ユーザ登録{% endblock %}
+{% block main %}
+<form method="POST">
+    {% csrf_token %}
+    <ul class="newuser">
+        <li>ユーザIDを英数字8文字以内で決めてください。</li>
+        {% if u_id_error %}<strong class="error">{{ u_id_error }}</strong><br>{% endif %}
+        <label for="u_id">ユーザID</label>
+        <input type="text" maxlength="8" name="u_id" id="u_id"><br>
+
+        <li>パスワードを英数字20文字以内で決めてください。</li>
+        {% if u_pass_error %}<strong class="error">{{ u_pass_error }}</strong><br>{% endif %}
+        <label for="u_pass">管理者パスワード</label>
+        <input type="text" maxlength="20" name="u_pass" id="u_pass"><br>
+
+        <li>ユーザ名をフルネームで入力してください。</li>
+        {% if u_name_error %}<strong class="error">{{ u_name_error }}</strong><br>{% endif %}
+        <label for="u_name">管理者名</label>
+        <input type="text" maxlength="20" name="u_name" id="u_name"><br>
+
+        <li>ユーザのメールアドレスを入力してください。</li>
+        {% if o_email_error %}<strong class="error">{{ o_email_error }}</strong><br>{% endif %}
+        <label for="u_email">メールアドレス</label>
+        <input type="email" maxlength="100" name="u_email" id="u_email">
+
+        <li><input type="submit" value="作成"></li>
+    </ul>
+
+</form>
+{% endblock %}

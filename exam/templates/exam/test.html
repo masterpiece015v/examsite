@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block addhead %}
+<script type="text/javascript">
+$(function(){
+    $("#btn01").on("click",function(){
+        btnOnClick();
+    });
+    function btnOnClick(){
+        var name = $("#txtName").val();
+        alert( name );
+    }
+});
+</script>
+{% endblock %}
+
+{% block body %}
+<select id="l_code">
+    <option value="1"></option>
+</select>
+{% endblock %}

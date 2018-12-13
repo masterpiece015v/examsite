@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}エラーページ{% endblock %}
+
+{% block main %}
+
+{{ message }}
+<p><a href="{% url 'exam:index' %}">戻る</a></p>
+
+{% endblock %}

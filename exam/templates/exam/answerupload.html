@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}
+解答マークシートのアップロード
+{% endblock %}
+{% block header %}新規ユーザファイルアップロード{% endblock %}
+
+{% block main %}
+<div class="row">
+
+    <div class="col-md-3">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Choose File<input type="file" style="display:none" name="file">
+                    </span>
+                </label>
+
+                <input type="text" class="form-control" readonly="">
+
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="upload" class="btn btn-primary">
+            </div>
+        </form>
+
+        <form>
+            <div class="form-group">
+                <select size="10" class="form-control" name="del">
+                    {% for file in filelist %}
+                    <option value="{{file}}"> {{ file }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="delete" class="btn btn-primary">
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $(document).on('change', ':file', function() {
+        var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.parent().parent().next(':text').val(label);
+    });
+});
+</script>
+{% endblock %}

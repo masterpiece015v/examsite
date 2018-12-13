@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}サイト管理者ログイン{% endblock %}
+
+{% block nav %}{% endblock %}
+{% block main %}
+<div class="row">
+        <div class="col-md-4">
+    <p>{{ message }}</p>
+    <form action="{% url 'exam:sapage' %}" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="u_id">UserId or Email address</label>
+            <input type="text" class="form-control" id="u_id" placeholder="e-mailまたはユーザIDを入力してください。" name="u_id">
+            <label for="u_pass">Password</label>
+            <input type="password" class="form-control" id="u_pass" placeholder="Password" name="u_pass">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    </div>
+    </div>
+{% endblock %}

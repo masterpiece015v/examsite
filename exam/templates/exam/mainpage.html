@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}メッセージページ{% endblock %}
+
+{% block main %}
+
+<div class="row">
+    <div class="col">
+<p>ユーザID:{{ u_id }}</p>
+<p>ユーザ名:{{ u_name }}</p>
+{% if u_admin == 1 %}
+<h2>管理者メニュー</h2>
+<ul>
+    <li><a href="{% url 'exam:addlicense' %}">ライセンスの購入</a></li>
+    <li>ユーザの追加</li>
+    <li>ユーザの延長</li>
+    <li><a href="{% url 'exam:answerupload' %}">解答アップロード</a></li>
+</ul>
+{% endif %}
+<h2>ユーザメニュー</h2>
+<ul>
+    <li><a href="{% url 'exam:testmake' %}">テスト作成</a></li>
+    <li><a href="{% url 'exam:testprint' %}">テスト印刷</a></li>
+    <li>分析</li>
+</ul>
+
+</div>
+</div>
+{% endblock %}

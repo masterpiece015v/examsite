@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}
+新規ユーザファイルアップロード
+{% endblock %}
+{% block header %}新規ユーザファイルアップロード{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="col-md-3">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group">
+                <label class="input-group-btn">
+                    <span class="btn btn-primary">
+                        Choose File<input type="file" style="display:none" name="file">
+                    </span>
+                </label>
+                <input type="text" class="form-control" readonly="">
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="upload" class="btn btn-primary">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(function(){
+    $(document).on('change', ':file', function() {
+        var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.parent().parent().next(':text').val(label);
+    });
+});
+</script>
+
+{% if users|length > 0 %}
+<div class="row">
+    <div class="col-md-5">
+    <h1>登録するユーザ</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="u_num">人数</label>{{ users | length }}
+            <input type="text" value="{{ users|length }}" hidden id="u_num" size="3" name="u_num" class="form-control">
+        </div>
+        
+        <div class="form-group">
+            <input type="submit" value="追加" class="btn btn-primary">
+        </div>
+        
+        <table>
+            <tr><th>u_id</th><th>u_pass</th><th>u_name</th><th>u_email</th><th>u_admin</th><th>u_enable</th><th>org_id</th></tr>
+    {% for user in users%}
+            <tr>
+                <td><input type="text" value="{{ user.u_id }}" name="u_id_{{ forloop.counter0 }}" size="8"></td>
+                <td><input type="text" value="{{ user.u_pass }}" name="u_pass_{{ forloop.counter0 }}"></td>
+                <td><input type="text" value="{{ user.u_name }}" name="u_name_{{ forloop.counter0 }}"></td>
+                <td><input type="email" value="{{ user.u_email }}" name="u_email_{{ forloop.counter0 }}"></td>
+                <td><input type="text" value="{{ user.u_admin }}" name="u_admin_{{ forloop.counter0 }}" size="4"></td>
+                <td><input type="text" value="{{ user.u_enable }}" name="u_enable_{{ forloop.counter0 }}" size="4"></td>
+                <td>{{ o_id }}<input type="text" hidden value="{{ o_id }}" name="o_id_{{ forloop.counter0 }}" size="6"></td>
+            </tr>
+    {% endfor %}
+        </table>
+    </form>
+    </div>
+</div>
+{% endif %}
+
+{% if ng_users|length > 0 %}
+    <p>登録できなかったユーザ</p>
+        <table>
+            <tr><th>u_id</th><th>u_pass</th><th>u_name</th><th>u_email</th><th>admin</th><th>disable</th><th>org_id</th></tr>
+    {% for user in ng_users%}
+            <tr>
+                <td>{{ user.u_id }}</td>
+                <td>{{ user.u_pass }}</td>
+                <td>{{ user.u_name }}</td>
+                <td>{{ user.u_email }}</td>
+                <td>{{ user.admin }}</td>
+                <td>{{ user.disable}}</td>
+            </tr>
+    {% endfor %}
+        </table>
+{% endif %}
+
+{% if ok_users|length > 0 %}
+        <p>登録できたユーザ</p>
+        <table>
+            <tr><th>u_id</th><th>u_pass</th><th>u_name</th><th>u_email</th><th>admin</th><th>disable</th><th>org_id</th></tr>
+    {% for user in ok_users%}
+            <tr>
+                <td>{{ user.u_id }}</td>
+                <td>{{ user.u_pass }}</td>
+                <td>{{ user.u_name }}</td>
+                <td>{{ user.u_email }}</td>
+                <td>{{ user.admin }}</td>
+                <td>{{ user.disable}}</td>
+            </tr>
+    {% endfor %}
+        </table>
+{% endif %}
+<p>
+{{ error_message }}
+</p>
+{% endblock %}

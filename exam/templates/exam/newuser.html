@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}新規ユーザ登録{% endblock %}
+
+{% block header %}<h1>新規ユーザ登録</h1>{% endblock %}
+
+{% block main %}
+<p>{{ message }}</p>
+<form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="e-mailを入力してください。" name="u_email">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+<p>ログインページへ<a href="{% url 'exam:index' %}">戻る</a></p>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}サイト管理者ページ{% endblock %}
+
+{% block nav%}
+<div class="row">
+        <div class="col-md-12">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">サイト管理者サイト</a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false" aria-label="ナビゲーションの切替">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="Navber">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'exam:sapage' %}">メインページ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">ライセンス</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'exam:saaddlicense' %}">ライセンス追加</a>
+                            <a class="dropdown-item" href="#">ライセンス延長</a>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="navbar-nav my-2 my-lg-0">
+                    <li class="nav-link">
+                        <a class="nav-link" href="{% url 'exam:logoff' %}">ログオフ</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block main %}
+
+{% endblock %}

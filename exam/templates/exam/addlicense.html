@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}ライセンスの購入{% endblock %}
+
+{% block bland %}ライセンスの購入{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col-md-4">
+        <p>組織ID：{{ o_id }}</p>
+        <p>組織名:{{ o_name }}</p>
+        <form action="{% url 'exam:addlicense_conf' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="o_id">組織ID：</label>
+                <input type="text" class="form-control" id="o_id" name="o_id" value="{{ o_id }}">
+                <label for="l_num">ライセンス数：</label>
+                <input type="text" class="form-control" id="l_num" name="l_num">
+
+            </div>
+            <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#modal-progress">購入</button>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

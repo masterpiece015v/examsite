@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block addhead %}
+<style type="text/css">
+
+td.marker { border : 0px;}
+p.user-name { margin-top:40px;}
+table , tr, td ,th {
+    margin : 0px;
+    padding : 0px;
+    
+}
+table.mark-sheet{
+    margin-top : 5px;
+}
+td.user{
+    border : solid 1px #000;
+    letter-spacing:0.5em;
+    font-size : 22px;
+    padding-left : 15px;
+}
+
+table.mark-sheet th{
+    height : 46px;
+    text-align : center;
+}
+table.mark-sheet td{ 
+    width : 46px;
+    height : 46px;
+}
+table.mark-sheet td.maru{
+    text-align : center;
+    border-bottom : solid 1px #000;
+    color : #eee;
+    font-size : 24px;
+}
+table.mark-sheet td.t-num{
+    text-align : center;
+    border-left: solid 1px #000;
+    border-bottom : solid 1px #000;
+}
+table.mark-sheet th.t-num{
+    text-align :center;
+    border-bottom : solid 1px #000;
+    border-left : solid 1px #000;
+}
+table.mark-sheet th.t-head{
+    text-align : center;
+    border-bottom : solid 1px #000;
+}
+table.mark-sheet td:last-child,table.mark-sheet th:last-child{
+    border-right : solid 1px #000;
+}
+</style>
+{% endblock %}
+{% block main %}
+{% csrf_token %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="form-group">
+            <select class="form-control d-print-none" id="t_id">
+                <option></option>
+                
+                {% for t in test %}
+                    <option value="{{ t.t_id }}">{{ t.t_id }} {{ t.t_date }}</option>
+                {% endfor %}
+                
+            </select>           
+        </div>
+    </div>
+</div>
+
+<div id="print">
+
+</div>
+
+<script type="text/javascript" src="{% static 'exam/js/answersheetprint.js' %}" charset="utf-8"></script>
+
+{% endblock %}

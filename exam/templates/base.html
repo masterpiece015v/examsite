@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}base{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!--
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    {% block addhead %}{% endblock %}
+    <style type="text/css">
+    nav {
+        margin-bottom : 10px;
+    }
+
+    </style>
+</head>
+<body>
+{% block body %}
+<div class="container">
+{% block container %}
+    {% block nav %}
+    {% if u_admin == 1 %}
+    <div class="row">
+        <div class="col-md-12">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">国家試験対策</a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false" aria-label="ナビゲーションの切替">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="Navber">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'exam:mainpage' %}">メインページ</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">管理者</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'exam:addlicense' %}">ライセンスの追加</a>
+                            <a class="dropdown-item" href="#">ユーザの有効期限を延長</a>
+                            <a class="dropdown-item" href="{% url 'exam:userregistercsv' %}">ユーザの追加(csv)</a>
+                            <a class="dropdown-item" href="{% url 'exam:userregisterweb' %}">ユーザの追加(web)</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">テスト</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'exam:testmake' %}">テスト作成</a>
+                            <a class="dropdown-item" href="{% url 'exam:testprint' %}">テスト印刷</a>
+                            <a class="dropdown-item" href="{% url 'exam:answersheetprint' %}">解答用紙印刷</a>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="navbar-nav my-2 my-lg-0">
+                    <li class="nav-link">
+                        <a class="nav-link" href="{% url 'exam:logoff' %}">ログオフ</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-md-12">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">国家試験対策</a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#Navber" aria-controls="Navber" aria-expanded="false" aria-label="ナビゲーションの切替">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="Navber">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'exam:mainpage' %}">メインページ</a>
+                    </li>                 
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">テスト</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'exam:testprint' %}">テスト印刷</a>
+                </ul>
+                <ul class="navbar-nav my-2 my-lg-0">
+                    <li class="nav-link">
+                        <a class="nav-link" href="{% url 'exam:logoff' %}">ログオフ</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        </div>
+    </div>
+    {% endif %}
+    {% endblock %}
+    {% block main %}
+    {% endblock %}
+    
+{% endblock%}
+</div>
+{% endblock %}
+<div class="modal" id="modal-question" tabindex="-1" style="position:fixed;top:10px;left:10px;">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:600px">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table id="msq" style="font-size:9pt;" class="table table-condensed"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal-progress" tabindex="-1" style="position:fixed;top:10px;left:10px;">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:600px">
+                <div class="modal-body">
+                    作成中です。しばらくお待ちください。
+                </div>
+            </div>
+        </div>
+    </div>
+{% block script %}
+{% endblock %}
+
+</body>
+</html>

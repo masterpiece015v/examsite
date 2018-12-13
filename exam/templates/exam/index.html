@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}ログイン{% endblock %}
+
+{% block nav %}{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col-md-4">
+<p>{{ message }}</p>
+<form action="{% url 'exam:mainpage' %}" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="u_id">UserId or Email address</label>
+        <input type="text" class="form-control" id="u_id" placeholder="e-mailまたはユーザIDを入力してください。" name="u_id">
+        <label for="u_pass">Password</label>
+        <input type="password" class="form-control" id="u_pass" placeholder="Password" name="u_pass">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<p>新規ユーザ登録は<a href="{% url 'exam:newuser' %}">ここ</a>から</p>
+
+<p>ユーザIDやパスワードを忘れた方は<a href="{% url 'exam:inquiry' %}">ここ</a>から</p>
+</div>
+</div>
+{% endblock %}

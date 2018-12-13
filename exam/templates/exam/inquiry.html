@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}問い合わせ{% endblock %}
+{% block addhead %}
+<style type="text/css">
+    h2{font-size : 15pt;
+    margin-top : 20px;}
+</style>
+{% endblock %}
+{% block header %}<h1>管理者に問い合わせ</h1>{% endblock %}
+{% block main %}
+<h2>ロック解除</h2>
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="lock_u_id">ユーザID</label>
+        <input type="text" class="form-control" name="lock_u_id" id="lock_u_id"><br>
+
+        <label for="lock_u_pass">パスワード</label>
+        <input type="password" class="form-control" name="lock_u_pass" id="lock_u_pass"><br>
+
+        <button type="submit" class="btn btn-primary">ロック解除</button>
+    </div>
+</form>
+
+<h2>パスワード忘れ</h2>
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="pass_u_id">ユーザID</label>
+        <input type="text" class="form-control" name="pass_u_id" id="pass_u_id"><br>
+        <label for="pass_u_email">メールアドレス</label>
+        <input type="email" class="form-control" name="pass_u_email" id="pass_u_email" size="40"><br>
+
+        <button type="submit" class="btn btn-primary">送信</button>
+    </div>
+
+</form>
+
+<h2>ユーザID忘れ</h2>
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="fgid_u_email">メールアドレス</label>
+        <input type="email" class="form-group" name="fgid_u_email" id="fgid_u_email" size="40"><br>
+
+        <button type="submit" class="btn btn-primary">送信</button>
+    </div>
+
+</form>
+
+<h2>その他要望など</h2>
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <textarea name="textarea" cols="40"></textarea><br>
+        <button type="submit" class="btn btn-primary">送信</button>
+    </div>
+
+</form>
+
+<p>トップに<a href="{% url 'exam:index' %}">戻る</a></p>
+{% endblock %}
