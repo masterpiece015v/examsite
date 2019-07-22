@@ -67,34 +67,36 @@ $(function(){
 
             for( var i = 0 ; i < 20 ; i++ ){
                 //alert( data.length );
-
-                if( data.length == 80 ){
-                    $tr3 = $("<tr>").append( 
-                        $("<td>").text(data[i]['t_num']) ,
-                        $("<td>").text(data[i]['q_answer']),
-                        $("<td>").text(data[i+20]['t_num']) ,
-                        $("<td>").text(data[i+20]['q_answer']),
-                        $("<td>").text(data[i+40]['t_num']) ,
-                        $("<td>").text(data[i+40]['q_answer']),
-                        $("<td>").text(data[i+60]['t_num']) ,
-                        $("<td>").text(data[i+60]['q_answer']),
-                    );
-                }else if( data.length == 40 ){
-                    $tr3 = $("<tr>").append( 
-                        $("<td>").text(data[i]['t_num']) ,
-                        $("<td>").text(data[i]['q_answer']),
-                        $("<td>").text(data[i+20]['t_num']) ,
-                        $("<td>").text(data[i+20]['q_answer'])
-                    );
-                }else{
+                if( data.length <= 20 ){
                     //console.log( data[i]['t_num']);
                     $tr3 = $('<tr>').append(
                         $("<td>").text( data[i]['t_num']),
                         $("<td>").text( data[i]['q_answer'])
                     );
-                    if( i == 9 ){
-                        $('#qanswer').append($tr3);
+                    if( i > data.length ){
                         break;
+                    }
+                } else if( data.length <= 40 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['t_num']) ,$("<td>").text(data[i]['q_answer']) );
+                    if( (i + 20 ) < data.length ) {
+                        $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']));
+                    }
+                } else if( data.length <= 60 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['t_num']) , $("<td>").text(data[i]['q_answer']) );
+                    $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']) );
+                    if((i+40) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+40]['t_num']) , $("<td>").text(data[i+40]['q_answer']) );
+                    }
+                } else if ( data.length <= 80 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['t_num']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+40]['t_num']) , $("<td>").text(data[i+40]['q_answer']));
+
+                    if((i+60) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+60]['t_num']) , $("<td>").text(data[i+60]['q_answer']));
                     }
                 }
 

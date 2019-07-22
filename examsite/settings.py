@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5mglp@=prz1t@c1w9-z$+$7msj%p)0^!-p%50wb*kn6r0g9n+h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'examsitedb',
         'USER': 'webmaster',
         'PASSWORD': 'P@ssword',
-        'HOST': '192.168.11.15',
+        'HOST': '192.168.11.7',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -139,3 +139,5 @@ EMAIL_HOST_USER = 'masterpiece.015v@gmail.com'
 EMAIL_HOST_PASSWORD = 'isqrbjpmapwwbatp'
 EMAIL_PORT = 587
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+STATIC_ROOT = os.path.join( BASE_DIR,'static')

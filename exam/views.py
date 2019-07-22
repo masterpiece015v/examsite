@@ -3,7 +3,7 @@ from django.shortcuts import render,HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.mail import EmailMessage
 import re,string,random,datetime,os,csv
-from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,ResultTest,SuperUser,AddLicenseRequest,AnswerImage
+from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.urls import reverse
@@ -100,6 +100,7 @@ def newuser( request ):
 
     #メールアドレスが存在したので登録できない
     return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
+
 #アカウント登録
 def orgregister( request ):
     #入力フォームを取得するリクエスト
@@ -157,6 +158,7 @@ def orgregister( request ):
     #不要な認証キーの削除
     auth.delete()
     return HttpResponseRedirect('/exam/')
+
 #メインページ
 def mainpage( request ):
     #セッションIDがある(戻るボタンなどで帰ってきたとき用)
@@ -305,6 +307,7 @@ def inquiry( request ):
         EmailMessage('ユーザID',con,to=[u_email,]).send()
 
         return render( request,'exam/message.html',{'message':'登録されているメールアドレスにユーザIDをお送りしました。'})
+
 #ライセンスの購入
 def addlicense( request ):
     #セッションにユーザIDの記録がない
@@ -314,6 +317,7 @@ def addlicense( request ):
     org = Org.objects.get(o_id=o_id)
     o_name = org.o_name
     return render( request,'exam/addlicense.html',{'o_id':o_id,'o_name':o_name,'u_admin':request.session['u_admin']})
+
 #ライセンスの購入
 def addlicense_conf( request ):
     message = """
@@ -330,6 +334,7 @@ def addlicense_conf( request ):
     bodystr = "o_id:%s,l_num:%s"%(o_id,l_num)
     EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['masterpiece.015v@gmail.com',]).send()
     return render( request, 'exam/message.html',{'message':message})
+
 #ログオフ
 def logoff( request ):
     request.session['u_id'] = ""
@@ -344,6 +349,7 @@ def testmake( request ):
     q_test = Question.objects.values('q_test').distinct()
 
     return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
+
 #テスト印刷画面
 def testprint( request ):
     securecheck( request )
@@ -353,7 +359,8 @@ def testprint( request ):
     test_list = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
     print( test_list )
     return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
-#解答用紙
+
+#解答用紙印刷
 def answersheetprint( request ):
     o_id = request.session['o_id']
     test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
@@ -365,6 +372,7 @@ def answersheetprint( request ):
         list.append( dic )
     return render( request, 'exam/answersheetprint.html',{'test':list,'u_admin':request.session['u_admin']})
 
+#解答用紙印刷
 def answersheetprint_conf( request ):
     t_id = byteToDic( request.body )['t_id']
     o_id = request.session['o_id']
@@ -427,7 +435,7 @@ def sapage( request ):
     addAccessLog(request, 'sapage', 'f')
     return render( request, 'exam/errorpage.html',{'message','ログインできません。'})
 
-#ライセンス追加
+#スーパーユーザがライセンス追加を許可する
 def saaddlicense( request ):
     org = Org.objects.all()
     list = []
@@ -438,7 +446,6 @@ def saaddlicense( request ):
         dic['l_num'] = o.l_num
         list.append( dic )
     return render( request,'exam/saaddlicense.html',{'org_list':list})
-
 #組織ごとのフィルタ
 def saaddlicense_filter( request ):
     dic = byteToDic( request.body )
@@ -456,7 +463,6 @@ def saaddlicense_filter( request ):
         list.append( d )
     jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
     return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
-
 #ライセンス追加confirm
 def saaddlicense_conf( request ):
     dics = byteToDic(request.body)
@@ -479,8 +485,7 @@ def saaddlicense_conf( request ):
         list.append( dict )
     jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
     return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
-
-#組織内ユーザの追加
+#組織内ユーザの追加csv番
 def userregistercsv( request ):
     securecheck( request )
 
@@ -489,7 +494,6 @@ def userregistercsv( request ):
 
     #リクエストにfileが含まれている
     if 'file' in request.FILES:
-
         o_id = request.session['o_id']
         u_num = User.objects.filter(o_id=o_id).count()
 
@@ -544,7 +548,49 @@ def userregistercsv( request ):
         return render(request, 'exam/userregistercsv.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregistercsv.html',{'u_admin':request.session['u_admin']})
 
+#組織内ユーザの追加Web版
 def userregisterweb( request ):
+    securecheck(request)
+
+    if request.method != 'POST':
+        return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
+
+    o_id = request.session['o_id']
+
+    #登録できるアカウント数の計算
+    org = Org.objects.get(pk=o_id)
+    ng_users = []
+    ok_users = []
+    #人数クリア追加可能
+    if org.u_num_check(l_num=1):
+        u_id = request.POST['u_id']
+        u_id = o_id + u_id
+        u_name = request.POST['u_name']
+        u_pass = request.POST['u_pass']
+        u_email = request.POST['u_email']
+        u_admin = '0'
+        u_enable = '1'
+
+        create_date = timezone.now()
+        user = {'u_id':u_id,'u_pass':u_pass,'u_name':u_name,'u_email':u_email,'u_admin':u_admin,'u_enable':u_enable}
+        obj,created = User.objects.get_or_create(u_id=u_id,u_name=u_name,u_pass=u_pass,u_email=u_email,u_admin=u_admin,u_enable=u_enable,u_hidden=False,u_date=create_date,o_id=o_id)
+        print( created )
+        if created:
+            ok_users.append(user)
+        else:
+            ng_users.append(user)
+
+    if len(ng_users) > 0 and len(ok_users) > 0:
+        print( '両方' )
+        return render( request,'exam/userregisterweb.html',{'ok_users':ok_users,'ng_users':ng_users})
+    elif len(ng_users) > 0:
+        print( 'NG' )
+        return render( request,'exam/userregisterweb.html',{'ng_users':ng_users})
+    elif len(ok_users) > 0:
+        print( 'OK' )
+        return render( request,'exam/userregisterweb.html',{'ok_users':ok_users})
+    else:
+        return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
 #ajaxの応答
@@ -633,6 +679,7 @@ def testupdate( request ):
     o_id = user.o_id
 
     num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().count()
+
     t_id = code4(num+1)
     test_dic = byteToDic( request.body)
     q_list = test_dic['q_list']
@@ -645,6 +692,7 @@ def testupdate( request ):
         l_test.save()
 
     return HttpResponse(json.dumps({"state":"ok"}, ensure_ascii=False, indent=2), content_type='application/json', charset='utf-8')
+
 #テストの印刷用データをajaxで取得する
 def gettestprint( request ):
     t_id_dic = byteToDic( request.body )
@@ -665,58 +713,101 @@ def gettestprint( request ):
 
     return HttpResponseJson( list )
 
-#解答をアップロードするサイト
-
-
+#解答のアップロード
 def answerupload( request ):
-
-    #print( settings.BASE_DIR )
-
-    #print( settings.MEDIA_ROOT )
-
     securecheck( request )
-    # ファイルのパス
+
+    # アップするファイルのパス
     o_id = request.session['o_id']
     media_path = os.path.join(settings.MEDIA_ROOT, "exam", o_id)
 
     if request.method != 'POST':
-        files = os.listdir(media_path)
-        filelist = []
-        for file in files:
-            filelist.append(file)
-        return render(request, 'exam/answerupload.html', {"filelist": filelist})
-
-    #リクエストにfileが含まれている
-    if 'file' in request.FILES:
-        files = os.listdir( media_path )
-        if len(files)+1 < 10:
-            num = "00" + str( len(files)+1 )
-        elif len(files)+1 < 100:
-            num = "0" + str( len(files)+1)
-        else:
-            num = str(len(files)+1)
-
-        filename = "answer%s.jpg"%num
-
-        filepath = os.path.join(media_path,filename)
-        dest = open( filepath ,'wb+')
-
-        for chunk in request.FILES['file']:
-            dest.write( chunk )
-
-        #画像認識
-        org_id, test_id, user_id, answerlist = get_answer_list(filepath)
-
-        add_answerimage = AnswerImage(image=filename,o_id=org_id,t_id=test_id,u_id=user_id)
-        add_answerimage.save()
-
         answerimage = AnswerImage.objects.all()
         #リストの再取得
         filelist = []
         for file in answerimage:
             filelist.append( file )
-        print( filelist )
-    return render( request, 'exam/answerupload.html',{"filelist":filelist})
 
-def test( request ):
-    return render(request,'exam/answerupload.html')
+        return render(request, 'exam/answerupload.html', {"filelist": filelist})
+
+    # リクエストにfileが含まれている
+    if 'file' in request.FILES:
+
+        upfiles = request.FILES.getlist('file')
+
+        #複数のファイルがアップロードされる
+        for uf in upfiles:
+            files = os.listdir( media_path )
+
+            if len(files)+1 < 10:
+                num = "00" + str( len(files)+1 )
+            elif len(files)+1 < 100:
+                num = "0" + str( len(files)+1)
+            else:
+                num = str(len(files)+1)
+
+            filename = "answer%s.jpg"%num
+
+            filepath = os.path.join( media_path , filename )
+            dest = open( filepath ,'wb+')
+
+            for chunk in uf:
+                dest.write( chunk )
+
+            # 画像認識
+            org_id, test_id, user_id, answerlist = get_answer_list(filepath)
+
+            # 登録チェック
+            check_answerimage = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
+
+            # すでにテストID＋ユーザIDが存在する場合
+            if len( check_answerimage ) >= 1:
+                # リストの再取得
+                answerimage = AnswerImage.objects.all()
+                filelist = []
+                for file in answerimage:
+                    filelist.append(file)
+                msg = msg + uf.name
+                #return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。" , "filelist" : filelist })
+            else:
+                # 画像をデータベースに登録する
+                add_answerimage = AnswerImage( image=filename , o_id=org_id , t_id=test_id , u_id=user_id )
+                add_answerimage.save()
+
+                # 解答をResultTestに登録する
+                date = datetime.datetime.now()
+
+                #テスト数を取得
+                num = LittleTest.objects.filter( o_id=org_id,t_id=test_id ).count()
+                #num = record.count()
+                print( num )
+                cnt = 0
+                for answer in answerlist:
+                    if cnt < num:
+                        if answer[1] == "未回答" or answer[1] == "複数回答":
+                            add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=user_id)
+                        else:
+                            add_rt = ResultTest(t_id=test_id,t_num=code4(answer[0]),r_answer=answer[1],r_date=date,u_id=user_id)
+                        add_rt.save()
+                    cnt = cnt + 1
+
+        # リストの再取得
+        answerimage = AnswerImage.objects.all()
+        filelist = []
+        for file in answerimage:
+            filelist.append( file )
+
+        return render(request, 'exam/answerupload.html' , { "filelist" : filelist , "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist })
+
+    elif 'del' in request.POST:
+        image = request.POST['del']
+        AnswerImage.objects.filter(image=image).delete()
+        os.remove( os.path.join( media_path , image ))
+
+        # リストの再取得
+        answerimage = AnswerImage.objects.all()
+        filelist = []
+        for file in answerimage:
+            filelist.append( file )
+
+        return render( request, 'exam/answerupload.html' , { "filelist" : filelist })

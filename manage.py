@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/var/www/env/denv/bin python
+
 import os
 import sys
 

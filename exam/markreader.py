@@ -1,8 +1,89 @@
 import cv2
-import os
+#from .tensor import Ainum
+import tensorflow as tf
+from PIL import Image
+from matplotlib import pylab as plt
 import numpy as np
-from .tensor import Ainum
+import os
 from django.conf import settings
+
+PATH="/var/www/env/examsite/"
+
+class Ainum:
+    sess = tf.InteractiveSession()
+    #入力データ
+    x = tf.placeholder("float",shape=[None,784])
+    #正解データ
+    y_ = tf.placeholder( "float" ,shape=[None,10])
+
+    def weight_variable( shape ):
+        initial = tf.truncated_normal( shape,stddev=0.1)
+        return tf.Variable(initial)
+
+    def bias_variable( shape ):
+        initial = tf.constant( 0.1, shape=shape)
+        return tf.Variable( initial )
+
+    def conv2d( x,W ):
+        return tf.nn.conv2d( x , W , strides=[1,1,1,1], padding='SAME')
+
+    def max_pool_2x2( x ):
+        return tf.nn.max_pool( x, ksize=[1,2,2,1],strides=[1,2,2,1],padding='SAME')
+
+    W_conv1 = weight_variable([5,5,1,32])
+    b_conv1 = bias_variable([32])
+
+    x_image = tf.reshape(x,[-1,28,28,1])
+
+    h_conv1 = tf.nn.relu( conv2d(x_image,W_conv1) + b_conv1)
+    h_pool1 = max_pool_2x2( h_conv1 )
+
+    W_conv2 = weight_variable( [5,5,32,64] )
+    b_conv2 = bias_variable([64])
+
+    h_conv2 = tf.nn.relu( conv2d(h_pool1,W_conv2) + b_conv2)
+    h_pool2 = max_pool_2x2( h_conv2 )
+
+    W_fc1 = weight_variable([7*7*64,1024])
+    b_fc1 = bias_variable( [1024] )
+
+    h_pool2_flat = tf.reshape( h_pool2,[-1,7*7*64])
+
+    h_fc1 = tf.nn.relu( tf.matmul(h_pool2_flat,W_fc1) + b_fc1 )
+
+    keep_prob = tf.placeholder("float")
+    h_fc1_drop = tf.nn.dropout( h_fc1,keep_prob)
+
+    W_fc2 = weight_variable( [1024,10] )
+    b_fc2 = bias_variable( [10] )
+
+    #y_conv = tf.nn.softmax( tf.matmul( h_fc1_drop , W_fc2 ) + b_fc2 )
+    y_conv = tf.nn.softmax( tf.matmul( h_fc1 , W_fc2 ) + b_fc2 )
+    sess.run( tf.initialize_all_variables() )
+
+    saver = tf.train.Saver()
+
+    #django用設定
+    #path = settings.BASE_DIR
+    #print( path )
+    #ローカル実行用設定
+    #path = "C:\\PythonProject\\examsite"
+
+    saver.restore( sess, os.path.join(PATH,"exam","CNN","CNN.ckpt"))
+    print("学習データを読み込みました")
+
+    def get_num(self,source):
+        img = Image.fromarray( source ).convert('L')
+        plt.imshow( img )
+        img.thumbnail((28,28))
+
+        img = np.array(img,dtype=np.float32)
+        img = 1 - np.array( img / 255 )
+        img = img.reshape( 1 , 784 )
+
+        p = self.sess.run( self.y_conv, feed_dict={self.x:img , self.y_:[[0.0] * 10], self.keep_prob:0.5})[0]
+
+        return np.argmax(p)
 
 #数字を中央に寄せる
 def img_center( img ):
@@ -34,7 +115,7 @@ def img_center( img ):
     c_mid = int( ( c_max/2 - ( c_right + c_left ) / 2) )
     #縦中央値
     r_mid = int( (r_max/2 - ( r_top + r_bottom) / 2))
-    #print( 'r_max:%d r_top:%d r_bottom:%d r_mid:%d'%(r_max,r_top,r_bottom,r_mid) )
+    print( 'r_max:%d,r_top:%d,r_bottom:%d,r_mid:%d,c_mid:%d'%(r_max,r_top,r_bottom,r_mid,c_mid) )
 
     #横位置を調整する
     if c_mid > 0:#右にずらす
@@ -44,10 +125,11 @@ def img_center( img ):
                 img[r][c] = img[r][c - c_mid]
                 c = c - 1
         for r in range( r_max ):
-            c = c_mid
+            c = c_left + c_mid - 1
             while c > 0:
                 img[r][c] = 255
                 c = c - 1
+
     elif c_mid < 0:#左にずらす
         for r in range( r_max):
             c = 0
@@ -55,7 +137,8 @@ def img_center( img ):
                 img[r][c] = img[r][c - c_mid]
                 c = c + 1
         for r in range( r_max ):
-            c = c_right + r_mid + 1
+            c = c_right + c_mid + 1
+            print( "c:%d",c)
             while c < c_max:
                 img[r][c] = 255
                 c = c + 1
@@ -83,8 +166,6 @@ def img_center( img ):
             while r < r_max:
                 img[r][c] = 255
                 r = r + 1
-    #ファイルに吐き出す
-    #cv2.imwrite('img.jpg',img)
     return img
 
 #画像を表示する
@@ -96,7 +177,8 @@ def imgshow(img):
 
 #２値画像に変換する
 def bwchange(img):
-    img_temp = cv2.GaussianBlur(img, (5, 5), 0)
+    img_temp = cv2.GaussianBlur(img, (1, 1), 3)
+    #imgshow( img_temp )
     res, img = cv2.threshold(img_temp, 50, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     return res,img
 
@@ -114,15 +196,18 @@ def makenum(num):
 
 def get_answer_list(filename):
     #マーカーの読み込み
-    path = settings.BASE_DIR
-    path = os.path.join( path , "exam" , "marker.png" )
+
+    #django用設定
+    #path = settings.BASE_DIR
+    #ローカル実行用設定
+
+    path = os.path.join( PATH , "exam" , "marker.png" )
     marker = cv2.imread(path, 0)
-    #print( filename )
+
     #画像ファイルの読み込みとサイズ調整
     img = cv2.imread(filename, 0)
-    #w, h = img.shape[::-1]
-    #print("%d,%d"%(w,h))
     img = cv2.resize(img, (2100, 2964))
+
     #img = cv2.resize(img, (1000, 1500))
     # markeと同じ画像の位置を取得する
     res_gaku = cv2.matchTemplate(img, marker, cv2.TM_CCOEFF_NORMED)
@@ -146,35 +231,50 @@ def get_answer_list(filename):
     #組織ID、テストID、ユーザIDを取得する
     img_info = img[mark_list[0]['y']-25: mark_list[0]['y']+140, mark_list[0]['x']+90: mark_list[0]['x']+1805]
     img_info = cv2.resize(img_info, (1400, 200))
+    #imgshow( img_info )
     org_id = img_info[0:100, 348:695]
     test_id = img_info[0:100, 1050:1400]
     user_id = img_info[104:200, 348:695]
-    org_id = cv2.resize(org_id,(400,100))
-    test_id = cv2.resize(test_id,(400,100))
-    user_id = cv2.resize(user_id,(400,100))
+    org_id = cv2.resize(org_id,(350,100))
+    test_id = cv2.resize(test_id,(350,100))
+    user_id = cv2.resize(user_id,(350,100))
 
+
+
+    ainum = Ainum()
     #白黒チェンジ
     res , org_id = bwchange( org_id )
-    ainum = Ainum()
-
     o_n = ""
-    for c in range(4):
-        o_num = org_id[5:90 , (c*40)+10:(c*40)+50]
-        o_num = cv2.resize(o_num,(28,28))
-        o_n = o_n + str( ainum.get_num( o_num ) )
-    res,test_id = bwchange( test_id )
 
-    t_n = ""
+    #imgshow( org_id )
     for c in range(4):
-        test_num = test_id[5:90 ,(c*40)+10:(c*40)+50]
+        o_num = org_id[10:90 , (c*42)+15:(c*42)+57]
+        o_num = cv2.resize(o_num,(28,28))
+        o_num = img_center( o_num )
+        #imgshow(o_num)
+        o_n = o_n + str( ainum.get_num( o_num ) )
+
+    res,test_id = bwchange( test_id )
+    t_n = ""
+
+    #imgshow( test_id )
+    for c in range(4):
+        test_num = test_id[10:90 ,(c*42)+15:(c*42)+57]
         test_num = cv2.resize(test_num,(28,28))
+        test_num = img_center( test_num )
+        #imgshow(test_num)
         t_n = t_n + str( ainum.get_num(test_num) )
+
     res,user_id = bwchange( user_id )
 
     u_n = ""
+
+    #imgshow( user_id )
     for c in range(8):
-        user_num = user_id[5:90 , (c*40)+10:(c*40)+50 ]
+        user_num = user_id[10:90 , (c*40)+15:(c*40)+55 ]
         user_num = cv2.resize( user_num , (28,28) )
+        user_num = img_center( user_num )
+        #imgshow(user_num)
         u_n = u_n + str( ainum.get_num(user_num) )
 
     # 列数
@@ -188,14 +288,19 @@ def get_answer_list(filename):
             img_ans = img[ mark_list[r]['y']-15:mark_list[r]['y']+55 , mark_list[r]['x']+85: 1950]
             # リサイズ
             img_ans = cv2.resize(img_ans, (n_col * 30, 30))
+            #img_ans = cv2.cvtColor( img_ans,cv2.COLOR_GRAY2RGBA)
+
             # 黒白に変換
             res_gaku, img_ans = bwchange(img_ans)
+            #imgshow( img_ans )
             img_ans = 255 - img_ans
-
+            #imgshow( img_ans )
             #1～20の答え
             area_sum1 = []
             for col in range(1,5):
                 tmp_img = img_ans[5:90 , col * 30 : col * 30 + 30 ]
+                #print( col )
+                #imgshow( tmp_img )
                 val = np.sum(tmp_img)
                 if val > 35000:
                     area_sum1.append(val)
@@ -203,9 +308,12 @@ def get_answer_list(filename):
                     area_sum1.append(0)
             result[0].append( area_sum1 > np.median(area_sum1) * 3)
 
+            #21～40の答え
             area_sum2 = []
             for col in range(6,10):
                 tmp_img = img_ans[5:90, col * 30: col * 30 + 30 ]
+                #print( col )
+                #imgshow( tmp_img )
                 val = np.sum(tmp_img)
                 if val > 35000:
                     area_sum2.append(val)
@@ -214,9 +322,12 @@ def get_answer_list(filename):
 
             result[1].append( area_sum2 > np.median(area_sum2) * 3 )
 
+            #41～60の答え
             area_sum3 = []
             for col in range(11,15):
                 tmp_img = img_ans[5:90, col * 30: col * 30 + 30 ]
+                #print( col )
+                #imgshow( tmp_img )
                 val = np.sum(tmp_img)
                 if val > 35000:
                     area_sum3.append(val)
@@ -224,9 +335,12 @@ def get_answer_list(filename):
                     area_sum3.append(0)
             result[2].append( area_sum3 > np.median(area_sum3) * 3 )
 
+            #61～80の答え
             area_sum4 = []
             for col in range(16,20):
                 tmp_img = img_ans[5:90, col * 30: col * 30 +30 ]
+                #print( col )
+                #imgshow( tmp_img )
                 val = np.sum(tmp_img)
                 if val > 35000:
                     area_sum4.append(val)
@@ -256,10 +370,10 @@ def get_answer_list(filename):
     return o_n,t_n,u_n, answerlist
 
 if __name__ == "__main__":
-    files = os.listdir('media/exam/0002/')
+    files = os.listdir('media/exam/0001/')
     #print(files)
     for file in files:
-        org_id,test_id,user_id , answerlist = get_answer_list('media/exam/0002/%s' % file)
+        org_id,test_id,user_id , answerlist = get_answer_list('media/exam/0001/%s' % file)
         print("org_id:%s"%org_id)
         print("test_id:%s"%test_id)
         print("user_id:%s"%user_id)

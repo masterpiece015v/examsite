@@ -6,15 +6,15 @@
 
 {% block main %}
 <div class="row">
-
     <div class="col-md-3">
+        <p> {{ message }} </p>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
             <div class="input-group">
                 <label class="input-group-btn">
                     <span class="btn btn-primary">
-                        Choose File<input type="file" style="display:none" name="file">
+                        Choose File<input type="file" style="display:none" name="file" multiple accept="image/jpeg">
                     </span>
                 </label>
 
@@ -27,11 +27,12 @@
             </div>
         </form>
 
-        <form>
+        <form method="POST">
+            {% csrf_token %}
             <div class="form-group">
                 <select size="10" class="form-control" name="del">
                     {% for file in filelist %}
-                    <option value="{{file}}"> {{ file }}</option>
+                    <option value="{{ file.image }}"> {{ file.image }},{{ file.t_id }},{{ file.u_id }} </option>
                     {% endfor %}
                 </select>
                 <input type="submit" value="delete" class="btn btn-primary">
@@ -39,6 +40,16 @@
 
         </form>
 
+    </div>
+    <div class="col-md-3">
+        <p>{{ t_id }},{{ u_id }}</p>
+        <table>
+            {% for al in answerlist %}
+            <tr>
+                <td>{{ al }}</td>
+            </tr>
+            {% endfor %}
+        </table>
     </div>
 </div>
 

@@ -27,9 +27,9 @@ class User( models.Model ):
     u_pass = models.CharField(max_length=20)
     u_name = models.CharField(max_length=40)
     o = models.ForeignKey(Org,on_delete=models.CASCADE )
-    u_admin = models.SmallIntegerField(default=0)    #管理者
-    u_enable = models.SmallIntegerField(default=1)    #ユーザの有効（期限切れまたはロックに使用）
-    u_hidden = models.SmallIntegerField(default=0)   #ユーザを隠す
+    u_admin = models.SmallIntegerField(default=0)   #管理者
+    u_enable = models.SmallIntegerField(default=1)  #ユーザの有効（期限切れまたはロックに使用）
+    u_hidden = models.SmallIntegerField(default=0)  #ユーザを隠す
     u_date = models.DateField()
     def pass_check(self,u_pass):
         return self.u_pass == u_pass
@@ -41,7 +41,7 @@ class AccessLog( models.Model ):
     a_date = models.DateTimeField()
     a_ipa = models.CharField(max_length=100)
     a_page = models.CharField(max_length=100)
-    a_state = models.CharField(max_length=1)  #ログイン成功、失敗
+    a_state = models.CharField(max_length=1)        #ログイン成功、失敗
 
 class Classify( models.Model ):
     c_id = models.CharField( max_length=6,primary_key=True )
@@ -80,10 +80,12 @@ class LittleTest( models.Model ):
         return classify
 
 class ResultTest( models.Model ):
-    t = models.ForeignKey( LittleTest,on_delete=models.CASCADE)
     u = models.ForeignKey( User,on_delete=models.CASCADE)
+    t_id = models.CharField( max_length=4 )
+    t_num = models.CharField( max_length=4 )
     r_answer = models.CharField( max_length=1 )
     r_date = models.DateTimeField()
+
 
 class SuperUser( models.Model ):
     u_id = models.CharField( max_length=40 , primary_key=True)

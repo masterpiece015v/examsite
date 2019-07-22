@@ -11,7 +11,6 @@ urlpatterns = [
     url(r'^newuser/$', views.newuser, name='newuser'),
     url(r'^orgregister/$',views.orgregister,name='orgregister'),
     url(r'^mainpage/$',views.mainpage,name='mainpage'),
-    url(r'^test/$',views.test, name='test'),
     url(r'^inquiry/$',views.inquiry,name='inquiry'),
     url(r'^addlicense/$',views.addlicense,name='addlicense'),
     url(r'^addlicense_conf/$',views.addlicense_conf,name='addlicense_conf'),
