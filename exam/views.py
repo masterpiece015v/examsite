@@ -696,7 +696,7 @@ def answerupload( request ):
 
     # アップするファイルのパス
     o_id = request.session['o_id']
-    media_path = os.path.join(settings.STATIC_ROOT, "exam","answer", o_id)
+    media_path = "/static/exam/answer/" + o_id
 
     if request.method != 'POST':
         answerimage = AnswerImage.objects.all()
