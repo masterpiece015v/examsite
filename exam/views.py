@@ -690,13 +690,14 @@ def gettestprint( request ):
         list.append(dic)
 
     return HttpResponseJson( list )
+
 #解答のアップロード
 def answerupload( request ):
     securecheck( request )
 
     # アップするファイルのパス
     o_id = request.session['o_id']
-    media_path = "/static/exam/answer/" + o_id
+    media_path = "static/exam/answer/" + o_id
 
     if request.method != 'POST':
         answerimage = AnswerImage.objects.all()
