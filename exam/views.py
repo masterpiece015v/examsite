@@ -20,12 +20,10 @@ def addAccessLog(request,a_page,a_state):
     ipa = request.environ['REMOTE_ADDR']
     alog = AccessLog(u_id=u_id, a_date=datetime.datetime.now(), a_ipa=ipa, a_page=a_page, a_state=a_state)
     alog.save()
-
 #ランダムな文字を作る関数
 def randomCharacter(n):
     c = string.ascii_lowercase + string.ascii_uppercase + string.digits
     return ''.join([random.choice(c) for i in range(n)])
-
 #000Xのコードを作成する
 def code4( c ):
     if c < 10:
@@ -36,7 +34,6 @@ def code4( c ):
         return '0' + str( c )
     else:
         return str( c )
-
 #認証システム（キーの追加）
 def auth_add(auth_kind,auth_value):
     auth_key = randomCharacter(40)
@@ -44,7 +41,6 @@ def auth_add(auth_kind,auth_value):
     auth = Auth(auth_key,auth_kind,auth_value,auth_date)
     auth.save()
     return auth_key
-
 #ブルートフォースをチェックする
 def checkBruteforce(u_id,a_page):
     delta = datetime.datetime.now() - datetime.timedelta(minutes=10)
@@ -55,16 +51,13 @@ def checkBruteforce(u_id,a_page):
     else:
         #攻撃されていない
         return False
-
 #ajaxのPOSTデータをDictionaryに変換する
 def byteToDic( data ):
     return  ast.literal_eval( data.decode() )
-
 #セッションにu_idを含むかをチェックする
 def securecheck( request ):
     if 'u_id' not in request.session:
         return render( request,'exam/errorpage.html',{'message','不正なアクセスです。'})
-
 #HttpResponseのJSON
 def HttpResponseJson( jsonobj ):
     jsonStr = json.dumps( jsonobj , ensure_ascii=False, indent=2)
@@ -75,7 +68,6 @@ def HttpResponseJson( jsonobj ):
 def index( request):
     request.session.clear()
     return render(request, 'exam/index.html')
-
 #新規ユーザ登録
 def newuser( request ):
     if request.method != "POST":
@@ -100,7 +92,6 @@ def newuser( request ):
 
     #メールアドレスが存在したので登録できない
     return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
-
 #アカウント登録
 def orgregister( request ):
     #入力フォームを取得するリクエスト
@@ -158,7 +149,6 @@ def orgregister( request ):
     #不要な認証キーの削除
     auth.delete()
     return HttpResponseRedirect('/exam/')
-
 #メインページ
 def mainpage( request ):
     #セッションIDがある(戻るボタンなどで帰ってきたとき用)
@@ -227,7 +217,6 @@ def mainpage( request ):
     else:
         addAccessLog(request,'mainpage','f')
         return render( request,'exam/index.html',{'message':'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
-
 #管理者問い合わせ
 def inquiry( request ):
     #POSTでない
@@ -307,7 +296,6 @@ def inquiry( request ):
         EmailMessage('ユーザID',con,to=[u_email,]).send()
 
         return render( request,'exam/message.html',{'message':'登録されているメールアドレスにユーザIDをお送りしました。'})
-
 #ライセンスの購入
 def addlicense( request ):
     #セッションにユーザIDの記録がない
@@ -317,7 +305,6 @@ def addlicense( request ):
     org = Org.objects.get(o_id=o_id)
     o_name = org.o_name
     return render( request,'exam/addlicense.html',{'o_id':o_id,'o_name':o_name,'u_admin':request.session['u_admin']})
-
 #ライセンスの購入
 def addlicense_conf( request ):
     message = """
@@ -334,7 +321,6 @@ def addlicense_conf( request ):
     bodystr = "o_id:%s,l_num:%s"%(o_id,l_num)
     EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['masterpiece.015v@gmail.com',]).send()
     return render( request, 'exam/message.html',{'message':message})
-
 #ログオフ
 def logoff( request ):
     request.session['u_id'] = ""
@@ -349,7 +335,6 @@ def testmake( request ):
     q_test = Question.objects.values('q_test').distinct()
 
     return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
-
 #テスト印刷画面
 def testprint( request ):
     securecheck( request )
@@ -359,7 +344,6 @@ def testprint( request ):
     test_list = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
     print( test_list )
     return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
-
 #解答用紙印刷
 def answersheetprint( request ):
     o_id = request.session['o_id']
@@ -371,7 +355,6 @@ def answersheetprint( request ):
         dic['t_date'] = t['t_date']
         list.append( dic )
     return render( request, 'exam/answersheetprint.html',{'test':list,'u_admin':request.session['u_admin']})
-
 #解答用紙印刷
 def answersheetprint_conf( request ):
     t_id = byteToDic( request.body )['t_id']
@@ -397,11 +380,9 @@ def answersheetprint_conf( request ):
     list = {'t_list':t_list,'u_list':u_list , 'o_id':o_id }
     print( list )
     return HttpResponseJson( list )
-
 #サイト管理者ログイン
 def salogin( request ):
     return render( request,'exam/salogin.html')
-
 #サイト管理者ページ
 def sapage( request ):
     #u_idやパスワードを持っていない
@@ -434,7 +415,6 @@ def sapage( request ):
 
     addAccessLog(request, 'sapage', 'f')
     return render( request, 'exam/errorpage.html',{'message','ログインできません。'})
-
 #スーパーユーザがライセンス追加を許可する
 def saaddlicense( request ):
     org = Org.objects.all()
@@ -547,7 +527,6 @@ def userregistercsv( request ):
     else:
         return render(request, 'exam/userregistercsv.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregistercsv.html',{'u_admin':request.session['u_admin']})
-
 #組織内ユーザの追加Web版
 def userregisterweb( request ):
     securecheck(request)
@@ -592,6 +571,8 @@ def userregisterweb( request ):
     else:
         return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
+def analysis( request):
+    return
 
 #ajaxの応答
 #分類名を取得する
@@ -619,7 +600,6 @@ def getclass( request ):
             dic = {c["s_id"] : c["s_name"]}
             dics.update( dic )
     return HttpResponseJson(dics)
-
 #問題を取得する(ajax)
 def getquestion( request ):
     q_dic = byteToDic( request.body )
@@ -666,7 +646,6 @@ def getquestion( request ):
                 ary.append( dic )
 
     return HttpResponseJson(ary)
-
 #作ったテストをデータベースにアップする
 def testupdate( request ):
     securecheck( request )
@@ -692,7 +671,6 @@ def testupdate( request ):
         l_test.save()
 
     return HttpResponse(json.dumps({"state":"ok"}, ensure_ascii=False, indent=2), content_type='application/json', charset='utf-8')
-
 #テストの印刷用データをajaxで取得する
 def gettestprint( request ):
     t_id_dic = byteToDic( request.body )
@@ -712,14 +690,13 @@ def gettestprint( request ):
         list.append(dic)
 
     return HttpResponseJson( list )
-
 #解答のアップロード
 def answerupload( request ):
     securecheck( request )
 
     # アップするファイルのパス
     o_id = request.session['o_id']
-    media_path = os.path.join(settings.MEDIA_ROOT, "exam", o_id)
+    media_path = os.path.join(settings.STATIC_ROOT, "exam","answer", o_id)
 
     if request.method != 'POST':
         answerimage = AnswerImage.objects.all()
