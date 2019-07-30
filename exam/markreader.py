@@ -7,7 +7,7 @@ import numpy as np
 import os
 from django.conf import settings
 
-PATH="/var/www/env/examsite/"
+PATH= os.path.join( settings.BASE_DIR , "exam")
 
 class Ainum:
     sess = tf.InteractiveSession()
@@ -69,7 +69,7 @@ class Ainum:
     #ローカル実行用設定
     #path = "C:\\PythonProject\\examsite"
 
-    saver.restore( sess, os.path.join(PATH,"exam","CNN","CNN.ckpt"))
+    saver.restore( sess, os.path.join(PATH,"CNN","CNN.ckpt"))
     print("学習データを読み込みました")
 
     def get_num(self,source):
