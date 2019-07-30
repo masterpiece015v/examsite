@@ -694,7 +694,6 @@ def gettestprint( request ):
         list.append(dic)
 
     return HttpResponseJson( list )
-
 #解答のアップロード
 def answerupload( request ):
     securecheck( request )
