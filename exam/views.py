@@ -12,6 +12,7 @@ from .forms import AnswerImageForm
 from .markreader import get_answer_list
 import json,ast
 from django.conf import settings
+import glob
 
 #関数
 #アクセスログに追加する
@@ -139,7 +140,9 @@ def orgregister( request ):
 
     org = Org.objects.get(o_id=o_id)
     #メディアディレクトリを作成する
-    media_dir = os.path.join( settings.MEDIA_ROOT , "o_id")
+    media_dir = os.path.join( settings.STATIC_ROOT ,"exam","answer",o_id)
+    #media_dir = "static/exam/answer/" + o_id
+
     os.mkdir( media_dir )
 
     try:
@@ -325,6 +328,7 @@ def addlicense_conf( request ):
 def logoff( request ):
     request.session['u_id'] = ""
     return render( request,'exam/index.html')
+
 #問題選択メイン画面
 def testmake( request ):
     #セッションを持っていない
@@ -697,7 +701,8 @@ def answerupload( request ):
 
     # アップするファイルのパス
     o_id = request.session['o_id']
-    media_path = "static/exam/answer/" + o_id
+    #media_path = "static/exam/answer/" + o_id
+    media_path = os.path.join(settings.STATIC_ROOT,"exam","answer",o_id)
 
     if request.method != 'POST':
         answerimage = AnswerImage.objects.all()
@@ -716,16 +721,13 @@ def answerupload( request ):
         #複数のファイルがアップロードされる
         for uf in upfiles:
             files = os.listdir( media_path )
-
             if len(files)+1 < 10:
                 num = "00" + str( len(files)+1 )
             elif len(files)+1 < 100:
                 num = "0" + str( len(files)+1)
             else:
                 num = str(len(files)+1)
-
             filename = "answer%s.jpg"%num
-
             filepath = os.path.join( media_path , filename )
             dest = open( filepath ,'wb+')
 
@@ -736,21 +738,22 @@ def answerupload( request ):
             org_id, test_id, user_id, answerlist = get_answer_list(filepath)
 
             # 登録チェック
-            check_answerimage = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
+            #check_answer = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
+            check_answer = ResultTest.objects.filter( test_id=test_id,user_id=user_id )
 
             # すでにテストID＋ユーザIDが存在する場合
-            if len( check_answerimage ) >= 1:
+            if len( check_answer ) >= 1:
                 # リストの再取得
-                answerimage = AnswerImage.objects.all()
-                filelist = []
-                for file in answerimage:
-                    filelist.append(file)
-                msg = msg + uf.name
-                #return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。" , "filelist" : filelist })
+                #answerimage = AnswerImage.objects.all()
+                #filelist = []
+                #for file in answerimage:
+                #    filelist.append(file)
+                #msg = msg + uf.name
+                return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。" })
             else:
                 # 画像をデータベースに登録する
-                add_answerimage = AnswerImage( image=filename , o_id=org_id , t_id=test_id , u_id=user_id )
-                add_answerimage.save()
+                #add_answerimage = AnswerImage( image=filename , o_id=org_id , t_id=test_id , u_id=user_id )
+                #add_answerimage.save()
 
                 # 解答をResultTestに登録する
                 date = datetime.datetime.now()
@@ -768,14 +771,18 @@ def answerupload( request ):
                             add_rt = ResultTest(t_id=test_id,t_num=code4(answer[0]),r_answer=answer[1],r_date=date,u_id=user_id)
                         add_rt.save()
                     cnt = cnt + 1
+                #ファイルを削除する
+                filelist = glob.glob( media_path )
+                for file in filelist:
+                    os.remove( os.path.join(media_path, file ) )
 
         # リストの再取得
-        answerimage = AnswerImage.objects.all()
-        filelist = []
-        for file in answerimage:
-            filelist.append( file )
+        #answerimage = AnswerImage.objects.all()
+        #filelist = []
+        #for file in answerimage:
+        #    filelist.append( file )
 
-        return render(request, 'exam/answerupload.html' , { "filelist" : filelist , "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist })
+        return render(request, 'exam/answerupload.html' , { "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist })
 
     elif 'del' in request.POST:
         image = request.POST['del']
