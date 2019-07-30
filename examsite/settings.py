@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'examsitedb',
         'USER': 'webmaster',
         'PASSWORD': 'P@ssword',
-        'HOST': '192.168.11.7',
+        'HOST': '192.168.11.8',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
