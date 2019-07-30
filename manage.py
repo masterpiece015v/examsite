@@ -1,4 +1,4 @@
-#!/var/www/env/denv/bin python
+#!/home/webmaster/dvenv/bin python
 
 import os
 import sys
