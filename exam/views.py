@@ -738,7 +738,7 @@ def answerupload( request ):
 
             # 登録チェック
             #check_answer = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
-            check_answer = ResultTest.objects.filter( test_id=test_id,user_id=user_id )
+            check_answer = ResultTest.objects.filter( t_id=test_id,u_id=user_id )
 
             # すでにテストID＋ユーザIDが存在する場合
             if len( check_answer ) >= 1:
