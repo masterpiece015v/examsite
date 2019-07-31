@@ -3,14 +3,13 @@
 解答マークシートのアップロード
 {% endblock %}
 {% block header %}新規ユーザファイルアップロード{% endblock %}
-
 {% block main %}
 <div class="row">
     <div class="col-md-3">
         <p> {{ message }} </p>
+        <!--解答ファイルをアップロードするフォーム-->
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-
             <div class="input-group">
                 <label class="input-group-btn">
                     <span class="btn btn-primary">
@@ -26,7 +25,7 @@
                 <input type="submit" value="upload" class="btn btn-primary">
             </div>
         </form>
-
+        <!--ファイル名一覧
         <form method="POST">
             {% csrf_token %}
             <div class="form-group">
@@ -39,7 +38,7 @@
             </div>
 
         </form>
-
+        -->
     </div>
     <div class="col-md-3">
         <p>{{ t_id }},{{ u_id }}</p>
