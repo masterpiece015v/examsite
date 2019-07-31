@@ -772,7 +772,7 @@ def answerupload( request ):
                     cnt = cnt + 1
                 #ファイルを削除する
                 filelist = glob.glob( media_path )
-
+                print( filelist )
                 for file in filelist:
                     print( os.path.join(media_path,file))
                     os.remove( os.path.join(media_path, file ) )
