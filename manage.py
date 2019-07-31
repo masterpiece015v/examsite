@@ -1,4 +1,4 @@
-#!/home/webmaster/dvenv/bin python
+#!/home/webmaster/venv/bin python
 
 import os
 import sys
