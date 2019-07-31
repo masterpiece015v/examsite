@@ -201,7 +201,7 @@ def get_answer_list(filename):
     #path = settings.BASE_DIR
     #ローカル実行用設定
 
-    path = os.path.join( PATH , "exam" , "marker.png" )
+    path = os.path.join( PATH , "marker.png" )
     marker = cv2.imread(path, 0)
 
     #画像ファイルの読み込みとサイズ調整
