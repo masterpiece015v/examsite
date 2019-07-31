@@ -771,7 +771,7 @@ def answerupload( request ):
                         add_rt.save()
                     cnt = cnt + 1
                 #ファイルを削除する
-                filelist = glob.glob( media_path )
+                filelist = glob.glob( media_path + '/*')
                 print( filelist )
                 for file in filelist:
                     print( os.path.join(media_path,file))
