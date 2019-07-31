@@ -14,6 +14,9 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_URL='/static/'
+MEDIA_ROOT = os.path.join(BASE_DIR , 'exam' , 'media')
+STATIC_ROOT = os.path.join( BASE_DIR,'static')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
@@ -22,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5mglp@=prz1t@c1w9-z$+$7msj%p)0^!-p%50wb*kn6r0g9n+h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -123,13 +126,8 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
-
-STATIC_URL='/static/'
-MEDIA_ROOT = os.path.join(BASE_DIR , 'exam' , 'media')
-STATIC_ROOT = os.path.join( BASE_DIR,'static')
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
