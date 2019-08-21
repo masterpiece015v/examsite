@@ -63,7 +63,7 @@ class Ainum:
     y_conv = tf.nn.softmax( tf.matmul( h_fc1 , W_fc2 ) + b_fc2 )
     sess.run( tf.initialize_all_variables() )
 
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
 
     #django用設定
     #path = settings.BASE_DIR
@@ -207,7 +207,6 @@ def get_answer_list(filename):
     log_write( path )
     try:
         marker = cv2.imread(path, 0)
-
     except Exception as e:
         log_write( e )
 
