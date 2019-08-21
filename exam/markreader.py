@@ -9,6 +9,8 @@ from django.conf import settings
 from .logger import log_write
 
 PATH= os.path.join( settings.BASE_DIR , "exam")
+STATIC_PATH = os.path.join(settings.STATIC_ROOT, "exam", "data")
+
 
 class Ainum:
     sess = tf.InteractiveSession()
@@ -202,7 +204,7 @@ def get_answer_list(filename):
     #path = settings.BASE_DIR
     #ローカル実行用設定
 
-    path = os.path.join( PATH , "marker.png" )
+    path = os.path.join( STATIC_PATH , "marker.png" )
     #log_write("a2")
     marker = cv2.imread(path, 0)
     log_write("a3")
