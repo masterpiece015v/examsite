@@ -6,6 +6,7 @@ from matplotlib import pylab as plt
 import numpy as np
 import os
 from django.conf import settings
+from .logger import log_write
 
 PATH= os.path.join( settings.BASE_DIR , "exam")
 
@@ -202,8 +203,9 @@ def get_answer_list(filename):
     #ローカル実行用設定
 
     path = os.path.join( PATH , "marker.png" )
+    log_write("a2")
     marker = cv2.imread(path, 0)
-
+    
     #画像ファイルの読み込みとサイズ調整
     img = cv2.imread(filename, 0)
     img = cv2.resize(img, (2100, 2964))
