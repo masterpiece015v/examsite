@@ -13,6 +13,7 @@ from .markreader import get_answer_list
 import json,ast
 from django.conf import settings
 import glob
+from .logger import log_write
 
 #関数
 #アクセスログに追加する
@@ -734,7 +735,10 @@ def answerupload( request ):
                 dest.write( chunk )
 
             # 画像認識
+
+            log_write("a")
             org_id, test_id, user_id, answerlist = get_answer_list(filepath)
+            log_write(org_id)
 
             # 登録チェック
             #check_answer = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
