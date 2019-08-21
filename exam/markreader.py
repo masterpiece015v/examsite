@@ -205,8 +205,11 @@ def get_answer_list(filename):
 
     path = os.path.join( STATIC_PATH , "marker.png" )
     log_write( path )
+    try:
+        marker = cv2.imread(path, 0)
 
-    marker = cv2.imread(path, 0)
+    except Exception as e:
+        log_write( e )
 
     log_write("a3")
     #画像ファイルの読み込みとサイズ調整
