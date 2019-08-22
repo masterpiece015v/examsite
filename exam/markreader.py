@@ -242,8 +242,6 @@ def get_answer_list(filename):
     test_id = cv2.resize(test_id,(350,100))
     user_id = cv2.resize(user_id,(350,100))
 
-
-
     ainum = Ainum()
     #白黒チェンジ
     res , org_id = bwchange( org_id )

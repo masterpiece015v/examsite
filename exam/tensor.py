@@ -61,8 +61,8 @@ class Ainum:
 
     path = settings.BASE_DIR
     print( path )
-    #saver.restore( sess, os.path.join(path,"exam","CNN","CNN.ckpt"))
-    saver.restore( sess, "/var/www/env/examsite/exam/CNN/CNN.ckpt")
+    saver.restore( sess, os.path.join(path,"exam","CNN","CNN.ckpt"))
+    #saver.restore( sess, "/var/www/env/examsite/exam/CNN/CNN.ckpt")
     print("学習データを読み込みました")
 
     def get_num(self,source):
