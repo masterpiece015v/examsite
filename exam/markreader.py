@@ -204,13 +204,9 @@ def get_answer_list(filename):
     #ローカル実行用設定
 
     path = os.path.join( STATIC_PATH , "marker.png" )
-    log_write( path )
-    try:
-        marker = cv2.imread(path, 0)
-    except Exception as e:
-        log_write( e )
 
-    log_write("a3")
+    marker = cv2.imread(path, 0)
+
     #画像ファイルの読み込みとサイズ調整
     img = cv2.imread(filename, 0)
     img = cv2.resize(img, (2100, 2964))

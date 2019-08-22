@@ -738,7 +738,7 @@ def answerupload( request ):
 
             #log_write("a")
             org_id, test_id, user_id, answerlist = get_answer_list(filepath)
-            log_write(org_id)
+            #log_write(org_id)
 
             # 登録チェック
             #check_answer = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
