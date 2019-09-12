@@ -338,9 +338,18 @@ def testmake( request ):
 
     l_class_list = Classify.objects.values('l_id','l_name').distinct()
     q_test = Question.objects.values('q_test').distinct()
-    q_period = Question.objects.filter(q_test='ap').values('q_period').distinct()
 
-    return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'q_period':q_period,'u_admin':request.session['u_admin']})
+    return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
+
+def testmakeperiod( request ):
+    #セッションを持っていない
+    if 'u_id' not in request.session:
+        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+
+    l_class_list = Classify.objects.values('l_id','l_name').distinct()
+    q_test = Question.objects.values('q_test').distinct()
+
+    return render(request,'exam/testmakeperiod.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
 
 #テスト印刷画面

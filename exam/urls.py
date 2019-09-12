@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^addlicense/$',views.addlicense,name='addlicense'),
     url(r'^addlicense_conf/$',views.addlicense_conf,name='addlicense_conf'),
     url(r'^testmake/$',views.testmake,name='testmake'),
+    url(r'^testmakeperiod/$',views.testmakeperiod,name='testmakeperiod'),
     url(r'^getclass/$',views.getclass,name='getclass'),
     url(r'^getquestion/$', views.getquestion, name='getquestion'),
     url(r'^testprint/$',views.testprint,name='testprint'),
