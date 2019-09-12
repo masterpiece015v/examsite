@@ -125,11 +125,10 @@ $(function(){
             //全クリア
             $( child_class ).children().remove();
             //追加
-            Object.keys(data).forEach( function( key ){
-                alert( key );
-                $option = $('<option>').val( key ).text( data[key] );
+            for( var i = 0 , len=data.length; i<len;++i){
+                $option = $('<option>').val( data[i]['q_period'] ).text( data[i]['q_period'] );
                 $( child_class ).append( $option );
-            });
+            }
         }).fail( (data)=>{
             alert( 'fail' );
         }).always( (data) => {
