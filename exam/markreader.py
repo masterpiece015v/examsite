@@ -9,7 +9,7 @@ from django.conf import settings
 from .logger import log_write
 
 PATH= os.path.join( settings.BASE_DIR , "exam")
-STATIC_PATH = os.path.join(settings.STATIC_ROOT, "exam", "data")
+STATIC_PATH = os.path.join( PATH , 'static' , "exam", "data")
 
 class Ainum:
     sess = tf.compat.v1.InteractiveSession()
