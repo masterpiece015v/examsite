@@ -658,13 +658,13 @@ def getperiod( request ):
 #問題を取得する(ajax)
 def getquestion( request ):
     q_dic = byteToDic( request.body )
+    ary = []
     if 'l_class' in q_dic and 'm_class' in q_dic and 's_class' in q_dic:
         l_id = q_dic['l_class']
         m_id = q_dic['m_class']
         s_id = q_dic['s_class']
         q_test = q_dic['q_test']
         classify = Classify.objects.filter(l_id=l_id,m_id=m_id,s_id=s_id)
-        ary = []
         for c in classify:
             question = c.question_set.all().filter(q_test=q_test).order_by('c_id','q_title')
             for q in question:
@@ -672,13 +672,22 @@ def getquestion( request ):
                 dic['q_id'] = q.q_id
                 dic['q_title'] = q.q_title
                 ary.append( dic )
-
     elif 'l_class' in q_dic and 'm_class' in q_dic:
         l_id = q_dic['l_class']
         m_id = q_dic['m_class']
         q_test = q_dic['q_test']
         classify = Classify.objects.filter(l_id=l_id,m_id=m_id)
-        ary = []
+        for c in classify:
+            question = c.question_set.all().filter(q_test=q_test).order_by('c_id','q_title')
+            for q in question:
+                dic = {}
+                dic['q_id'] = q.q_id
+                dic['q_title'] = q.q_title
+                ary.append( dic )
+    elif 'l_class' in q_dic:
+        l_id = q_dic['l_class']
+        q_test = q_dic['q_test']
+        classify = Classify.objects.filter( l_id=l_id )
         for c in classify:
             question = c.question_set.all().filter(q_test=q_test).order_by('c_id','q_title')
             for q in question:
@@ -687,23 +696,10 @@ def getquestion( request ):
                 dic['q_title'] = q.q_title
                 ary.append( dic )
 
-    elif 'l_class' in q_dic:
-        l_id = q_dic['l_class']
-        q_test = q_dic['q_test']
-        classify = Classify.objects.filter( l_id=l_id )
-        ary = []
-        for c in classify:
-            question = c.question_set.all().filter(q_test=q_test).order_by('c_id','q_title')
-            for q in question:
-                dic = {}
-                dic['q_id'] = q.q_id
-                dic['q_title'] = q.q_title
-                ary.append( dic )
     elif 'q_test' in q_dic and 'q_period' in q_dic:
         q_test = q_dic['q_test']
         q_period = q_dic['q_period']
         question = Question.objects.filter( q_test=q_test,q_period=q_period).distinct()
-        ary = []
         for q in question:
             dic = {}
             dic['q_id'] = q.q_id
