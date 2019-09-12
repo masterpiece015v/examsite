@@ -125,6 +125,7 @@ $(function(){
             //全クリア
             $( child_class ).children().remove();
             //追加
+            alert( data );
             Object.keys(data).forEach( function( key ){
                 $option = $('<option>').val( key ).text( data[key] );
                 $( child_class ).append( $option );
