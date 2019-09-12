@@ -136,8 +136,9 @@ $(function(){
     }
 
     //試験のクリックイベント
-    $("#q_test").on('click',function() {
+    $("#q_test").on('change',function() {
         var json = {'q_test':$('#q_test').val() }
+        alert( json );
         ajax_getperiod('#q_period',json );
     });
 
