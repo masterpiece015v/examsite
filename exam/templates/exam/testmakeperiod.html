@@ -48,7 +48,7 @@
         <div class="form-group">
             <label for="q_period" style="font-size:12pt;">年度期</label>
             <select id="q_period" site="5" style="width:180px;height:100px;font-size:9pt" class="form-control">
-                {% for period in q_period %}
+                {% for period in q_period_list %}
                 <option value="{{ period.q_period }}">{{ period.q_period }}</option>
                 {% endfor%}
             </select>
