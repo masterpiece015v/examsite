@@ -644,15 +644,16 @@ def getclass( request ):
 def getperiod( request ):
 
     c_dic = byteToDic( request.body )
+    ary = []
     if 'q_test' in c_dic:
         q_test = c_dic['q_test']
         classify = Question.objects.filter(q_test=q_test).values('q_period').distinct()
         dics = {}
         for c in classify:
             dic = { 'q_period' : c["q_period"] }
-            dics.update( dic )
-    print( dics )
-    return HttpResponseJson(dics)
+            ary.append( dic )
+    print( ary )
+    return HttpResponseJson(ary)
 
 #問題を取得する(ajax)
 def getquestion( request ):
