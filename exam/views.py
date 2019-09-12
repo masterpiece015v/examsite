@@ -651,6 +651,7 @@ def getquestion( request ):
                 ary.append( dic )
 
     return HttpResponseJson(ary)
+
 #作ったテストをデータベースにアップする
 def testupdate( request ):
     securecheck( request )
@@ -676,6 +677,7 @@ def testupdate( request ):
         l_test.save()
 
     return HttpResponse(json.dumps({"state":"ok"}, ensure_ascii=False, indent=2), content_type='application/json', charset='utf-8')
+
 #テストの印刷用データをajaxで取得する
 def gettestprint( request ):
     t_id_dic = byteToDic( request.body )
