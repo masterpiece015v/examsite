@@ -107,6 +107,41 @@ $(function(){
         });
     }
 
+    //テストごとの年度期を取得するajax
+    function ajax_period(child_class , query ){
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+
+        $.ajax({
+            type:"POST",
+            url:"/exam/getperiod/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( query ),
+        }).done( (data) => {
+            //全クリア
+            $( child_class ).children().remove();
+            //追加
+            Object.keys(data).forEach( function( key ){
+                $option = $('<option>').val( key ).text( data[key] );
+                $( child_class ).append( $option );
+            });
+        }).fail( (data)=>{
+            alert( 'fail' );
+        }).always( (data) => {
+        });
+    }
+
+
+
+    //試験のクリックイベント
+    $("#q_test").on('click',function()){
+        var json = {'q_test':$('#q_test').val() }
+        ajax_getperiod('#q_period',json )
+    }
     //大分類のリストのクリックイベント
     $("#l_class").on('click',function(){
         //大分類を選択すると中分類を取得する

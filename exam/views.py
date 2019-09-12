@@ -22,10 +22,12 @@ def addAccessLog(request,a_page,a_state):
     ipa = request.environ['REMOTE_ADDR']
     alog = AccessLog(u_id=u_id, a_date=datetime.datetime.now(), a_ipa=ipa, a_page=a_page, a_state=a_state)
     alog.save()
+
 #ランダムな文字を作る関数
 def randomCharacter(n):
     c = string.ascii_lowercase + string.ascii_uppercase + string.digits
     return ''.join([random.choice(c) for i in range(n)])
+
 #000Xのコードを作成する
 def code4( c ):
     if c < 10:
@@ -36,6 +38,7 @@ def code4( c ):
         return '0' + str( c )
     else:
         return str( c )
+
 #認証システム（キーの追加）
 def auth_add(auth_kind,auth_value):
     auth_key = randomCharacter(40)
@@ -43,6 +46,7 @@ def auth_add(auth_kind,auth_value):
     auth = Auth(auth_key,auth_kind,auth_value,auth_date)
     auth.save()
     return auth_key
+
 #ブルートフォースをチェックする
 def checkBruteforce(u_id,a_page):
     delta = datetime.datetime.now() - datetime.timedelta(minutes=10)
@@ -53,13 +57,16 @@ def checkBruteforce(u_id,a_page):
     else:
         #攻撃されていない
         return False
+
 #ajaxのPOSTデータをDictionaryに変換する
 def byteToDic( data ):
     return  ast.literal_eval( data.decode() )
+
 #セッションにu_idを含むかをチェックする
 def securecheck( request ):
     if 'u_id' not in request.session:
         return render( request,'exam/errorpage.html',{'message','不正なアクセスです。'})
+
 #HttpResponseのJSON
 def HttpResponseJson( jsonobj ):
     jsonStr = json.dumps( jsonobj , ensure_ascii=False, indent=2)
@@ -70,6 +77,7 @@ def HttpResponseJson( jsonobj ):
 def index( request):
     request.session.clear()
     return render(request, 'exam/index.html')
+
 #新規ユーザ登録
 def newuser( request ):
     if request.method != "POST":
@@ -94,6 +102,7 @@ def newuser( request ):
 
     #メールアドレスが存在したので登録できない
     return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
+
 #アカウント登録
 def orgregister( request ):
     #入力フォームを取得するリクエスト
@@ -153,6 +162,7 @@ def orgregister( request ):
     #不要な認証キーの削除
     auth.delete()
     return HttpResponseRedirect('/exam/')
+
 #メインページ
 def mainpage( request ):
     #セッションIDがある(戻るボタンなどで帰ってきたとき用)
@@ -221,6 +231,7 @@ def mainpage( request ):
     else:
         addAccessLog(request,'mainpage','f')
         return render( request,'exam/index.html',{'message':'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
+
 #管理者問い合わせ
 def inquiry( request ):
     #POSTでない
@@ -300,6 +311,7 @@ def inquiry( request ):
         EmailMessage('ユーザID',con,to=[u_email,]).send()
 
         return render( request,'exam/message.html',{'message':'登録されているメールアドレスにユーザIDをお送りしました。'})
+
 #ライセンスの購入
 def addlicense( request ):
     #セッションにユーザIDの記録がない
@@ -309,6 +321,7 @@ def addlicense( request ):
     org = Org.objects.get(o_id=o_id)
     o_name = org.o_name
     return render( request,'exam/addlicense.html',{'o_id':o_id,'o_name':o_name,'u_admin':request.session['u_admin']})
+
 #ライセンスの購入
 def addlicense_conf( request ):
     message = """
@@ -324,6 +337,7 @@ def addlicense_conf( request ):
 
     bodystr = "o_id:%s,l_num:%s"%(o_id,l_num)
     EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['masterpiece.015v@gmail.com',]).send()
+
     return render( request, 'exam/message.html',{'message':message})
 #ログオフ
 def logoff( request ):
@@ -341,6 +355,7 @@ def testmake( request ):
 
     return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
+#年度期ごとの問題を作成する画面
 def testmakeperiod( request ):
     #セッションを持っていない
     if 'u_id' not in request.session:
@@ -624,6 +639,22 @@ def getclass( request ):
             dic = {c["s_id"] : c["s_name"]}
             dics.update( dic )
     return HttpResponseJson(dics)
+
+#分類名を取得する
+def getperiod( request ):
+
+    c_dic = byteToDic( request.body )
+
+    if 'q_test' in c_dic:
+        q_test = c_dic['q_test']
+        classify = Question.objects.filter(l_id=q_test).values('q_period').distinct()
+        dics = {}
+        for c in classify:
+            dic = { 'q_period' : c.q_period }
+            dics.update( dic )
+
+    return HttpResponseJson(dics)
+
 #問題を取得する(ajax)
 def getquestion( request ):
     q_dic = byteToDic( request.body )
