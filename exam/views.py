@@ -699,6 +699,16 @@ def getquestion( request ):
                 dic['q_id'] = q.q_id
                 dic['q_title'] = q.q_title
                 ary.append( dic )
+    elif 'q_test' in q_dic and 'q_period' in q_dic:
+        q_test = q_dic['q_test']
+        q_period = q_dic['q_period']
+        question = Question.objects.filter( q_test=q_test,q_period=q_period).distinct()
+        ary = []
+        for q in question:
+            dic = {}
+            dic['q_id'] = q.q_id
+            dic['q_title'] = q.q_title
+            ary.append( dic )
 
     return HttpResponseJson(ary)
 

@@ -175,7 +175,7 @@ $(function(){
         var q_json={"q_test":$('q_test').val(),"q_period":$('#q_period').val()}
         ajax_getquestion( q_json )
     });
-    
+
     //問題数の選択
     $("#q_quantity").on('change',function(){
         $('#sq').children().remove();
