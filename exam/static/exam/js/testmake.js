@@ -173,7 +173,7 @@ $(function(){
     //年度期リストのクリックイベント
     $("#q_period").on('click',function(){
         //選択した年度期の問題を取得する
-        var q_json={"q_test":$('q_test').val(),"q_period":$('#q_period').val()}
+        var q_json={"q_test":$('#q_test').val(),"q_period":$('#q_period').val()}
         ajax_getquestion( q_json );
     });
 
