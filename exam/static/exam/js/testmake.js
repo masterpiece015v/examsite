@@ -138,10 +138,11 @@ $(function(){
 
 
     //試験のクリックイベント
-    $("#q_test").on('click',function()){
+    $("#q_test").on('click',function() {
         var json = {'q_test':$('#q_test').val() }
         ajax_getperiod('#q_period',json )
-    }
+    });
+    
     //大分類のリストのクリックイベント
     $("#l_class").on('click',function(){
         //大分類を選択すると中分類を取得する
