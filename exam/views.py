@@ -346,10 +346,9 @@ def testmakeperiod( request ):
     if 'u_id' not in request.session:
         return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
 
-    l_class_list = Classify.objects.values('l_id','l_name').distinct()
     q_test = Question.objects.values('q_test').distinct()
-
-    return render(request,'exam/testmakeperiod.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
+    q_period_list = Question.objects.filter(q_test='ap').values('q_period').distionct()
+    return render(request,'exam/testmakeperiod.html',{'q_period_list':q_period_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
 
 #テスト印刷画面
