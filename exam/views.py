@@ -645,6 +645,8 @@ def getperiod( request ):
 
     c_dic = byteToDic( request.body )
 
+    print( c_dic )
+
     if 'q_test' in c_dic:
         q_test = c_dic['q_test']
         classify = Question.objects.filter(l_id=q_test).values('q_period').distinct()
