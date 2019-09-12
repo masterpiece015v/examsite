@@ -46,8 +46,8 @@
 <div class="row">
     <div class="col-md-2">
         <div class="form-group">
-            <label for="l_class" style="font-size:9pt;">年度期</label>
-            <select id="l_class" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
+            <label for="q_period" style="font-size:9pt;">年度期</label>
+            <select id="q_period" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
             {% for q_period in q_period_list %}
             <option value="{{ q_period.q_period }}">{{ q_period.q_period }}</option>
             {% endfor %}

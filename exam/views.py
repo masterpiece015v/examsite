@@ -662,7 +662,7 @@ def getquestion( request ):
     q_dic = byteToDic( request.body )
 
     print( q_dic )
-    
+
     ary = []
     if 'l_class' in q_dic and 'm_class' in q_dic and 's_class' in q_dic:
         l_id = q_dic['l_class']
