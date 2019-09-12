@@ -138,7 +138,7 @@ $(function(){
     //試験のクリックイベント
     $("#q_test").on('click',function() {
         var json = {'q_test':$('#q_test').val() }
-        ajax_getperiod('#q_period',json )
+        ajax_getperiod('#q_period',json );
     });
 
     //大分類のリストのクリックイベント
@@ -173,7 +173,7 @@ $(function(){
     $("#q_period").on('click',function(){
         //選択した年度期の問題を取得する
         var q_json={"q_test":$('q_test').val(),"q_period":$('#q_period').val()}
-        ajax_getquestion( q_json )
+        ajax_getquestion( q_json );
     });
 
     //問題数の選択
