@@ -135,14 +135,12 @@ $(function(){
         });
     }
 
-
-
     //試験のクリックイベント
     $("#q_test").on('click',function() {
         var json = {'q_test':$('#q_test').val() }
         ajax_getperiod('#q_period',json )
     });
-    
+
     //大分類のリストのクリックイベント
     $("#l_class").on('click',function(){
         //大分類を選択すると中分類を取得する
@@ -172,11 +170,12 @@ $(function(){
     });
 
     //年度期リストのクリックイベント
-    $("#q_period").on('click',function()){
+    $("#q_period").on('click',function(){
         //選択した年度期の問題を取得する
         var q_json={"q_test":$('q_test').val(),"q_period":$('#q_period').val()}
         ajax_getquestion( q_json )
-    }
+    });
+    
     //問題数の選択
     $("#q_quantity").on('change',function(){
         $('#sq').children().remove();
