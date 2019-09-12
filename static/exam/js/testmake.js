@@ -134,6 +134,12 @@ $(function(){
         ajax_getquestion(q_json);
     });
 
+    //年度期リストのクリックイベント
+    $("#period").on('click',function()){
+        //選択した年度期の問題を取得する
+        var q_json={"q_test":$('q_test').val(),"period":$('#period').val()}
+        ajax_getquestion( q_json )
+    }
     //問題数の選択
     $("#q_quantity").on('change',function(){
         $('#sq').children().remove();
