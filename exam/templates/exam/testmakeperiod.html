@@ -8,14 +8,6 @@
 <div class="row">
     <div class="col-md-8">
         <form class="form-inline">
-            <!--
-            <div class="form-group">
-                <select id="chadd" class="form-control">
-                    <option value="0">追加しない</option>
-                    <option value="1">追加する</option>
-                </select>
-            </div>
-            -->
             <div class="form-group" style="margin-left:10px;">
                 <input type="button" class="form-control" id="q_add" value="追加">
             </div>
@@ -53,22 +45,6 @@
 </div>
 <div class="row">
     <div class="col-md-2">
-        <div class="form-group">
-            <label for="l_class" style="font-size:9pt;">大分類</label>
-            <select id="l_class" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
-            {% for l_class in l_class_list %}
-            <option value="{{ l_class.l_id }}">{{ l_class.l_name }}</option>
-            {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="m_class" style="font-size:12pt;">中分類</label>
-            <select id="m_class" size="5" style="width:180px;height:100px;font-size:9pt" class="form-control"></select>
-        </div>
-        <div class="form-group">
-            <label for="s_class" style="font-size:12pt;">小分類</label>
-            <select id="s_class" size="5" style="width:180px;height:100px;font-size:9pt" class="form-control"></select>
-        </div>
         <div class="form-group">
             <label for="q_period" style="font-size:12pt;">年度期</label>
             <select id="q_period" site="5" style="width:180px;height:100px;font-size:9pt" class="form-control">

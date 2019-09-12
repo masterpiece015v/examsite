@@ -223,6 +223,7 @@ $(function(){
             }
         }
     });
+    
     //問題の追加
     $("#q_add").on('click',function(){
         $('#question').children().each(function(){
