@@ -108,7 +108,7 @@ $(function(){
     }
 
     //テストごとの年度期を取得するajax
-    function ajax_period(child_class , query ){
+    function ajax_getperiod(child_class , query ){
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
                 xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
