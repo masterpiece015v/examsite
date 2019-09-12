@@ -652,7 +652,7 @@ def getperiod( request ):
         classify = Question.objects.filter(q_test=q_test).values('q_period').distinct()
         dics = {}
         for c in classify:
-            dic = { 'q_period' : c.q_period }
+            dic = { 'q_period' : c["q_period"] }
             dics.update( dic )
 
     return HttpResponseJson(dics)
