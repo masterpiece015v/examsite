@@ -126,6 +126,7 @@ $(function(){
             $( child_class ).children().remove();
             //追加
             for( var i = 0 , len=data.length; i<len;++i){
+                print( data[i]['q_period']);
                 $option = $('<option>').val( data[i]['q_period'] ).text( data[i]['q_period'] );
                 $( child_class ).append( $option );
             }
