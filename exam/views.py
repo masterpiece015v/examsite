@@ -660,6 +660,9 @@ def getperiod( request ):
 #問題を取得する(ajax)
 def getquestion( request ):
     q_dic = byteToDic( request.body )
+
+    print( q_dic )
+    
     ary = []
     if 'l_class' in q_dic and 'm_class' in q_dic and 's_class' in q_dic:
         l_id = q_dic['l_class']
@@ -697,7 +700,6 @@ def getquestion( request ):
                 dic['q_id'] = q.q_id
                 dic['q_title'] = q.q_title
                 ary.append( dic )
-
     elif 'q_test' in q_dic and 'q_period' in q_dic:
         q_test = q_dic['q_test']
         q_period = q_dic['q_period']
