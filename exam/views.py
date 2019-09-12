@@ -362,7 +362,7 @@ def testmakeperiod( request ):
         return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
 
     q_test = Question.objects.values('q_test').distinct()
-    q_period_list = Question.objects.filter(q_test='ap').values('q_period').distionct()
+    q_period_list = Question.objects.filter(q_test='ap').values('q_period').distinct()
     return render(request,'exam/testmakeperiod.html',{'q_period_list':q_period_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
 
