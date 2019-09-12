@@ -39,6 +39,7 @@ $(function(){
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
         return csrftoken;
     }
+
     //分類を取得するajax
     function ajax_getclass(child_class , query ){
         $.ajaxSetup({
@@ -282,6 +283,7 @@ $(function(){
         });
         $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
     });
+
     //テストの作成
     $("#q_make").on('click',function(){
         var q_json = {}

@@ -330,7 +330,7 @@ def logoff( request ):
     request.session['u_id'] = ""
     return render( request,'exam/index.html')
 
-#問題選択メイン画面
+#問題作成メイン画面
 def testmake( request ):
     #セッションを持っていない
     if 'u_id' not in request.session:
@@ -338,8 +338,11 @@ def testmake( request ):
 
     l_class_list = Classify.objects.values('l_id','l_name').distinct()
     q_test = Question.objects.values('q_test').distinct()
+    q_period = Question.objects.filter(q_test='ap').values('q_period').distinct()
 
-    return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
+    return render(request,'exam/testmake.html',{'l_class_list':l_class_list , 'q_test':q_test,'q_period':q_period,'u_admin':request.session['u_admin']})
+
+
 #テスト印刷画面
 def testprint( request ):
     securecheck( request )
@@ -385,9 +388,11 @@ def answersheetprint_conf( request ):
     list = {'t_list':t_list,'u_list':u_list , 'o_id':o_id }
     print( list )
     return HttpResponseJson( list )
+
 #サイト管理者ログイン
 def salogin( request ):
     return render( request,'exam/salogin.html')
+
 #サイト管理者ページ
 def sapage( request ):
     #u_idやパスワードを持っていない
@@ -420,6 +425,7 @@ def sapage( request ):
 
     addAccessLog(request, 'sapage', 'f')
     return render( request, 'exam/errorpage.html',{'message','ログインできません。'})
+
 #スーパーユーザがライセンス追加を許可する
 def saaddlicense( request ):
     org = Org.objects.all()
@@ -431,6 +437,7 @@ def saaddlicense( request ):
         dic['l_num'] = o.l_num
         list.append( dic )
     return render( request,'exam/saaddlicense.html',{'org_list':list})
+
 #組織ごとのフィルタ
 def saaddlicense_filter( request ):
     dic = byteToDic( request.body )
@@ -448,6 +455,7 @@ def saaddlicense_filter( request ):
         list.append( d )
     jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
     return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
+
 #ライセンス追加confirm
 def saaddlicense_conf( request ):
     dics = byteToDic(request.body)
@@ -470,6 +478,7 @@ def saaddlicense_conf( request ):
         list.append( dict )
     jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
     return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
+
 #組織内ユーザの追加csv番
 def userregistercsv( request ):
     securecheck( request )
@@ -532,6 +541,7 @@ def userregistercsv( request ):
     else:
         return render(request, 'exam/userregistercsv.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregistercsv.html',{'u_admin':request.session['u_admin']})
+
 #組織内ユーザの追加Web版
 def userregisterweb( request ):
     securecheck(request)
@@ -576,6 +586,7 @@ def userregisterweb( request ):
     else:
         return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
+
 def analysis( request):
     return
 
