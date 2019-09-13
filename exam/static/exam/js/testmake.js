@@ -360,6 +360,8 @@ $(function(){
 
         q_json['q_list'] = q_list;
 
+        console.log( q_list );
+
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
                 xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
