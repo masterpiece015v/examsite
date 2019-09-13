@@ -136,7 +136,7 @@ $(function(){
         });
     }
 
-    //試験のクリックイベント
+    //ap,feの選択
     $("#q_test").on('change',function() {
         var json = {'q_test':$('#q_test').val() }
         //alert( json['q_test'] );
@@ -355,7 +355,7 @@ $(function(){
                 }
                 cnt = cnt + 1;
             });
-            cosole.log( data );
+            console.log( data );
             q_list.push( data );
         });
 
