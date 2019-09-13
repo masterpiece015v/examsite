@@ -204,7 +204,7 @@ $(function(){
                         $mtd = $("<td>")
                         $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "'>");
                         $mtd.append( $img );
-                        console.log('/static/exam/image/question/' + $(this).text() + '.png' );
+                        //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
                         $mtr2 = $("<tr>").append( $mtd )
                         $('#msq').append( $mtr2 );
                     }
@@ -279,7 +279,7 @@ $(function(){
                     $mtd = $("<td>")
                     $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "'>");
                     $mtd.append( $img );
-                    console.log('/static/exam/image/question/' + $(this).text() + '.png' );
+                    //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
                     $mtr2 = $("<tr>").append( $mtd )
                     $('#msq').append( $mtr2 );
                 }
@@ -355,12 +355,13 @@ $(function(){
                 }
                 cnt = cnt + 1;
             });
+            cosole.log( data );
             q_list.push( data );
         });
 
         q_json['q_list'] = q_list;
 
-        console.log( q_list );
+        //console.log( q_list );
 
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
