@@ -327,7 +327,9 @@ $(function(){
         var q_json = {}
         q_json['chadd'] = $('#chadd').val();
         q_json['q_test'] = $('#q_test').val();
-
+        console.log( q_json['chadd'] );
+        console.log( q_json['q_test']);
+        
         if ( $('#l_class').val() !== null){
             q_json['l_class'] = $('#l_class').val();
         }
