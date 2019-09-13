@@ -311,7 +311,7 @@ $(function(){
                     $mtd = $("<td>")
                     $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "'>");
                     $mtd.append( $img );
-                    console.log('/static/exam/image/question/' + $(this).text() + '.png' );
+                    //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
                     $mtr2 = $("<tr>").append( $mtd )
                     $('#msq').append( $mtr2 );
                 }
