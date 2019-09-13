@@ -728,6 +728,7 @@ def testupdate( request ):
     q_list = test_dic['q_list']
     t_date = datetime.datetime.now()
     for item in q_list:
+        print( item )
         t_num = item['t_num']
         t_key = o_id + t_id + t_num
         q_id = item['q_id']
