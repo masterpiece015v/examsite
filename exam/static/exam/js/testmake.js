@@ -329,7 +329,7 @@ $(function(){
         q_json['q_test'] = $('#q_test').val();
         console.log( q_json['chadd'] );
         console.log( q_json['q_test']);
-        
+
         if ( $('#l_class').val() !== null){
             q_json['l_class'] = $('#l_class').val();
         }
@@ -387,4 +387,58 @@ $(function(){
         });
     });
 
+    //テストの作成
+    $("#q_make_period").on('click',function(){
+        var q_json = {}
+        q_json['chadd'] = $('#chadd').val();
+        q_json['q_test'] = $('#q_test').val();
+        console.log( q_json['chadd'] );
+        console.log( q_json['q_test']);
+
+        var q_list = [];
+
+        $('#question').children().each(function(){
+            var data = {};
+            cnt = 1;
+            $(this).children().each(function(){
+                switch( cnt ){
+                    case 1:
+                        data['t_num'] = $(this).text();
+                        break;
+                    case 2:
+                        data['q_id'] = $(this).text();
+                        break;
+                    case 3:
+                }
+                cnt = cnt + 1;
+            });
+            console.log( data );
+            q_list.push( data );
+        });
+
+        q_json['q_list'] = q_list;
+
+        //console.log( q_list );
+
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+
+        $.ajax({
+            type:"POST",
+            url:"/exam/testupdate/",
+            dataType:'json',
+            data: getJsonStr( q_json ),
+            contentType: 'charset=utf-8'
+
+        }).done( (data) => {
+
+            $('#modal-progress').modal('hide');
+
+        }).fail( (data)=>{
+        }).always( (data) => {
+        });
+    });
 });
