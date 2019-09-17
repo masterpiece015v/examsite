@@ -416,7 +416,13 @@ def answersheetprint_conf( request ):
 
 #分析ページ
 def analysis( request):
-    return render( request, 'exam/analysis.html' )
+    #セッションを持っていない
+    if 'u_id' not in request.session:
+        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+
+    user_list = User.objects.values('u_id','u_name')
+
+    return render( request, 'exam/analysis.html',{'user_list':user_list} )
 
 #サイト管理者ログイン
 def salogin( request ):

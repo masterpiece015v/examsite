@@ -54,10 +54,10 @@
 <div class="row">
     <div class="col-md-2">
         <div class="form-group">
-            <label for="l_class" style="font-size:9pt;">大分類</label>
+            <label for="l_class" style="font-size:9pt;">ユーザ</label>
             <select id="l_class" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
-            {% for l_class in l_class_list %}
-            <option value="{{ l_class.l_id }}">{{ l_class.l_name }}</option>
+            {% for user in user_list %}
+            <option value="{{ user.u_id }}">{{ user.u_id }},{{user.u_name}}</option>
             {% endfor %}
             </select>
         </div>
