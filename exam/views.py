@@ -72,7 +72,7 @@ def HttpResponseJson( jsonobj ):
     jsonStr = json.dumps( jsonobj , ensure_ascii=False, indent=2)
     return HttpResponse(jsonStr, content_type='application/json', charset='utf-8')
 
-#ページ
+#-*-*-*-*-*-ページ-*-*-*-*-*-*-*-*-*
 #ログイン
 def index( request):
     request.session.clear()
@@ -339,6 +339,7 @@ def addlicense_conf( request ):
     EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['masterpiece.015v@gmail.com',]).send()
 
     return render( request, 'exam/message.html',{'message':message})
+
 #ログオフ
 def logoff( request ):
     request.session['u_id'] = ""
@@ -365,7 +366,6 @@ def testmakeperiod( request ):
     q_period_list = Question.objects.filter(q_test='ap').values('q_period').distinct()
     return render(request,'exam/testmakeperiod.html',{'q_period_list':q_period_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
-
 #テスト印刷画面
 def testprint( request ):
     securecheck( request )
@@ -375,6 +375,7 @@ def testprint( request ):
     test_list = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
     print( test_list )
     return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
+
 #解答用紙印刷
 def answersheetprint( request ):
     o_id = request.session['o_id']
@@ -386,6 +387,7 @@ def answersheetprint( request ):
         dic['t_date'] = t['t_date']
         list.append( dic )
     return render( request, 'exam/answersheetprint.html',{'test':list,'u_admin':request.session['u_admin']})
+
 #解答用紙印刷
 def answersheetprint_conf( request ):
     t_id = byteToDic( request.body )['t_id']
@@ -411,6 +413,10 @@ def answersheetprint_conf( request ):
     list = {'t_list':t_list,'u_list':u_list , 'o_id':o_id }
     print( list )
     return HttpResponseJson( list )
+
+#分析ページ
+def analysis( request):
+    return render( request, 'exam/analysis.html' )
 
 #サイト管理者ログイン
 def salogin( request ):
@@ -610,10 +616,7 @@ def userregisterweb( request ):
         return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
-def analysis( request):
-    return
-
-#ajaxの応答
+#-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
 #分類名を取得する
 def getclass( request ):
 
