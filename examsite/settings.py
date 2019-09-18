@@ -72,14 +72,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'examsite.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'examsitedb',
+        'NAME': 'examsitedb_test',
         'USER': 'webmaster',
         'PASSWORD': 'P@ssword',
         'HOST': '192.168.11.8',
