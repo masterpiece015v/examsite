@@ -765,6 +765,7 @@ def gettestprint( request ):
         list.append(dic)
 
     return HttpResponseJson( list )
+
 #解答のアップロード
 def answerupload( request ):
     securecheck( request )
@@ -839,9 +840,9 @@ def answerupload( request ):
                 for answer in answerlist:
                     if cnt < num:
                         if answer[1] == "未回答" or answer[1] == "複数回答":
-                            add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=user_id)
+                            add_rt = ResultTest(t_id="%s%s%s"%(o_id,test_id,code4(answer[0])), r_answer='', r_date=date, u_id=user_id)
                         else:
-                            add_rt = ResultTest(t_id=test_id,t_num=code4(answer[0]),r_answer=answer[1],r_date=date,u_id=user_id)
+                            add_rt = ResultTest(t_id="%s%s%s"%(o_id,test_id,code4(answer[0])),r_answer=answer[1],r_date=date,u_id=user_id)
                         add_rt.save()
                     cnt = cnt + 1
                 #ファイルを削除する

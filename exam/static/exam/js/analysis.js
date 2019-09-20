@@ -68,8 +68,8 @@ $(function(){
         });
     }
 
-    //ユーザ名をクリック
-    $("#user_list").on('click',function(){
+    //ユーザ名を変える
+    $("#user_list").on('change',function(){
         //大分類を選択すると中分類を取得する
         var json = {'u_id' : $('#u_id').val() }
         ajax_userinfo( '#m_class' , json );
