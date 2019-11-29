@@ -78,10 +78,10 @@ WSGI_APPLICATION = 'examsite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'examsitedb_test',
+        'NAME': 'examsitedb',
         'USER': 'webmaster',
         'PASSWORD': 'P@ssword',
-        'HOST': '192.168.11.8',
+        'HOST': '192.168.11.20',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
