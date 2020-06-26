@@ -1,5 +1,3 @@
-#!/home/webmaster/venv/bin python
-
 import os
 import sys
 

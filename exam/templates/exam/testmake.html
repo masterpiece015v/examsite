@@ -16,13 +16,15 @@
                 </select>
             </div>
             -->
+            <!--
             <div class="form-group" style="margin-left:10px;">
                 <input type="button" class="form-control" id="q_add" value="追加">
             </div>
+
             <div class="form-group" style="margin-left:10px;">
                 <input type="button" class="form-control" id="q_renew" value="入替">
             </div>
-
+            -->
             <div class="form-group">
                 <label style="margin-left:10px;">試験:</label>
                 <select id="q_test" class="form-control">
@@ -31,27 +33,13 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="form-group">
-                <label style="margin-left:10px;">問題数:</label>
-                <select id="q_quantity" class="form-control">
-                    <option value="0">全て</option>
-                    <option value="10">10問</option>
-                    <option value="20">20問</option>
-                    <option value="30">30問</option>
-                    <option value="40">40問</option>
-                    <option value="80">80問</option>
-                </select>
-            </div>
-            <div class="form-group" style="margin-left:10px;">
-                <input type="button" class="form-control" id="q_modal" value="問題確認" data-toggle="modal" data-target="#modal-question">
-            </div>
-            <div class="form-group" style="margin-left:10px;">
-                <input type="button" class="form-control" id="q_make" value="テスト作成" data-toggle="modal" data-target="#modal-progress">
-            </div>
+
+
         </form>
     </div>
 </div>
-<div class="row">
+
+<div class="row" style="margin-top:20px;">
     <div class="col-md-2">
         <div class="form-group">
             <label for="l_class" style="font-size:9pt;">大分類</label>
@@ -72,23 +60,73 @@
     </div>
 
     <div class="col-md-3">
+        <form class="form-inline">
+            <div class="form-group" style="margin-left:3px;">
+                <input type="button" class="form-control" id="q_add" value="追加">
+            </div>
+            <div class="form-group" style="margin-left:10px;">
+                <input type="button" class="form-control" id="q_renew" value="入替">
+            </div>
+        </form>
+
         <div id="qcnt1">問題数:0</div>
         <table id="question" style="font-size:9pt;" class="table table-condensed"></table>
     </div>
 
     <div class="col-md-3">
-        <div id="a_qcnt">問題数:0</div>
+        <div class="form-group">
+            <form class="form-inline">
+                <label style="margin-left:10px;">問題数:</label>
+                <select id="q_quantity" class="form-control">
+                    <option value="0">全て</option>
+                    <option value="10">10問</option>
+                    <option value="20">20問</option>
+                    <option value="30">30問</option>
+                    <option value="40">40問</option>
+                    <option value="80">80問</option>
+                </select>
+            </form>
+        </div>
+        <div id="a_qcnt">選択した問題数:0</div>
         <table id="a_que" style="font-size:9pt;" class="table table-condensed"></table>
     </div>
 
     <div class="col-md-3">
-        <div id="qcnt2">問題数:0</div>
+        <form class="form-inline">
+            <div class="form-group" style="margin-left:10px;">
+                <input type="button" class="form-control" id="q_modal" value="問題確認" data-toggle="modal" data-target="#modal-question">
+            </div>
+            <div class="form-group" style="margin-left:10px;">
+                <input type="button" class="form-control" id="q_make" value="テスト作成" data-toggle="modal" data-target="#modal-progress">
+            </div>
+        </form>
+        <div id="qcnt2">テスト問題数:0</div>
         <table id="sq" style="font-size:9pt;" class="table table-condensed"></table>
     </div>
 </div>
 {% csrf_token %}
+<div class="modal" id="modal-question" tabindex="-1" style="position:fixed;top:10px;left:10px;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="msq" style="font-size:9pt;" class="table table-condensed"></table>
+            </div>
+        </div>
+    </div>
+</div>
 
-
+<div class="modal" id="modal-progress" tabindex="-1" style="position:fixed;top:10px;left:10px;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-body">作成中です。しばらくお待ちください</div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block script %}
 <script type="text/javascript" src="{% static 'exam/js/testmake.js' %}" charset="utf-8"></script>

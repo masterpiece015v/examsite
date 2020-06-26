@@ -102,3 +102,9 @@ class AnswerImage( models.Model ):
     o_id = models.CharField( max_length=4 )
     t_id = models.CharField( max_length=4 )
     u_id = models.CharField( max_length=20 )
+
+class MakeLittletest( models.Model ):
+    m_key = models.CharField( max_length=8, primary_key=True)
+    o_id = models.CharField( max_length=4 )
+    t_id = models.CharField( max_length=4 )
+    u_id = models.CharField( max_length=20 )

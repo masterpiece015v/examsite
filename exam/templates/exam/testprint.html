@@ -4,6 +4,7 @@
 {% block addhead %}
 <link rel="stylesheet" href="{% static 'exam/css/mtcss.css' %}">
 {% endblock %}
+
 {% block main %}
     <div class="row">
         <div class="col">
@@ -12,7 +13,7 @@
                     <select class="form-control d-print-none" id="s_test">
                         <option></option>
                         {% for test in test_list %}
-                            <option value="{{ test.t_id }}">{{ test.t_id }}:{{ test.t_date }}</option>
+                            <option value="{{ test.t_id }}">{{ test.t_id }} : {{test.u_id}} : {{ test.t_date }}</option>
                         {% endfor %}
                     </select>
                 </div>

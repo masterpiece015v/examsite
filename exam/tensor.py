@@ -77,3 +77,6 @@ class Ainum:
         p = self.sess.run( self.y_conv, feed_dict={self.x:img , self.y_:[[0.0] * 10], self.keep_prob:0.5})[0]
 
         return np.argmax(p)
+if __name__ == "__main__":
+    ai = Ainum()
+    

@@ -14,10 +14,9 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_URL='/static/'
-# MEDIA_ROOT = os.path.join(BASE_DIR , 'exam' , 'media')
-STATIC_ROOT = os.path.join( BASE_DIR,'static')
 
+STATIC_URL='/static/'
+STATIC_ROOT = os.path.join( BASE_DIR,'static')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -82,7 +81,7 @@ DATABASES = {
         'NAME': 'examsitedb',
         'USER': 'webmaster',
         'PASSWORD': 'P@ssword',
-        'HOST': '192.168.11.8',
+        'HOST': '192.168.41.20',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -131,7 +130,7 @@ USE_TZ = True
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'masterpiece.015v@gmail.com'
-EMAIL_HOST_PASSWORD = 'isqrbjpmapwwbatp'
+EMAIL_HOST_USER = 'mstp015v@gmail.com'
+EMAIL_HOST_PASSWORD = 'ygoinqdhlwiooumo'
 EMAIL_PORT = 587
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

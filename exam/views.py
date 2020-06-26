@@ -3,7 +3,7 @@ from django.shortcuts import render,HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.mail import EmailMessage
 import re,string,random,datetime,os,csv
-from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest
+from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest,MakeLittletest
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.urls import reverse
@@ -14,6 +14,7 @@ import json,ast
 from django.conf import settings
 import glob
 from .logger import log_write
+
 
 #関数
 #アクセスログに追加する
@@ -30,14 +31,25 @@ def randomCharacter(n):
 
 #000Xのコードを作成する
 def code4( c ):
-    if c < 10:
-        return '000' + str( c )
-    elif c < 100:
-        return '00' + str( c )
-    elif c < 1000:
-        return '0' + str( c )
+
+    if type( c ) is int:
+        if c < 10:
+            return '000' + str( c )
+        elif c < 100:
+            return '00' + str( c )
+        elif c < 1000:
+            return '0' + str( c )
+        else:
+            return str( c )
     else:
-        return str( c )
+        if len(c) == 1:
+            return '000' + c
+        elif len(c) == 2:
+            return '00' + c
+        elif len(c) == 3:
+            return '0' + c
+        else:
+            return c
 
 #認証システム（キーの追加）
 def auth_add(auth_kind,auth_value):
@@ -95,7 +107,7 @@ def newuser( request ):
         con = """
         新規ユーザ登録をしていただきありがとうございました。
         24時間以内に、下記URLから本登録にお進みください。
-        http://localhost:8000/exam/orgregister/?auth_key=%s
+        http://examsite.room.kaikei.ac.jp:8000/exam/orgregister/?auth_key=%s
         """ % (auth_key)
         EmailMessage(sub, con, to=[u_email, ]).send()
         return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
@@ -176,6 +188,7 @@ def mainpage( request ):
             #request.session['u_id'] = u_id
             u_name = user.u_name
             u_admin = user.u_admin
+            request.session['u_admin'] = u_admin
             return render( request,'exam/mainpage.html',{'u_id':u_id,'u_name':u_name,'u_admin':u_admin})
 
     #u_idやパスワードを持っていない
@@ -336,7 +349,7 @@ def addlicense_conf( request ):
     adr.save()
 
     bodystr = "o_id:%s,l_num:%s"%(o_id,l_num)
-    EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['masterpiece.015v@gmail.com',]).send()
+    EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['mstp015v@gmail.com',]).send()
 
     return render( request, 'exam/message.html',{'message':message})
 
@@ -372,8 +385,15 @@ def testprint( request ):
     user = User.objects.get(pk=request.session['u_id'])
     o_id = user.o_id
 
-    test_list = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
-    print( test_list )
+    test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
+    test_list = []
+    for t in test:
+        t_id = t['t_id']
+        mt = MakeLittletest.objects.get(pk="%s%s"%(o_id,t_id))
+
+        print( mt.u_id )
+
+        test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date']})
     return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
 
 #解答用紙印刷
@@ -414,15 +434,98 @@ def answersheetprint_conf( request ):
     print( list )
     return HttpResponseJson( list )
 
+# 分析ページ(全員)
+def a_all(request):
+    # セッションを持っていない
+    if 'u_id' not in request.session:
+        return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです'})
+
+    o_id = request.session['o_id']
+    users = User.objects.filter(o_id=o_id)
+
+    result_list = []
+    t_list = []
+    for user in users:
+        u_id = user.u_id
+        u_name = user.u_name
+        r_list = ResultTest.objects.filter(u_id=u_id)
+        positive = 0
+        for r in r_list:
+            t_id = r.t_id
+            t_list.append( t_id )
+            t_num = r.t_num
+            r_answer = r.r_answer
+            l_list = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+            q_id = l_list[0].q_id
+            q_list = Question.objects.filter(q_id=q_id)
+            q_answer = q_list[0].q_answer
+            if r_answer == q_answer:
+                positive = positive + 1
+
+        result ={'u_id':u_id , 'u_name':u_name , 'positive':positive }
+        result_list.append( result )
+        print("%s,%s,%s,%d\n" % (u_id, u_name,t_id,positive))
+
+    test_set = set(t_list)
+    test_list = []
+    for t in test_set:
+        test_list.append({'t_id': t})
+    u_admin = request.session['u_admin']
+
+    make_test_uid = MakeLittletest.objects.values('u_id').distinct()
+
+    make_test_uid_list = []
+
+    for m in make_test_uid:
+        u_id = m['u_id']
+        make_test_uid_list.append( {'u_id':u_id})
+
+    return render(request, 'exam/a_all.html', {'result_list': result_list, 'u_admin': u_admin,'test_list':test_list , 'make_test_uid_list':make_test_uid_list})
+
+# 分析ページ(分野ごと)
+def a_bunya(request):
+    # セッションを持っていない
+    if 'u_id' not in request.session:
+        return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです'})
+
+    o_id = request.session['o_id']
+    users = User.objects.filter(o_id=o_id)
+    user_list = users.values('u_id', 'u_name')
+    print( user_list )
+    littletest = LittleTest.objects.filter(o_id=o_id)
+    l_list = []
+    l_id_old = 0
+    for l in littletest:
+        q_id = l.q_id
+        question = Question.objects.filter(q_id=q_id)
+        c_id = question[0].c_id
+        classify = Classify.objects.filter(c_id=c_id)
+
+        l_id = classify[0].l_id
+        l_name = classify[0].l_name
+
+        if l_id != l_id_old:
+            l_list.append( {'l_id':l_id ,'l_name':l_name })
+            l_id_old = l_id
+
+
+    print( l_list )
+    u_admin = request.session['u_admin']
+    return render(request, 'exam/a_bunya.html', {'user_list': user_list, 'u_admin': u_admin , 'l_list':l_list} )
+
 #分析ページ
 def analysis( request):
     #セッションを持っていない
     if 'u_id' not in request.session:
         return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+    print("analysis")
+    o_id = request.session['o_id']
+    users = User.objects.filter( o_id=o_id)
+    user_list = users.values('u_id','u_name')
 
-    user_list = User.objects.values('u_id','u_name')
+    u_admin = request.session['u_admin']
 
-    return render( request, 'exam/analysis.html',{'user_list':user_list} )
+    return render( request, 'exam/analysis.html',{'user_list':user_list ,'u_admin':u_admin} )
 
 #サイト管理者ログイン
 def salogin( request ):
@@ -623,6 +726,168 @@ def userregisterweb( request ):
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
+# u_idとt_idから結果を取得する
+
+# u_idからt_idを取得する
+def gettid( request):
+    c_dic = byteToDic( request.body )
+    if 'u_id' in c_dic:
+        u_id = c_dic['u_id']
+        classify = ResultTest.objects.filter(u_id=u_id)
+        classify = classify.values('t_id').distinct()
+        dics = {'t_id':[]}
+
+        for c in classify:
+            dics['t_id'].append( c['t_id'])
+
+        #print( dics )
+        return HttpResponseJson( dics )
+
+# u_idから分野を取得する
+def get_result_bunya( request):
+    c_dic = byteToDic( request.body )
+    if 'u_id' in c_dic:
+        u_id = c_dic['u_id']
+        dics = {'u_id':u_id,'l_name':[],'m_name':[],'s_name':[],'p':[],'t':[],'l_dics':{}}
+        dics['u_id'] = u_id
+        l_dics = {}
+        resulttest = ResultTest.objects.filter(u_id=u_id)
+        p = 0
+        t = 0
+        old_s_id = 0
+        for r in resulttest:
+            t_id = r.t_id
+            t_num = r.t_num
+            littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+            q_id = littletest.order_by('t_key').first().q_id
+            #dics['q_id'].append( q_id )
+            question = Question.objects.filter( q_id=q_id )
+            c_id = question.order_by('q_id').first().c_id
+            classify = Classify.objects.filter(c_id=c_id)
+            #一回目
+            if old_s_id == 0:
+                old_s_id = classify.order_by('c_id').first().s_id
+
+            if old_s_id == classify.order_by('c_id').first().s_id:
+                if r.r_answer == question.order_by('q_id').first().q_answer:
+                    p = p + 1
+                t = t + 1
+            else:
+                l_id = classify.order_by('c_id').first().l_id
+                l_name = classify.order_by('c_id').first().l_name
+                m_name = classify.order_by('c_id').first().m_name
+                s_name = classify.order_by('c_id').first().s_name
+                l_dics.update({l_id:l_name})
+                dics['l_name'].append(l_name)
+                dics['m_name'].append(m_name)
+                dics['s_name'].append(s_name)
+                dics['p'].append( p )
+                dics['t'].append( t )
+                old_s_id = classify.order_by('c_id').first().s_id
+        l_id = classify.order_by('c_id').first().l_id
+        l_name = classify.order_by('c_id').first().l_name
+        m_name = classify.order_by('c_id').first().m_name
+        s_name = classify.order_by('c_id').first().s_name
+        l_dics.update({l_id: l_name})
+        dics['m_name'].append(m_name)
+        dics['s_name'].append(s_name)
+        dics['p'].append(p)
+        dics['t'].append(t)
+        dics['l_name'].append(l_name)
+        print( l_name )
+        dics['l_dics'] = l_dics
+        return HttpResponseJson( dics )
+
+# u_idから分野を取得する
+def get_m_list( request):
+    c_dic = byteToDic( request.body )
+    print( "get_m_list" )
+    if 'u_id' in c_dic:
+        u_id = c_dic['u_id']
+        l_id1 = c_dic['l_id']
+        m_dics = {}
+        resulttest = ResultTest.objects.filter(u_id=u_id)
+        for r in resulttest:
+            t_id = r.t_id
+            t_num = r.t_num
+            littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+            q_id = littletest.order_by('t_key').first().q_id
+            question = Question.objects.filter( q_id=q_id )
+            c_id = question.order_by('q_id').first().c_id
+            classify = Classify.objects.filter(c_id=c_id)
+            l_id2 = classify.order_by('c_id').first().l_id
+            m_id = classify.order_by('c_id').first().m_id
+            m_name = classify.order_by('c_id').first().m_name
+            if l_id1 == l_id2:
+                print( "%s,%s"%(m_id,m_name))
+                m_dics[m_id] = m_name
+
+        return HttpResponseJson( m_dics )
+
+def get_s_list( request):
+    c_dic = byteToDic( request.body )
+    print( "get_s_list" )
+    if 'u_id' in c_dic:
+        u_id = c_dic['u_id']
+        l_id1 = c_dic['l_id']
+        m_id1 = c_dic['m_id']
+        s_dics = {}
+        resulttest = ResultTest.objects.filter(u_id=u_id)
+        for r in resulttest:
+            t_id = r.t_id
+            t_num = r.t_num
+            littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+            q_id = littletest.order_by('t_key').first().q_id
+            question = Question.objects.filter( q_id=q_id )
+            c_id = question.order_by('q_id').first().c_id
+            classify = Classify.objects.filter(c_id=c_id)
+            l_id2 = classify.order_by('c_id').first().l_id
+            m_id2 = classify.order_by('c_id').first().m_id
+            s_id = classify.order_by('c_id').first().s_id
+            s_name = classify.order_by('c_id').first().m_name
+            if l_id1 == l_id2 and m_id1 == m_id2:
+                print( "%s,%s"%(s_id,s_name))
+                s_dics[s_id] = s_name
+
+        return HttpResponseJson( s_dics )
+
+# u_idとt_idからテストの結果を取得する
+def getresult( request):
+    c_dic = byteToDic( request.body )
+    #print( c_dic )
+    if 'u_id' in c_dic:
+        u_id = c_dic['u_id']
+        t_id = c_dic['t_id']
+        dics = {'u_id': u_id ,'t_id': t_id , 't_num' :[] , 'q_id':[],'r_answer':[] , 'q_answer':[] , 'mb' : [] , 'score':0 , 'total' : 0}
+        resulttest = ResultTest.objects.filter(u_id=u_id,t_id=t_id)
+        score1 = 0
+        score2 = 0
+        print( "%s,%s"%(u_id,t_id))
+        for r in resulttest:
+            t_num = r.t_num
+            r_answer = r.r_answer
+            littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+            q_id = littletest.order_by('t_key').first().q_id
+            #q_id = littletest[0].q_id
+            dics['q_id'].append( q_id )
+            question = Question.objects.filter( q_id=q_id)
+            q_answer = question.order_by('q_id').first().q_answer
+            dics['t_num'].append( t_num )
+            dics['r_answer'].append( r_answer)
+            dics['q_answer'].append( q_answer)
+            if r_answer == q_answer:
+                dics['mb'].append( 1 )
+                score1 = score1 + 1
+            else:
+                dics['mb'].append( 0 )
+                score2 = score2 + 1
+
+        dics['score'] = score1
+        dics['total'] = score1 + score2
+
+        #print( dics )
+        return HttpResponseJson( dics )
+
 #分類名を取得する
 def getclass( request ):
 
@@ -744,6 +1009,9 @@ def testupdate( request ):
         l_test = LittleTest(t_key=t_key,t_id=t_id,t_num=t_num,t_date=t_date,o_id=o_id,q_id=q_id)
         l_test.save()
 
+    m_test = MakeLittletest(m_key="%s%s"%(o_id,t_id),o_id=o_id,t_id=t_id,u_id=u_id)
+    m_test.save()
+
     return HttpResponse(json.dumps({"state":"ok"}, ensure_ascii=False, indent=2), content_type='application/json', charset='utf-8')
 
 #テストの印刷用データをajaxで取得する
@@ -765,14 +1033,65 @@ def gettestprint( request ):
         list.append(dic)
 
     return HttpResponseJson( list )
+
+def ajax_answerupload( request ):
+
+    c_dic = byteToDic(request.body)
+    o_id = request.session['o_id']
+
+    test_id = c_dic['t_id']
+    user_id = c_dic['u_id']
+    answerlist = c_dic['answerlist']
+
+    media_path = os.path.join(settings.STATIC_ROOT,"exam","answer",o_id)
+
+    # 登録チェック
+    check_answer = ResultTest.objects.filter(t_id=test_id, u_id=user_id)
+
+    # すでにテストID＋ユーザIDが存在する場合
+    if len(check_answer) >= 1:
+        return render(request, 'exam/answerupload.html',
+                      {"message": "そのデータはすでに存在します。", "t_id": test_id, "u_id": user_id, "answerlist": answerlist})
+    else:
+
+        # 解答をResultTestに登録する
+        date = datetime.datetime.now()
+
+        # テスト数を取得
+        num = LittleTest.objects.filter(o_id=o_id, t_id=test_id).count()
+
+        cnt = 0
+        for answer in answerlist:
+            if cnt < num:
+                if answer[1] == "未回答" or answer[1] == "複数回答":
+                    add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=user_id)
+                else:
+                    add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer=answer[1], r_date=date,
+                                        u_id=user_id)
+                add_rt.save()
+            cnt = cnt + 1
+        # ファイルを削除する
+        filelist = glob.glob(media_path + '/*')
+
+        for file in filelist:
+            print(os.path.join(media_path, file))
+            # os.remove( os.path.join(media_path, file ) )
+    c_dic['message'] = "登録できました。"
+    return HttpResponseJson( c_dic )
+
 #解答のアップロード
 def answerupload( request ):
-    securecheck( request )
 
+    securecheck( request )
+    u_admin = request.session['u_admin']
     # アップするファイルのパス
     o_id = request.session['o_id']
-    #media_path = "static/exam/answer/" + o_id
     media_path = os.path.join(settings.STATIC_ROOT,"exam","answer",o_id)
+
+    #if 't_id' in request.POST:
+    #    print( "post" )
+    #    dic = byteToDic(request.body )
+    #    return HttpResponseJson(dic)
 
     if request.method != 'POST':
         answerimage = AnswerImage.objects.all()
@@ -780,13 +1099,16 @@ def answerupload( request ):
         filelist = []
         for file in answerimage:
             filelist.append( file )
-
-        return render(request, 'exam/answerupload.html', {"filelist": filelist})
+        return render(request, 'exam/answerupload.html', {"filelist": filelist,'u_admin':u_admin})
 
     # リクエストにfileが含まれている
     if 'file' in request.FILES:
 
         upfiles = request.FILES.getlist('file')
+
+        #複数ファイルのアップは拒否
+        if len(upfiles)>1:
+            return render(request, 'exam/answerupload.html',{"message": "ファイルのアップロードは1つずつにしてください。",'u_admin':u_admin})
 
         #複数のファイルがアップロードされる
         for uf in upfiles:
@@ -805,13 +1127,9 @@ def answerupload( request ):
                 dest.write( chunk )
 
             # 画像認識
-
-            #log_write("a")
             org_id, test_id, user_id, answerlist = get_answer_list(filepath)
-            #log_write(org_id)
 
             # 登録チェック
-            #check_answer = AnswerImage.objects.filter( o_id=org_id  ,u_id=user_id )
             check_answer = ResultTest.objects.filter( t_id=test_id,u_id=user_id )
 
             # すでにテストID＋ユーザIDが存在する場合
@@ -822,7 +1140,7 @@ def answerupload( request ):
                 #for file in answerimage:
                 #    filelist.append(file)
                 #msg = msg + uf.name
-                return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。" })
+                return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。", "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist ,'u_admin':u_admin})
             else:
                 # 画像をデータベースに登録する
                 #add_answerimage = AnswerImage( image=filename , o_id=org_id , t_id=test_id , u_id=user_id )
@@ -834,7 +1152,7 @@ def answerupload( request ):
                 #テスト数を取得
                 num = LittleTest.objects.filter( o_id=org_id,t_id=test_id ).count()
                 #num = record.count()
-                print( num )
+
                 cnt = 0
                 for answer in answerlist:
                     if cnt < num:
@@ -846,10 +1164,10 @@ def answerupload( request ):
                     cnt = cnt + 1
                 #ファイルを削除する
                 filelist = glob.glob( media_path + '/*')
-                print( filelist )
+
                 for file in filelist:
                     print( os.path.join(media_path,file))
-                    os.remove( os.path.join(media_path, file ) )
+                    #os.remove( os.path.join(media_path, file ) )
 
         # リストの再取得
         #answerimage = AnswerImage.objects.all()
@@ -857,7 +1175,7 @@ def answerupload( request ):
         #for file in answerimage:
         #    filelist.append( file )
 
-        return render(request, 'exam/answerupload.html' , { "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist })
+        return render(request, 'exam/answerupload.html' , { "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist ,'u_admin':u_admin})
 
     elif 'del' in request.POST:
         image = request.POST['del']
@@ -870,4 +1188,58 @@ def answerupload( request ):
         for file in answerimage:
             filelist.append( file )
 
-        return render( request, 'exam/answerupload.html' , { "filelist" : filelist })
+        return render( request, 'exam/answerupload.html' , { "filelist" : filelist ,'u_admin':u_admin})
+
+def get_test_id_list( request ):
+    c_dic = byteToDic(request.body )
+
+    if 'u_id' in c_dic:
+        u_id = c_dic['u_id']
+        mk = MakeLittletest.objects.filter(u_id=u_id)
+        test_list = []
+        for m in mk:
+            t_id = m.t_id
+            test_list.append( {'t_id':t_id})
+    print( test_list )
+    return HttpResponseJson( test_list )
+
+def get_test_id_result( request ):
+
+    # セッションを持っていない
+    if 'u_id' not in request.session:
+        return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです'})
+
+    c_dic = byteToDic(request.body )
+    t_id = c_dic['t_id']
+    t_id2 = t_id
+    o_id = request.session['o_id']
+    users = User.objects.filter(o_id=o_id)
+
+    result_list = []
+    t_list = []
+    for user in users:
+        u_id = user.u_id
+        u_name = user.u_name
+        if t_id2 == 'all':
+            r_list = ResultTest.objects.filter(u_id=u_id)
+        else:
+            r_list = ResultTest.objects.filter(u_id=u_id,t_id=t_id)
+        positive = 0
+        for r in r_list:
+            if t_id2 == 'all':
+                t_id = r.t_id
+            t_list.append( t_id )
+            t_num = r.t_num
+            r_answer = r.r_answer
+            l_list = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+            q_id = l_list[0].q_id
+            q_list = Question.objects.filter(q_id=q_id)
+            q_answer = q_list[0].q_answer
+            if r_answer == q_answer:
+                positive = positive + 1
+
+        result ={'u_id':u_id , 'u_name':u_name , 'positive':positive }
+        result_list.append( result )
+        #print("%s,%s,%s,%d\n" % (u_id, u_name,t_id,positive))
+        print( result_list )
+    return HttpResponseJson( result_list )

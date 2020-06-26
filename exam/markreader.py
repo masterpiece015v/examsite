@@ -1,15 +1,18 @@
 import cv2
-#from .tensor import Ainum
 import tensorflow as tf
 from PIL import Image
 from matplotlib import pylab as plt
 import numpy as np
 import os
 from django.conf import settings
-from .logger import log_write
+import math
+#from .logger import log_write
 
 PATH= os.path.join( settings.BASE_DIR , "exam")
-STATIC_PATH = os.path.join( PATH , 'static' , "exam", "data")
+STATIC_PATH = os.path.join( settings.STATIC_ROOT , "exam" , "data")
+
+print( 'BASE_DIR %s'%PATH )
+print( 'STATIC_PATH %s'%STATIC_PATH )
 
 class Ainum:
     sess = tf.compat.v1.InteractiveSession()
@@ -120,7 +123,7 @@ def img_center( img ):
     c_mid = int( ( c_max/2 - ( c_right + c_left ) / 2) )
     #縦中央値
     r_mid = int( (r_max/2 - ( r_top + r_bottom) / 2))
-    print( 'r_max:%d,r_top:%d,r_bottom:%d,r_mid:%d,c_mid:%d'%(r_max,r_top,r_bottom,r_mid,c_mid) )
+    #print( 'r_max:%d,r_top:%d,r_bottom:%d,r_mid:%d,c_mid:%d'%(r_max,r_top,r_bottom,r_mid,c_mid) )
 
     #横位置を調整する
     if c_mid > 0:#右にずらす
@@ -214,10 +217,29 @@ def get_answer_list(filename):
     img = cv2.imread(filename, 0)
     img = cv2.resize(img, (2100, 2964))
 
+    #角度を調節する
+    res_gaku = cv2.matchTemplate(img, marker, cv2.TM_CCOEFF_NORMED)
+    threshold = 0.5
+    loc = np.where(res_gaku >= threshold)
+    #print( loc )
+    min_x = min(loc[1])
+    min_y = min(loc[0])
+    max_x = max(loc[1])
+    max_y = max(loc[0])
+    print( "minx:%d,maxy:%d,miny:%d,maxy:%d"%(min_x,max_x,min_y,max_y))
+    x1 = max_x - min_x
+    y1 = max_y - min_y
+    rad1 = math.sqrt( x1*x1 + y1*y1)
+    #print(math.degrees(math.asin(y1/rad1)))
+    rad = 90-math.degrees(math.asin(y1/rad1))
+    print( rad )
+    trans = cv2.getRotationMatrix2D((1050,1485), rad, 1.0)
+    img = cv2.warpAffine(img,trans,(2100,2970))
+
     #img = cv2.resize(img, (1000, 1500))
     # markeと同じ画像の位置を取得する
     res_gaku = cv2.matchTemplate(img, marker, cv2.TM_CCOEFF_NORMED)
-    threshold = 0.6
+    threshold = 0.5
     loc = np.where(res_gaku >= threshold)
     x = min(loc[1])
     y = min(loc[0])
@@ -237,7 +259,9 @@ def get_answer_list(filename):
     #組織ID、テストID、ユーザIDを取得する
     img_info = img[mark_list[0]['y']-25: mark_list[0]['y']+140, mark_list[0]['x']+90: mark_list[0]['x']+1805]
     img_info = cv2.resize(img_info, (1400, 200))
+
     #imgshow( img_info )
+
     org_id = img_info[0:100, 348:695]
     test_id = img_info[0:100, 1050:1400]
     user_id = img_info[104:200, 348:695]
@@ -306,7 +330,8 @@ def get_answer_list(filename):
                 #print( col )
                 #imgshow( tmp_img )
                 val = np.sum(tmp_img)
-                if val > 35000:
+                #print( "%s,%s"%(col,val) )
+                if val > 20000:
                     area_sum1.append(val)
                 else:
                     area_sum1.append(0)
@@ -319,7 +344,7 @@ def get_answer_list(filename):
                 #print( col )
                 #imgshow( tmp_img )
                 val = np.sum(tmp_img)
-                if val > 35000:
+                if val > 20000:
                     area_sum2.append(val)
                 else:
                     area_sum2.append(0)
@@ -333,7 +358,7 @@ def get_answer_list(filename):
                 #print( col )
                 #imgshow( tmp_img )
                 val = np.sum(tmp_img)
-                if val > 35000:
+                if val > 20000:
                     area_sum3.append(val)
                 else:
                     area_sum3.append(0)
@@ -346,7 +371,7 @@ def get_answer_list(filename):
                 #print( col )
                 #imgshow( tmp_img )
                 val = np.sum(tmp_img)
-                if val > 35000:
+                if val > 20000:
                     area_sum4.append(val)
                 else:
                     area_sum4.append(0)
@@ -372,16 +397,5 @@ def get_answer_list(filename):
             answerlist.append(q)
 
     return o_n,t_n,u_n, answerlist
-
-if __name__ == "__main__":
-    files = os.listdir('media/exam/0001/')
-    #print(files)
-    for file in files:
-        org_id,test_id,user_id , answerlist = get_answer_list('media/exam/0001/%s' % file)
-        print("org_id:%s"%org_id)
-        print("test_id:%s"%test_id)
-        print("user_id:%s"%user_id)
-        for list in answerlist:
-            print( list )
 
 

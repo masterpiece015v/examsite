@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}分析{% endblock %}
+{% block bland %}分析{% endblock %}
+{% block a2 %}active{% endblock %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="lst_user" style="font-size:9pt;">ユーザ</label>
+            <select id="lst_user" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
+            {% for user in user_list %}
+            <option value="{{ user.u_id }}">{{ user.u_id }},{{user.u_name}}</option>
+            {% endfor %}
+            </select>
+        </div>
+        <div class="col_md-3" style="margin-left:5px;">
+            <div class="form-group">
+                <label for="l_list" style="font-size:9pt;">大分類:</label>
+                <select id="l_list">
+                    {% for l in l_list %}
+                    <option value="{{ l.l_id}}">{{ l.l_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col_md-3" style="margin-left:5px;">
+            <div class="form-group">
+                <label for="m_list" style="font-size:9pt;">中分類：</label>
+                <select id="m_list"></select>
+            </div>
+        </div>
+        <div class="col_md-3" style="margin-left:5px;">
+            <div class="form-group">
+                <label for="s_list" style="font-size:9pt;">小分類：</label>
+                <select id="s_list"></select>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-8">
+        <p>得点：<span id="score"></span>　問題数：<span id="total"></span></p>
+        <table style="font-size:11pt;" class="table table-condensed">
+            <thead>
+            <th>q_id</th><th>l_id</th><th>l_name</th><th>m_id</th><th>m_name</th><th>s_id</th><th>s_name</th>
+            </thead>
+            <tbody id="resultdata"></tbody>
+        </table>
+    </div>
+
+</div>
+{% csrf_token %}
+
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="{% static 'exam/js/getresult2.js' %}" charset="utf-8"></script>
+{% endblock %}
