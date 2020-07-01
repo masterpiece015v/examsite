@@ -743,60 +743,55 @@ def gettid( request):
         #print( dics )
         return HttpResponseJson( dics )
 
-# u_idから分野を取得する
+def list_in_dict_sort( list , key1 , key2 ):
+    i = 0
+    while i < len( list ) - 1:
+        j = i + 1
+        while j < len( list ):
+            if list[i][key1] > list[j][key1]:
+                temp = list[i]
+                list[i] = list[j]
+                list[j] = temp
+            elif list[i][key1] == list[j][key1] and list[i][key2] > list[j][key2]:
+                temp = list[i]
+                list[i] = list[j]
+                list[j] = temp
+            j = j + 1
+        i = i + 1
+    return list
+
+# u_idから分野ごとの点数を取得する
 def get_result_bunya( request):
     c_dic = byteToDic( request.body )
     if 'u_id' in c_dic:
         u_id = c_dic['u_id']
-        dics = {'u_id':u_id,'l_name':[],'m_name':[],'s_name':[],'p':[],'t':[],'l_dics':{}}
-        dics['u_id'] = u_id
-        l_dics = {}
+        list = []
         resulttest = ResultTest.objects.filter(u_id=u_id)
-        p = 0
-        t = 0
-        old_s_id = 0
         for r in resulttest:
-            t_id = r.t_id
-            t_num = r.t_num
-            littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
-            q_id = littletest.order_by('t_key').first().q_id
-            #dics['q_id'].append( q_id )
-            question = Question.objects.filter( q_id=q_id )
-            c_id = question.order_by('q_id').first().c_id
-            classify = Classify.objects.filter(c_id=c_id)
-            #一回目
-            if old_s_id == 0:
-                old_s_id = classify.order_by('c_id').first().s_id
+            dict = {'u_id': u_id}
+            litteltest = LittleTest.objects.filter( t_id=r.t_id,t_num=r.t_num)
+            for l in litteltest:
+                question = Question.objects.get(pk=l.q_id)
+                classify = Classify.objects.get(pk=question.c_id)
+                dict['q_id'] = l.q_id
+                dict['l_id'] = classify.l_id
+                dict['l_name'] = classify.l_name
+                dict['m_id'] = classify.m_id
+                dict['m_name'] = classify.m_name
+                dict['s_id'] = classify.s_id
+                dict['s_name'] = classify.s_name
+                dict['r_answer'] = r.r_answer
+                dict['q_answer'] = question.q_answer
+                if r.r_answer == question.q_answer:
+                    dict['result'] = 1
+                else:
+                    dict['result'] = 0
+                list.append( dict )
 
-            if old_s_id == classify.order_by('c_id').first().s_id:
-                if r.r_answer == question.order_by('q_id').first().q_answer:
-                    p = p + 1
-                t = t + 1
-            else:
-                l_id = classify.order_by('c_id').first().l_id
-                l_name = classify.order_by('c_id').first().l_name
-                m_name = classify.order_by('c_id').first().m_name
-                s_name = classify.order_by('c_id').first().s_name
-                l_dics.update({l_id:l_name})
-                dics['l_name'].append(l_name)
-                dics['m_name'].append(m_name)
-                dics['s_name'].append(s_name)
-                dics['p'].append( p )
-                dics['t'].append( t )
-                old_s_id = classify.order_by('c_id').first().s_id
-        l_id = classify.order_by('c_id').first().l_id
-        l_name = classify.order_by('c_id').first().l_name
-        m_name = classify.order_by('c_id').first().m_name
-        s_name = classify.order_by('c_id').first().s_name
-        l_dics.update({l_id: l_name})
-        dics['m_name'].append(m_name)
-        dics['s_name'].append(s_name)
-        dics['p'].append(p)
-        dics['t'].append(t)
-        dics['l_name'].append(l_name)
-        print( l_name )
-        dics['l_dics'] = l_dics
-        return HttpResponseJson( dics )
+        list = list_in_dict_sort(list,'m_id','s_id')
+
+
+        return HttpResponseJson( list )
 
 # u_idから分野を取得する
 def get_m_list( request):

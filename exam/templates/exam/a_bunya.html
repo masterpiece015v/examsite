@@ -1,55 +1,61 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}分析{% endblock %}
+{% block css %}
+.modal{
+    display: none;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+.modal__bg{
+    background: rgba(0,0,0,0.8);
+    height: 100vh;
+    position: absolute;
+    width: 100%;
+}
+.modal__content{
+    background: #fff;
+    left: 50%;
+    padding: 40px;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 60%;
+}
+{% endblock%}
 {% block bland %}分析{% endblock %}
 {% block a2 %}active{% endblock %}
 {% block main %}
 
 <div class="row" style="margin-top:20px">
-    <div class="col-md-3">
+    <div class="col-md-2">
         <div class="form-group">
             <label for="lst_user" style="font-size:9pt;">ユーザ</label>
-            <select id="lst_user" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
+            <select id="lst_user" size="5" style="width:150px;height:200px;font-size:9pt" class="form-control">
             {% for user in user_list %}
             <option value="{{ user.u_id }}">{{ user.u_id }},{{user.u_name}}</option>
             {% endfor %}
             </select>
         </div>
-        <div class="col_md-3" style="margin-left:5px;">
-            <div class="form-group">
-                <label for="l_list" style="font-size:9pt;">大分類:</label>
-                <select id="l_list">
-                    {% for l in l_list %}
-                    <option value="{{ l.l_id}}">{{ l.l_name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <div class="col_md-3" style="margin-left:5px;">
-            <div class="form-group">
-                <label for="m_list" style="font-size:9pt;">中分類：</label>
-                <select id="m_list"></select>
-            </div>
-        </div>
-        <div class="col_md-3" style="margin-left:5px;">
-            <div class="form-group">
-                <label for="s_list" style="font-size:9pt;">小分類：</label>
-                <select id="s_list"></select>
-            </div>
-        </div>
-
     </div>
 
     <div class="col-md-8">
-        <p>得点：<span id="score"></span>　問題数：<span id="total"></span></p>
-        <table style="font-size:11pt;" class="table table-condensed">
+        <table class="table-striped">
             <thead>
-            <th>q_id</th><th>l_id</th><th>l_name</th><th>m_id</th><th>m_name</th><th>s_id</th><th>s_name</th>
+            <th>大分類名</th>
+            <th>中分類名</th>
+            <th>小分類名</th>
+            <th>正解数</th>
+            <th>問題数</th>
             </thead>
             <tbody id="resultdata"></tbody>
         </table>
     </div>
+    <div id="modal">
 
+    </div>
 </div>
 {% csrf_token %}
 
