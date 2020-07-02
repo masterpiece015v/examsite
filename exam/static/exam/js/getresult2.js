@@ -31,7 +31,9 @@ $(function(){
             resultcount = 0;
             old_s_name = data[0]['s_name'];
             modalid = data[0]['m_id'] + data[0]['s_id'];
+
             $modal_main = $('#modal');
+            $modal_main.children().remove();
             for( var i = 0 , len=data.length ; i<len ; ++i ){
                 if( old_s_name != data[i]['s_name'] ){
                     $modal_content.append( $modal_table );
@@ -51,19 +53,27 @@ $(function(){
                     $tr.append( $td );
                     $r.append( $tr );
                     old_s_name = data[i]['s_name'];
+
+                    //モーダルに追加
                     modalid = data[i]['m_id'] + data[i]['s_id'];
                     $modal = $('<div>').attr('id',modalid).attr('class','modal js-modal');
                     $modal.append( $('<div>').attr('class','modal__bg js-modal-close'));
                     $modal_content = $('<div>').attr('class','modal__content');
                     $modal_content.append( $('<a href="">').attr('class','js-modal-close').text('閉じる'));
-                    $modal_table = $('<table>');
+                    $modal_table = $('<table>').attr('class','table');
                     $modal_tr = $('<tr>');
+                    if( data[i]['result']==0){
+                            $modal_tr = $modal_tr.attr('style','background-color:red');
+                    }
                     $modal_td = $('<td>').text( data[i]['q_id']);
                     $modal_tr.append( $modal_td );
                     $modal_td = $('<td>').text( data[i]['r_answer']);
                     $modal_tr.append( $modal_td );
                     $modal_td = $('<td>').text( data[i]['q_answer']);
                     $modal_tr.append( $modal_td );
+                    $modal_td = $('<td>');
+                    $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" );
+                    $modal_tr.append( $('<td>').append( $img) );
                     $modal_table.append( $modal_tr );
                     count = 1;
                     resultcount = data[i]['result'];
@@ -73,23 +83,35 @@ $(function(){
                         $modal.append( $('<div>').attr('class','modal__bg js-modal-close'));
                         $modal_content = $('<div>').attr('class','modal__content');
                         $modal_content.append( $('<a href="">').attr('class','js-modal-close').text('閉じる'));
-                        $modal_table = $('<table>');
+                        $modal_table = $('<table>').attr('class','table');
                         $modal_tr = $('<tr>');
+                        if( data[i]['result']==0){
+                            $modal_tr = $modal_tr.attr('style','background-color:red');
+                        }
                         $modal_td = $('<td>').text( data[i]['q_id']);
                         $modal_tr.append( $modal_td );
                         $modal_td = $('<td>').text( data[i]['r_answer']);
                         $modal_tr.append( $modal_td );
                         $modal_td = $('<td>').text( data[i]['q_answer']);
                         $modal_tr.append( $modal_td );
+                        $modal_td = $('<td>');
+                        $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" );
+                        $modal_tr.append( $('<td>').append( $img) );
                         $modal_table.append( $modal_tr );
                     }else{
                         $modal_tr = $('<tr>');
+                        if( data[i]['result']==0){
+                            $modal_tr = $modal_tr.attr('style','background-color:red');
+                        }
                         $modal_td = $('<td>').text( data[i]['q_id']);
                         $modal_tr.append( $modal_td );
                         $modal_td = $('<td>').text( data[i]['r_answer']);
                         $modal_tr.append( $modal_td );
                         $modal_td = $('<td>').text( data[i]['q_answer']);
                         $modal_tr.append( $modal_td );
+                        $modal_td = $('<td>');
+                        $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" );
+                        $modal_tr.append( $('<td>').append( $img) );
                         $modal_table.append( $modal_tr );
                     }
                     count++;
@@ -114,7 +136,11 @@ $(function(){
         var json = {'u_id' : $('#lst_user').val() };
         ajax_getresult2( '#lst_tid' , json );
     });
-
+    $("#showdata").on('click',function(){
+        //ユーザのidを送信する
+        var json = {'u_id' : $('#u_id').text() };
+        ajax_getresult2( '#resultdata' , json );
+    });
     //モダールのイベント
     function modalset(){
         $('.js-modal-open').each(function(){

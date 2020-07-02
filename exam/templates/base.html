@@ -88,9 +88,12 @@
                         <a class="nav-link" href="{% url 'exam:mainpage' %}">メインページ</a>
                     </li>                 
                     <li class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">テスト</a>
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">【一般】結果</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{% url 'exam:testprint' %}">テスト印刷</a>
+                            <a class="dropdown-item" href="{% url 'exam:analysis' %}">【一般】テストごと</a>
+                            <a class="dropdown-item" href="{% url 'exam:a_bunya' %}">【一般】分野ごと</a>
+                        </div>
+                    </li>
                 </ul>
                 <ul class="navbar-nav my-2 my-lg-0">
                     <li class="nav-link">

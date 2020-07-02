@@ -487,7 +487,7 @@ def a_bunya(request):
     # セッションを持っていない
     if 'u_id' not in request.session:
         return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです'})
-
+    u_id = request.session['u_id']
     o_id = request.session['o_id']
     users = User.objects.filter(o_id=o_id)
     user_list = users.values('u_id', 'u_name')
@@ -511,7 +511,7 @@ def a_bunya(request):
 
     print( l_list )
     u_admin = request.session['u_admin']
-    return render(request, 'exam/a_bunya.html', {'user_list': user_list, 'u_admin': u_admin , 'l_list':l_list} )
+    return render(request, 'exam/a_bunya.html', {'user_list': user_list, 'u_admin': u_admin , 'l_list':l_list , 'u_id':u_id} )
 
 #分析ページ
 def analysis( request):

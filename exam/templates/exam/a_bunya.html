@@ -4,10 +4,11 @@
 {% block css %}
 .modal{
     display: none;
-    height: 100vh;
+    height: 100vh%;
     position: fixed;
-    top: 0;
+    top: 0%;
     width: 100%;
+
 }
 .modal__bg{
     background: rgba(0,0,0,0.8);
@@ -22,13 +23,16 @@
     position: absolute;
     top: 50%;
     transform: translate(-50%,-50%);
-    width: 60%;
+    width: 80%;
+    height : 90%;
+    overflow-y:scroll;
 }
 {% endblock%}
 {% block bland %}分析{% endblock %}
 {% block a2 %}active{% endblock %}
 {% block main %}
 
+{% if u_admin == 1 %}
 <div class="row" style="margin-top:20px">
     <div class="col-md-2">
         <div class="form-group">
@@ -57,9 +61,39 @@
 
     </div>
 </div>
+{% else %}
+<div class="row" style="margin-top:20px">
+    <div class="col-md-2">
+        <div class="form-group">
+            <label id="u_id">{{ u_id }}</label>
+            <input type="button" value="表示" id="showdata">
+        </div>
+    </div>
+    <div class="col-md-8">
+        <table class="table-striped">
+            <thead>
+            <th>大分類名</th>
+            <th>中分類名</th>
+            <th>小分類名</th>
+            <th>正解数</th>
+            <th>問題数</th>
+            </thead>
+            <tbody id="resultdata"></tbody>
+        </table>
+    </div>
+    <div id="modal">
+
+    </div>
+</div>
+<script type="text/javascript">
+    load_ajax('00024001');
+</script>
+{% endif %}
+
 {% csrf_token %}
 
 {% endblock %}
-{% block script %}
+
+{% block addhead %}
 <script type="text/javascript" src="{% static 'exam/js/getresult2.js' %}" charset="utf-8"></script>
 {% endblock %}
