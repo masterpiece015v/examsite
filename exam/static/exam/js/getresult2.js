@@ -36,7 +36,7 @@ $(function(){
             $modal_main.children().remove();
             for( var i = 0 , len=data.length ; i<len ; ++i ){
                 if( old_s_name != data[i]['s_name'] ){
-                    $modal_content.append( $modal_table );
+                    $modal_content.append( $modal_item );
                     $modal.append( $modal_content );
                     $modal_main.append( $modal );
                     $tr = $('<tr>');
@@ -60,21 +60,19 @@ $(function(){
                     $modal.append( $('<div>').attr('class','modal__bg js-modal-close'));
                     $modal_content = $('<div>').attr('class','modal__content');
                     $modal_content.append( $('<a href="">').attr('class','js-modal-close').text('閉じる'));
-                    $modal_table = $('<table>').attr('class','table');
-                    $modal_tr = $('<tr>');
+                    $modal_item = $("<div style='padding:5px;margin-top:20px;border-top:solid 2px black;'>");
                     if( data[i]['result']==0){
-                            $modal_tr = $modal_tr.attr('style','background-color:red');
+                        $modal_item = $modal_item.attr('style','padding:5px;margin-top:20px;border-top:solid 2px black;background-color:red');
                     }
-                    $modal_td = $('<td>').text( data[i]['q_id']);
-                    $modal_tr.append( $modal_td );
-                    $modal_td = $('<td>').text( data[i]['r_answer']);
-                    $modal_tr.append( $modal_td );
-                    $modal_td = $('<td>').text( data[i]['q_answer']);
-                    $modal_tr.append( $modal_td );
-                    $modal_td = $('<td>');
-                    $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" );
-                    $modal_tr.append( $('<td>').append( $img) );
-                    $modal_table.append( $modal_tr );
+                    $modal_item.append( $("<p style='margin-top:5px;'>").text(data[i]['q_id']) );
+                    $modal_item.append( $("<p style='margin-top:5px;'>").append($("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" )));
+                    $modal_answer = $( "<p style='margin-top:5px;'>" );
+                    $modal_answer.append( $("<span>").text("あなたの解答:") );
+                    $modal_answer.append( $("<span class='r_answer'>").text( data[i]['r_answer']) );
+                    $modal_answer.append( $("<span>").text("  答え:"));
+                    $modal_answer.append( $("<span class='q_answer'>").text( data[i]['q_answer']));
+                    $modal_item.append( $modal_answer );
+                    $modal_content.append( $modal_item );
                     count = 1;
                     resultcount = data[i]['result'];
                 }else{
@@ -83,36 +81,35 @@ $(function(){
                         $modal.append( $('<div>').attr('class','modal__bg js-modal-close'));
                         $modal_content = $('<div>').attr('class','modal__content');
                         $modal_content.append( $('<a href="">').attr('class','js-modal-close').text('閉じる'));
-                        $modal_table = $('<table>').attr('class','table');
-                        $modal_tr = $('<tr>');
+
+                        $modal_item = $("<div style='padding:5px;margin-top:20px;border-top:solid 2px black;'>");
                         if( data[i]['result']==0){
-                            $modal_tr = $modal_tr.attr('style','background-color:red');
+                            $modal_item = $modal_item.attr('style','padding:5px;margin-top:20px;border-top:solid 2px black;background-color:red');
                         }
-                        $modal_td = $('<td>').text( data[i]['q_id']);
-                        $modal_tr.append( $modal_td );
-                        $modal_td = $('<td>').text( data[i]['r_answer']);
-                        $modal_tr.append( $modal_td );
-                        $modal_td = $('<td>').text( data[i]['q_answer']);
-                        $modal_tr.append( $modal_td );
-                        $modal_td = $('<td>');
-                        $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" );
-                        $modal_tr.append( $('<td>').append( $img) );
-                        $modal_table.append( $modal_tr );
+                        $modal_item.append( $("<p style='margin-top:5px;'>").text(data[i]['q_id']) );
+                        $modal_item.append( $("<p style='margin-top:5px;'>").append($("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" )));
+                        $modal_answer = $( "<p style='margin-top:5px;'>" );
+                        $modal_answer.append( $("<span>").text("あなたの解答:") );
+                        $modal_answer.append( $("<span class='r_answer'>").text( data[i]['r_answer']) );
+                        $modal_answer.append( $("<span>").text("答え:"));
+                        $modal_answer.append( $("<span class='q_answer'>").text( data[i]['q_answer']));
+                        $modal_item.append( $modal_answer );
+                        $modal_content.append( $modal_item );
+
                     }else{
-                        $modal_tr = $('<tr>');
+                        $modal_item = $("<div style='padding:5px;margin-top:20px;border-top:solid 2px black;'>");
                         if( data[i]['result']==0){
-                            $modal_tr = $modal_tr.attr('style','background-color:red');
+                            $modal_item = $modal_item.attr('style','padding:5px;margin-top:20px;border-top:solid 2px black;background-color:red');
                         }
-                        $modal_td = $('<td>').text( data[i]['q_id']);
-                        $modal_tr.append( $modal_td );
-                        $modal_td = $('<td>').text( data[i]['r_answer']);
-                        $modal_tr.append( $modal_td );
-                        $modal_td = $('<td>').text( data[i]['q_answer']);
-                        $modal_tr.append( $modal_td );
-                        $modal_td = $('<td>');
-                        $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" );
-                        $modal_tr.append( $('<td>').append( $img) );
-                        $modal_table.append( $modal_tr );
+                        $modal_item.append( $("<p style='margin-top:5px;'>").text(data[i]['q_id']) );
+                        $modal_item.append( $("<p style='margin-top:5px;'>").append($("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png' alt='" + data[i]['q_id'] + "' style='width:600px'>" )));
+                        $modal_answer = $("<p style='margin-top:5px;'>");
+                        $modal_answer.append( $("<span>").text("あなたの解答:") );
+                        $modal_answer.append( $("<span class='r_answer'>").text( data[i]['r_answer']) );
+                        $modal_answer.append( $("<span>").text("答え:"));
+                        $modal_answer.append( $("<span class='q_answer'>").text( data[i]['q_answer']));
+                        $modal_item.append( $modal_answer );
+                        $modal_content.append( $modal_item );
                     }
                     count++;
                     resultcount = resultcount + data[i]['result'];

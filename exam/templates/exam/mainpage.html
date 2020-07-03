@@ -8,25 +8,25 @@ padding-left:50px;
 padding-right:50px;}
 span.answer:hover{background-color : white;}
 p.question { margin-top : 30px; }
+h2 {font-size : 15pt;}
+h3 {font-size :12pt;}
 {% endblock %}
 {% load static %}
 {% block main %}
 
 <div class="row">
     <div class="col">
-        <p>ユーザID:{{ u_id }}</p>
-        <p>ユーザ名:{{ u_name }}</p>
-        <p><a href="{% url 'exam:passchange' %}">パスワードの変更</a></p>
+        <p>{{ u_id }}:{{ u_name }}<a href="{% url 'exam:passchange' %}">パスワードの変更</a></p>
     </div>
 </div>
 {% if u_admin == 1 %}
+<h2>管理者メニュー</h2>
 <div class="row">
-    <h2>管理者メニュー</h2>
-    <ul>
-        <li><a href="{% url 'exam:addlicense' %}">ライセンスの購入</a></li>
-        <li><a href="{% url 'exam:userregisterweb' %}">ユーザの追加</a></li>
-        <li>ユーザの延長</li>
-        <li><a href="{% url 'exam:answerupload' %}">解答アップロード</a></li>
+    <ul class="list-group">
+        <li class="list-group-item"><a href="{% url 'exam:addlicense' %}">ライセンスの購入</a></li>
+        <li class="list-group-item"><a href="{% url 'exam:userregisterweb' %}">ユーザの追加</a></li>
+        <li class="list-group-item">ユーザの延長</li>
+        <li class="list-group-item"><a href="{% url 'exam:answerupload' %}">解答アップロード</a></li>
     </ul>
 </div>
 {% endif %}
