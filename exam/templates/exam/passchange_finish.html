@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title %}パスワードの変更完了{% endblock %}
+{% load static %}
+{% block main %}
+<div class="row">
+    <p>{{ message }}</p>
+    <p><a href="{% url 'exam:mainpage' %}">もどる</a></p>
+</div>
+{% endblock %}

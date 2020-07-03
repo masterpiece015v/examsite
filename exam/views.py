@@ -189,7 +189,21 @@ def mainpage( request ):
             u_name = user.u_name
             u_admin = user.u_admin
             request.session['u_admin'] = u_admin
-            return render( request,'exam/mainpage.html',{'u_id':u_id,'u_name':u_name,'u_admin':u_admin})
+            period = Question.objects.values_list('q_period').distinct()
+            periodlist = []
+            for p in period:
+                periodlist.append(p[0])
+
+            classify = Classify.objects.values_list('m_id','m_name').distinct()
+            print( classify )
+            classifylist = []
+            for c in classify:
+                dict = {}
+                dict['m_id'] = c[0]
+                dict['m_name'] = c[1]
+                classifylist.append( dict )
+
+            return render( request,'exam/mainpage.html',{'u_id':u_id,'u_name':u_name,'u_admin':u_admin,'period':periodlist,'classify':classifylist})
 
     #u_idやパスワードを持っていない
     if request.method != "POST":
@@ -239,11 +253,42 @@ def mainpage( request ):
         u_admin = user.u_admin
         request.session['o_id'] = user.o_id
         request.session['u_admin'] = u_admin
-        return render( request,'exam/mainpage.html',{'u_id':u_id,'u_name':u_name,'u_admin':u_admin})
+        period = Question.objects.values_list('q_period').distinct()
+        periodlist = []
+        for p in period:
+            periodlist.append(p[0])
+
+        classify = Classify.objects.values_list('m_id', 'm_name').distinct()
+        print(classify)
+        classifylist = []
+        for c in classify:
+            dict = {}
+            dict['m_id'] = c[0]
+            dict['m_name'] = c[1]
+            classifylist.append(dict)
+
+        return render(request, 'exam/mainpage.html',
+                      {'u_id': u_id, 'u_name': u_name, 'u_admin': u_admin, 'period': periodlist,'classify': classifylist})
 
     else:
         addAccessLog(request,'mainpage','f')
         return render( request,'exam/index.html',{'message':'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
+def passchange( request ):
+    return render( request, 'exam/passchange.html')
+def passchange_finish( request):
+    u_id = request.session['u_id']
+    old_pass = request.POST['old_pass']
+    new_pass = request.POST['new_pass1']
+    user = User.objects.get(pk=u_id)
+    #print( user.u_pass )
+    if old_pass == user.u_pass:
+        #print('パスワード変更')
+        user.u_pass = new_pass
+        user.save()
+        return render(request, 'exam/passchange_finish.html',{'message':'パスワードの変更ができました。'})
+    else:
+        #print('パスワードが違う')
+        return render(request, 'exam/passchange.html',{'message':'パスワードが違うので変更できません。'})
 
 #管理者問い合わせ
 def inquiry( request ):
@@ -518,14 +563,14 @@ def analysis( request):
     #セッションを持っていない
     if 'u_id' not in request.session:
         return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
-    print("analysis")
+    u_id = request.session['u_id']
     o_id = request.session['o_id']
     users = User.objects.filter( o_id=o_id)
     user_list = users.values('u_id','u_name')
 
     u_admin = request.session['u_admin']
 
-    return render( request, 'exam/analysis.html',{'user_list':user_list ,'u_admin':u_admin} )
+    return render( request, 'exam/analysis.html',{'user_list':user_list ,'u_admin':u_admin , 'u_id':u_id } )
 
 #サイト管理者ログイン
 def salogin( request ):
@@ -727,7 +772,38 @@ def userregisterweb( request ):
 
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
 # u_idとt_idから結果を取得する
+def ajax_getquestion_period( request):
+    c_dic = byteToDic( request.body )
+    if 'q_period' in c_dic:
+        q_period = c_dic['q_period']
+        question = Question.objects.filter(q_period=q_period).values_list('q_id','q_answer')
 
+        questionlist = []
+        for q in question:
+            dict = {}
+            dict['q_id'] = q[0]
+            dict['q_answer'] = q[1]
+            questionlist.append( dict )
+
+        return HttpResponseJson( questionlist )
+
+def ajax_getquestion_classify( request):
+    c_dic = byteToDic( request.body )
+    if 'm_id' in c_dic:
+        m_id = c_dic['m_id']
+        question = Question.objects.values()
+
+        questionlist = []
+        for q in question:
+            c_id = q['c_id']
+            if c_id[2:4] == m_id:
+                #print( c_id + "," + c_id[2:4] )
+                dict = {}
+                dict['q_id'] = q['q_id']
+                dict['q_answer'] = q['q_answer']
+                questionlist.append( dict )
+        print( questionlist )
+        return HttpResponseJson( questionlist )
 # u_idからt_idを取得する
 def gettid( request):
     c_dic = byteToDic( request.body )
