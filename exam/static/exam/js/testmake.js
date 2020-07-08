@@ -253,6 +253,7 @@ $(function(){
 
     $('#a_que').on('dblclick',function(){
         var txt = $('#a_que option:selected').text();
+        alert( txt );
     });
     //問題選択ボタンのクリック
     //table ver
@@ -425,9 +426,9 @@ $(function(){
     //テストの作成
     $("#q_make").on('click',function(){
         var q_json = {}
-        q_json['chadd'] = $('#chadd').val();
+        //q_json['chadd'] = $('#chadd').val();
         q_json['q_test'] = $('#q_test').val();
-        console.log( q_json['chadd'] );
+        //console.log( q_json['chadd'] );
         console.log( q_json['q_test']);
 
         if ( $('#l_class').val() !== null){
@@ -441,29 +442,23 @@ $(function(){
         }
 
         var q_list = [];
-
+        cnt = 1;
         $('#sq').children().each(function(){
             var data = {};
-            cnt = 1;
-            $(this).children().each(function(){
-                switch( cnt ){
-                    case 1:
-                        data['t_num'] = $(this).text();
-                        break;
-                    case 2:
-                        data['q_id'] = $(this).text();
-                        break;
-                    case 3:
-                }
-                cnt = cnt + 1;
-            });
-            console.log( data );
+            data['t_num'] = $(this).val();
+
+            text = $(this).text();
+
+            q_id = text.split(',')[0];
+            data['q_id'] = q_id;
+
+            console.log( data['t_num'] );
+            console.log( data['q_id'] );
             q_list.push( data );
         });
 
         q_json['q_list'] = q_list;
 
-        //console.log( q_list );
 
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
@@ -483,8 +478,10 @@ $(function(){
             $('#modal-progress').modal('hide');
 
         }).fail( (data)=>{
+            alert('error');
         }).always( (data) => {
         });
+
     });
 
     //テストの作成

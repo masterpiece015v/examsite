@@ -1149,8 +1149,13 @@ def ajax_answerupload( request ):
 
     # すでにテストID＋ユーザIDが存在する場合
     if len(check_answer) >= 1:
-        return render(request, 'exam/answerupload.html',
-                      {"message": "そのデータはすでに存在します。", "t_id": test_id, "u_id": user_id, "answerlist": answerlist})
+        for i,a in enumerate( answerlist ):
+            result=ResultTest.objects.filter(t_id=test_id,u_id=user_id,t_num=code4(i+1))
+            result.update(r_answer=a[1])
+            #ret = resulttest.objects.filter(t_num=code4(i+1))
+            #print( ret.t_num )
+
+        return HttpResponseJson( {'message':'更新しました。'})
     else:
 
         # 解答をResultTestに登録する

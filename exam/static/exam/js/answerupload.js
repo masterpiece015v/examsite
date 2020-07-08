@@ -50,7 +50,7 @@ $(function(){
         }).done( (data) => {
 
             $(child_class).children().remove();
-            $('msg').text = data['message'];
+            alert( data['message'] );
 
             //console.log( data );
 
