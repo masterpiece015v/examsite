@@ -110,4 +110,43 @@ $(function(){
         });
 
     });
+
+
+   $("#btnDelete").on('click',function(){
+
+        var result = window.confirm('選択しているテストを削除しますか？');
+
+        if( result ){
+            $.ajaxSetup({
+                beforeSend : function(xhr,settings ){
+                    xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+                }
+            });
+
+            $.ajax({
+                type:"POST",
+                url:"/exam/ajax_testdelete/",
+                dataType:'json',
+                contentType: 'charset=utf-8',
+                data: getJsonStr( query ),
+            }).done( (data) => {
+                $s_test = $('#s_test')
+                $s_test.children().remove();
+                $s_test.append( $('<option>') );
+
+            }).fail( (data)=>{
+                alert('fail');
+            }).always( (data) => {
+
+            });
+
+        }else{
+
+        }
+
+        query = {'t_id':$("#s_test").val() };
+
+
+    });
+
 });

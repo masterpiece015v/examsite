@@ -10,7 +10,7 @@ import math
 #from django.conf import settings
 #from .logger import log_write
 
-PATH= os.path.join( "C:\\users\\mnt\\documents\\pythonproject\\examsite" , "exam")
+PATH= "C:/users/mnt/documents/pythonproject/examsite"
 #STATIC_PATH = os.path.join( PATH , 'static' , "exam", "data")
 STATIC_PATH = os.path.join( PATH,"static" , "exam" , "data")
 class Ainum:
@@ -405,7 +405,7 @@ def get_answer_list(filename):
     return o_n,t_n,u_n, answerlist
 
 if __name__ == "__main__":
-    filename = os.path.join(PATH,"static","exam","answer","0002","answer036.jpg")
+    filename = os.path.join(PATH,"static","exam","answer","0002","answer087.jpg")
     print( filename )
     o_n,t_n,u_n,answerlist = get_answer_list(filename )
 

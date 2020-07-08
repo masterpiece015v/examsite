@@ -8,23 +8,6 @@
 <div class="row">
     <div class="col-md-8">
         <form class="form-inline">
-            <!--
-            <div class="form-group">
-                <select id="chadd" class="form-control">
-                    <option value="0">追加しない</option>
-                    <option value="1">追加する</option>
-                </select>
-            </div>
-            -->
-            <!--
-            <div class="form-group" style="margin-left:10px;">
-                <input type="button" class="form-control" id="q_add" value="追加">
-            </div>
-
-            <div class="form-group" style="margin-left:10px;">
-                <input type="button" class="form-control" id="q_renew" value="入替">
-            </div>
-            -->
             <div class="form-group">
                 <label style="margin-left:10px;">試験:</label>
                 <select id="q_test" class="form-control">
@@ -33,8 +16,6 @@
                     {% endfor %}
                 </select>
             </div>
-
-
         </form>
     </div>
 </div>
@@ -59,6 +40,7 @@
         </div>
     </div>
 
+    <!--全問題-->
     <div class="col-md-3">
         <form class="form-inline">
             <div class="form-group" style="margin-left:3px;">
@@ -68,11 +50,11 @@
                 <input type="button" class="form-control" id="q_renew" value="入替">
             </div>
         </form>
-
         <div id="qcnt1">問題数:0</div>
-        <table id="question" style="font-size:9pt;" class="table table-condensed"></table>
+        <select id="question" size="20" class="form-control"></select>
+        <!--<table id="question" style="font-size:9pt;" class="table table-condensed"></table>-->
     </div>
-
+    <!--選択前問題-->
     <div class="col-md-3">
         <div class="form-group">
             <form class="form-inline">
@@ -80,17 +62,23 @@
                 <select id="q_quantity" class="form-control">
                     <option value="0">全て</option>
                     <option value="10">10問</option>
+                    <option value="15">15問</option>
                     <option value="20">20問</option>
+                    <option value="25">25問</option>
                     <option value="30">30問</option>
                     <option value="40">40問</option>
                     <option value="80">80問</option>
                 </select>
+                <input type="button" value="問題表示" id="q_select" class="form-control">
             </form>
         </div>
+
         <div id="a_qcnt">選択した問題数:0</div>
-        <table id="a_que" style="font-size:9pt;" class="table table-condensed"></table>
+        <select id="a_que" size="20" class="form-control"></select>
+        <!--<table id="a_que" style="font-size:9pt;" class="table table-condensed"></table>-->
     </div>
 
+    <!--テストにする問題-->
     <div class="col-md-3">
         <form class="form-inline">
             <div class="form-group" style="margin-left:10px;">
@@ -101,10 +89,12 @@
             </div>
         </form>
         <div id="qcnt2">テスト問題数:0</div>
-        <table id="sq" style="font-size:9pt;" class="table table-condensed"></table>
+        <select id="sq" size="20" class="form-control"></select>
+        <!--<table id="sq" style="font-size:9pt;" class="table table-condensed"></table>-->
     </div>
 </div>
 {% csrf_token %}
+<!--モーダル-->
 <div class="modal" id="modal-question" tabindex="-1" style="position:fixed;top:10px;left:10px;">
     <div class="modal-dialog">
         <div class="modal-content" style="width:800px">

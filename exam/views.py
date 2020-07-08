@@ -3,7 +3,7 @@ from django.shortcuts import render,HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.mail import EmailMessage
 import re,string,random,datetime,os,csv
-from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest,MakeLittletest
+from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest,MakeLittletest,CompQuestion
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.urls import reverse
@@ -421,7 +421,7 @@ def testmakeperiod( request ):
         return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
 
     q_test = Question.objects.values('q_test').distinct()
-    q_period_list = Question.objects.filter(q_test='ap').values('q_period').distinct()
+    q_period_list = Question.objects.filter(q_test='fe').values('q_period').distinct()
     return render(request,'exam/testmakeperiod.html',{'q_period_list':q_period_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
 #テスト印刷画面
@@ -771,6 +771,24 @@ def userregisterweb( request ):
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
+def ajax_testdelete( request ):
+    c_dic = byteToDic( request.body )
+    if 's_test' in c_dic:
+        o_id = request.session['o_id']
+        s_test = c_dic['s_test']
+        LittleTest.objects.filter(t_id=s_test,o_id=o_id).delete()
+        MakeLittletest.objects.filter(t_id=s_test,o_id=o_id).delete()
+        makelittletest = MakeLittletest.objects.all()
+
+    test_list = []
+    for m in makelittletest:
+        dict = {}
+        dict['t_id'] = m.t_id
+        dict['u_id'] = m.u_id
+        test_list.append( dict )
+
+    return HttpResponseJson( test_list )
+
 # u_idとt_idから結果を取得する
 def ajax_getquestion_period( request):
     c_dic = byteToDic( request.body )
@@ -1004,9 +1022,8 @@ def getperiod( request ):
 def getquestion( request ):
     q_dic = byteToDic( request.body )
 
-    print( q_dic )
-
     ary = []
+    #大分類、中分類、小分類
     if 'l_class' in q_dic and 'm_class' in q_dic and 's_class' in q_dic:
         l_id = q_dic['l_class']
         m_id = q_dic['m_class']
@@ -1019,7 +1036,9 @@ def getquestion( request ):
                 dic = {}
                 dic['q_id'] = q.q_id
                 dic['q_title'] = q.q_title
-                ary.append( dic )
+                ary.append(dic)
+
+    #大分類、中分類
     elif 'l_class' in q_dic and 'm_class' in q_dic:
         l_id = q_dic['l_class']
         m_id = q_dic['m_class']
@@ -1028,10 +1047,13 @@ def getquestion( request ):
         for c in classify:
             question = c.question_set.all().filter(q_test=q_test).order_by('c_id','q_title')
             for q in question:
+                cp = CompQuestion.objects.filter(q_id1=q.q_id)
                 dic = {}
                 dic['q_id'] = q.q_id
                 dic['q_title'] = q.q_title
-                ary.append( dic )
+                ary.append(dic)
+
+    #大分類
     elif 'l_class' in q_dic:
         l_id = q_dic['l_class']
         q_test = q_dic['q_test']
@@ -1043,6 +1065,7 @@ def getquestion( request ):
                 dic['q_id'] = q.q_id
                 dic['q_title'] = q.q_title
                 ary.append( dic )
+
     elif 'q_test' in q_dic and 'q_period' in q_dic:
         q_test = q_dic['q_test']
         q_period = q_dic['q_period']
@@ -1051,6 +1074,11 @@ def getquestion( request ):
             dic = {}
             dic['q_id'] = q.q_id
             dic['q_title'] = q.q_title
+            comp = CompQuestion.objects.filter(q_id1=q.q_id)
+            comp_list = []
+            for c in comp:
+                comp_list.append(c.q_id2)
+            dic['comp_list'] = comp_list
             ary.append( dic )
 
     return HttpResponseJson(ary)

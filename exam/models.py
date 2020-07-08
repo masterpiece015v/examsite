@@ -108,3 +108,8 @@ class MakeLittletest( models.Model ):
     o_id = models.CharField( max_length=4 )
     t_id = models.CharField( max_length=4 )
     u_id = models.CharField( max_length=20 )
+
+class CompQuestion( models.Model ):
+    cq_key = models.CharField( max_length=18,primary_key=True)
+    q_id1 = models.CharField( max_length=9)
+    q_id2 = models.CharField( max_length=9)

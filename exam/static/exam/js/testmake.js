@@ -1,4 +1,5 @@
 $(function(){
+    var comp_list = [];
     //4桁のコードを作る
     function getcode4( code ){
         if(code < 10){
@@ -70,6 +71,7 @@ $(function(){
 
     //問題を取得するajax
     function ajax_getquestion( query ){
+        var comp_list = [];
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
                 xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
@@ -86,20 +88,27 @@ $(function(){
 
             for( var i = 0 , len=data.length; i<len;++i){
 
-                code4 = getcode4(i+1);
+                //code4 = getcode4(i+1);
+                //select ver
+
+                $option = $('<option>').attr('value',data[i]['q_id']).text(data[i]['q_id'] + "," + data[i]['q_title']);
+                $('#question').append( $option );
+
+                //table ver
+                /*
                 $tr = $("<tr id='tr" + code4 + "'>");
                 $td = $('<td>').text( code4 );
-
                 $tr.append( $td );
-                Object.keys(data[i]).forEach( function( key ){
-                    $td = $('<td>').text( data[i][key] );
-                    $tr.append( $td );
-                });
+                $td = $('<td>').text( data[i]['q_id'] );
+                $tr.append( $td );
+                $td = $('<td>').text( data[i]['q_title']);
+                $tr.append( $td );
                 $('#question').append( $tr );
+                */
              }
 
              //問題数を表示
-             $('#qcnt1').text( '問題数:' + $('#question tr').length );
+             $('#qcnt1').text( '問題数:' + $('#question option').length );
 
         }).fail( (data)=>{
             alert( data );
@@ -151,7 +160,6 @@ $(function(){
         //選択した大分類の問題を取得する
         var q_json = {'l_class':$('#l_class').val(), 'q_test':$('#q_test').val() }
         ajax_getquestion( q_json );
-
     });
 
     //中分類リストのクリックイベント
@@ -178,18 +186,90 @@ $(function(){
         ajax_getquestion( q_json );
     });
 
-    //問題数の選択
-    $("#q_quantity").on('change',function(){
+    //問題選択ボタンのクリック
+    $("#q_select").on('click',function(){
+        $sq = $('#sq');
+        $msq = $('#msq');
+        $qua = $('#q_quantity');
+        $sq.children().remove();
+        $msq.children().remove();
+        var max = $('#a_que').children().length;
+        var num = $qua.val();
+        console.log( num );
+        if( num == 0 ){
+            //すべて追加
+            cnt = 1;
+            $("#a_que").children().each(function(){
+                $option = $('<option>');
+                code4 = getcode4( cnt );
+                $option.attr('value',code4);
+                $option.text( $(this).text() );
+                $sq.append( $option );
+                //モーダルに追加
+                $mtd = $("<td>")
+                $img = $("<img src='" + '/static/exam/image/question/' + $(this).attr('value') + '.png' + "'>");
+                $mtd.append( $img );
+                //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
+                $mtr2 = $("<tr>").append( $mtd )
+                $msq.append( $mtr2 )
+
+                cnt = cnt + 1;
+            });
+            $('#qcnt2').text( "問題数:" + $("#sq").children().length );
+        }else{
+            //問題数が選択問題数を超えているかチェック
+            if( max >= num ){
+                //排他的ランダム数を取得するジェネリック
+                var gen = getrandom(max)
+                for( var i = 1 ; i <= num ; i++){
+                    code4 = getcode4( i );
+                    $opt = $("#a_que option:nth-child(" + gen.next().value + ")");
+                    $option = $('<option>').attr('value',code4).text( $opt.text() );
+                    $sq.append( $option );
+                    //ランダムに選ばれた問題に追加
+                    //$dtr = $("<tr id='" + code4 + "'>");
+                    //$td1 = $('<td>').text( code4 );
+                    //$dtr.append( $td1 );
+
+                    //モダールに追加
+                    $mtr1 = $("<tr id='" + code4 + "'>");
+                    $mtd1 = $('<td>').text( code4 );
+                    $mtr1.append( $mtd1 );
+                    $mtd2 = $("<td>")
+                    $img = $("<img src='" + '/static/exam/image/question/' + $opt.attr('value') + '.png' + "' style='width:400px;'>");
+                    $mtd2.append( $img );
+                    $mtr1.append( $mtd2);
+
+                    $('#msq').append( $mtr1 );
+
+                }
+                //console.log( num );
+                $('#qcnt2').text( '問題数:' + num );
+            }else{
+                alert( '問題数が足りません。');
+            }
+        }
+    });
+
+    $('#a_que').on('dblclick',function(){
+        var txt = $('#a_que option:selected').text();
+    });
+    //問題選択ボタンのクリック
+    //table ver
+    /*
+    $("#q_select").on('click',function(){
         $('#sq').children().remove();
         $('#msq').children().remove();
+        $q_qua = $('#q_quantity');
 
         var max = $('#a_que').children().length;
-        var num = $(this).val();
+        var num = $q_qua.val();
 
         //全てを追加する
         if( num == 0 ){
             $('#a_que').children().each(function(){
                 $tr = $("<tr id='" + $(this).id + "'>");
+                $option = $('<option>');
                 cnt = 0;
                 $(this).children().each(function(){
                     $td = $('<td>').text( $(this).text() );
@@ -260,11 +340,28 @@ $(function(){
             }
         }
     });
-
+    */
     //問題の追加
     $("#q_add").on('click',function(){
         $('#question').children().each(function(){
-            $tr = $("<tr id='" + $(this).id + "'>");
+            $("#a_que").append( $(this) );
+        });
+        $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
+    });
+    //問題の新規
+    $("#q_renew").on('click',function(){
+        $("#a_que").children().remove();
+        $('#question').children().each(function(){
+            $("#a_que").append( $(this) );
+        });
+        $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
+    });
+
+    //table ver
+    /*
+    $("#q_add").on('click',function(){
+        $('#question').children().each(function(){
+            $tr = $("<tr id='" + $(this).attr('id') + "' class='tr1'>");
             var cnt = 0;
             $(this).children().each(function(){
                 $td = $('<td>').text( $(this).text() );
@@ -289,14 +386,16 @@ $(function(){
         });
         $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
     });
-
+    */
     //問題の新規
+    //table ver
+    /*
     $("#q_renew").on('click',function(){
         $('#a_que').children().remove();
         $('#msq').children().remove();
 
         $('#question').children().each(function(){
-            $tr = $("<tr id='" + $(this).id + "'>");
+            $tr = $("<tr id='" + $(this).attr('id') + "' class='tr1'>");
             var cnt = 0;
             $(this).children().each(function(){
                 $td = $('<td>').text( $(this).text() );
@@ -321,6 +420,7 @@ $(function(){
         });
         $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
     });
+    */
 
     //テストの作成
     $("#q_make").on('click',function(){
@@ -441,4 +541,5 @@ $(function(){
         }).always( (data) => {
         });
     });
+
 });
