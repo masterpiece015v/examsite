@@ -113,3 +113,11 @@ class CompQuestion( models.Model ):
     cq_key = models.CharField( max_length=18,primary_key=True)
     q_id1 = models.CharField( max_length=9)
     q_id2 = models.CharField( max_length=9)
+
+class QuestionPm( models.Model):
+    q_id = models.CharField( max_length=9,primary_key=True)
+    q_test = models.CharField( max_length=2)
+    q_period = models.CharField( max_length=5 )
+    q_num = models.IntegerField()
+    q_classify = models.CharField( max_length=20)
+    q_title = models.CharField( max_length=40 )

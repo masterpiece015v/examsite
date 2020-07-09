@@ -251,10 +251,13 @@ $(function(){
         }
     });
 
+    //ダブルクリック
     $('#a_que').on('dblclick',function(){
-        var txt = $('#a_que option:selected').text();
-        alert( txt );
+        //var txt = $('#a_que option:selected').text();
+        //alert( txt );
+        alert('dblclick');
     });
+
     //問題選択ボタンのクリック
     //table ver
     /*

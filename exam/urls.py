@@ -47,7 +47,8 @@ urlpatterns = [
     url(r'^saaddlicense/$',views.saaddlicense,name='saaddlicense'),
     url(r'^saaddlicense_filter/$',views.saaddlicense_filter,name='saaddlicense_filter'),
     url(r'^saaddlicense_conf/$',views.saaddlicense_conf,name='saaddlicense_conf'),
-
+    url(r'^questionpm/$',views.questionpm,name='questionpm'),
+    url(r'^ajax_getquestionpm/$',views.ajax_getquestionpm,name='ajax_questionpm'),
 ]
 
 from django.conf import settings

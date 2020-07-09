@@ -3,7 +3,7 @@ from django.shortcuts import render,HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.mail import EmailMessage
 import re,string,random,datetime,os,csv
-from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest,MakeLittletest,CompQuestion
+from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest,MakeLittletest,CompQuestion,QuestionPm
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.urls import reverse
@@ -14,7 +14,6 @@ import json,ast
 from django.conf import settings
 import glob
 from .logger import log_write
-
 
 #関数
 #アクセスログに追加する
@@ -31,7 +30,6 @@ def randomCharacter(n):
 
 #000Xのコードを作成する
 def code4( c ):
-
     if type( c ) is int:
         if c < 10:
             return '000' + str( c )
@@ -266,15 +264,15 @@ def mainpage( request ):
             dict['m_id'] = c[0]
             dict['m_name'] = c[1]
             classifylist.append(dict)
-
         return render(request, 'exam/mainpage.html',
                       {'u_id': u_id, 'u_name': u_name, 'u_admin': u_admin, 'period': periodlist,'classify': classifylist})
-
     else:
         addAccessLog(request,'mainpage','f')
         return render( request,'exam/index.html',{'message':'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
+
 def passchange( request ):
     return render( request, 'exam/passchange.html')
+
 def passchange_finish( request):
     u_id = request.session['u_id']
     old_pass = request.POST['old_pass']
@@ -770,7 +768,27 @@ def userregisterweb( request ):
         return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
+#午後問題表示
+def questionpm( request ):
+    qpm = QuestionPm.objects.values('q_classify').distinct().order_by('q_classify')
+    return render( request,'exam/questionpm.html',{'q_list':qpm})
+
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
+def ajax_getquestionpm( request ):
+    c_dic = byteToDic( request.body )
+    classify = c_dic['classify']
+    qpm = QuestionPm.objects.filter(q_classify=classify).values()
+    q_list = []
+    for q in qpm:
+        qfn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + q['q_title'] +".pdf"
+        afn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + "ans.pdf"
+        dict = {}
+        dict['qfn'] = qfn
+        dict['afn'] = afn
+        q_list.append( dict )
+
+    return HttpResponseJson({'q_list':q_list})
+
 def ajax_testdelete( request ):
     c_dic = byteToDic( request.body )
     if 's_test' in c_dic:

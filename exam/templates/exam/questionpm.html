@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}午後問題{% endblock %}
+{% block css %}
+{% endblock %}
+{% load static %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="classify" style="font-size:9pt;">分野</label>
+            <select id="classify" style="width:180px;font-size:9pt" class="form-control">
+                {% for c in q_list %}
+                <option value="{{ c.q_classify }}">{{ c.q_classify }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10">
+        <table class="table" >
+            <thead><th>問題</th><th>解答</th></thead>
+            <tbody id="questionpm"></tbody>
+        </table>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'exam/js/questionpm.js' %}" charset="utf-8"></script>
+{% endblock %}
