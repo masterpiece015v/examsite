@@ -1,0 +1,20 @@
+pythonはtensorflowの関係で3.7を使用
+
+visual c++ build toolsをインストール
+
+mysqlclientはwheelからのインストールが必要
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient
+mysqlclient-1.4.6-cp37-cp37m-win_amd64.whl
+>python.exe -m pip install mysqlclient-1.4.6-cp37-cp37-amd64.whl
+
+opencv-pythonをpipでインストール
+
+tensorflow1.Xをpipでインストール
+
+djangoをpipでインストール
+
+Pillowをpipでインストール
+
+matplotlibをpipでインストール
+
+gmailの二段階認証とアプリパスワードの設定
