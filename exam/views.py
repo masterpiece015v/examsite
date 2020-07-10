@@ -439,6 +439,18 @@ def testprint( request ):
         test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date']})
     return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
 
+#間違った問題を印刷
+def miss_question( request ):
+    securecheck( request )
+    user = User.objects.get(pk=request.session['u_id'])
+    o_id = user.o_id
+
+    users = User.objects.filter(o_id=o_id).values()
+
+    print( users )
+
+    return render( request,'exam/miss_question.html',{'u_admin':request.session['u_admin'] , 'users':users})
+
 #解答用紙印刷
 def answersheetprint( request ):
     o_id = request.session['o_id']
@@ -770,21 +782,86 @@ def userregisterweb( request ):
 
 #午後問題表示
 def questionpm( request ):
+    #セッションを持っていない
+    if 'u_id' not in request.session:
+        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+
+    u_admin = request.session['u_admin']
     qpm = QuestionPm.objects.values('q_classify').distinct().order_by('q_classify')
-    return render( request,'exam/questionpm.html',{'q_list':qpm})
+    return render( request,'exam/questionpm.html',{'q_list':qpm,'u_admin':u_admin})
+
+def question_am_upload( request ):
+    securecheck(request)
+    u_admin = request.session['u_admin']
+
+    # リクエストにfileが含まれている
+    if 'file' in request.FILES:
+        # アップするファイルのパス
+        o_id = request.session['o_id']
+        media_path = os.path.join(settings.STATIC_ROOT, "exam", "image", "question")
+
+        upfiles = request.FILES.getlist('file')
+
+        # 複数のファイルがアップロードされる
+        filelist = []
+        for uf in upfiles:
+            filepath = os.path.join(media_path, uf.name)
+            dest = open(filepath, 'wb+')
+            #print( filepath )
+            for chunk in uf:
+                dest.write(chunk)
+            filelist.append( uf.name )
+        return render(request, 'exam/question_am_upload.html',{'u_admin':u_admin,'filelist':filelist} )
+
+    return render( request, 'exam/question_am_upload.html',{'u_admin':u_admin} )
 
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
+#テストの印刷用データをajaxで取得する
+def ajax_miss_question( request ):
+    c_dic = byteToDic( request.body )
+    o_id = request.session['o_id']
+    resulttest = ResultTest.objects.filter(u_id=c_dic['u_id'])
+    list = []
+    for item in resulttest:
+        littletest = LittleTest.objects.filter(t_id=item.t_id,t_num=item.t_num)
+        q_id = littletest[0].q_id
+        question = Question.objects.get(pk=q_id)
+        if item.r_answer != question.q_answer:
+            dic={}
+            dic['t_id']=item.t_id
+            dic['t_num']=str( item.t_num )
+            dic['q_id']=q_id
+            dic['q_answer'] = question.q_answer
+            classify = Classify.objects.filter(c_id=question.c_id)
+            #c = question.get_classify()
+            dic['l_name'] = classify[0].l_name
+            dic['m_name'] = classify[0].m_name
+            dic['s_name'] = classify[0].s_name
+            print( dic )
+            list.append(dic)
+
+    return HttpResponseJson( list )
+
+def ajax_question_am_upload( request ):
+    return HttpResponseJson( {} )
+
 def ajax_getquestionpm( request ):
     c_dic = byteToDic( request.body )
     classify = c_dic['classify']
     qpm = QuestionPm.objects.filter(q_classify=classify).values()
     q_list = []
+    static_dir = settings.STATIC_ROOT
     for q in qpm:
         qfn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + q['q_title'] +".pdf"
         afn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + "ans.pdf"
         dict = {}
         dict['qfn'] = qfn
-        dict['afn'] = afn
+        afn_path = os.path.join( static_dir,'exam','pdf','question_pm',afn)
+        print( afn_path )
+        if (os.path.exists(afn_path)):
+            dict['afn'] = afn
+        else:
+            dict['afn'] = "ファイルなし"
         q_list.append( dict )
 
     return HttpResponseJson({'q_list':q_list})

@@ -49,6 +49,10 @@ urlpatterns = [
     url(r'^saaddlicense_conf/$',views.saaddlicense_conf,name='saaddlicense_conf'),
     url(r'^questionpm/$',views.questionpm,name='questionpm'),
     url(r'^ajax_getquestionpm/$',views.ajax_getquestionpm,name='ajax_questionpm'),
+    url(r'^question_am_upload/$',views.question_am_upload,name='question_am_upload'),
+    url(r'^ajax_question_am_upload/$',views.question_am_upload,name='ajax_question_am_upload'),
+    url(r'^miss_question/$',views.miss_question,name='miss_question'),
+    url(r'^ajax_miss_question/$',views.ajax_miss_question,name='ajax_miss_question'),
 ]
 
 from django.conf import settings
