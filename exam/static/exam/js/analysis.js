@@ -49,7 +49,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/gettid/",
+            url:"/exam/ajax_gettid/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
@@ -81,7 +81,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/getresult/",
+            url:"/exam/ajax_getresult/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),

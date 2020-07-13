@@ -19,7 +19,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/get_result_bunya/",
+            url:"/exam/ajax_getresultbunya/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),

@@ -20,7 +20,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/get_test_id_list/",
+            url:"/exam/ajax_gettestidlist/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
@@ -46,7 +46,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/get_test_id_result/",
+            url:"/exam/ajax_gettestidresult/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),

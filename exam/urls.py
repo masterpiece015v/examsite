@@ -7,28 +7,42 @@ app_name = "exam"
 urlpatterns = [
     url(r'^$',views.index , name="index" ),
     url(r'^admin/',admin.site.urls),
-    url(r'^answerupload/$',views.answerupload,name='answerupload'),
-    url(r'^ajax_answerupload/$',views.ajax_answerupload,name='ajax_answerupload'),
+    # AnswerUpload 解答用紙アップロード
+    url(r'^answerupload/$',views.AnswerUpload.answerupload,name='answerupload'),
+    url(r'^ajax_answerupload/$',views.AnswerUpload.ajax_answerupload,name='ajax_answerupload'),
+    # AnswerSheetPrint 解答用紙印刷
+    url(r'^answersheetprint/$', views.AnswerSheetPrint.answersheetprint, name='answersheetprint'),
+    url(r'^answersheetprint_conf/$', views.AnswerSheetPrint.ajax_answersheetprint, name='ajax_answersheetprint'),
+    # Analysis テストNOごとに結果分析
+    url(r'^analysis', views.Analysis.analysis,name='analysis'),
+    url(r'^ajax_gettid/$', views.Analysis.ajax_gettid, name='ajax_gettid'),
+    url(r'^ajax_getresult/$', views.Analysis.ajax_getresult, name='ajax_getresult'),
+    # A_All　すべてのテスト結果
+    url(r'^a_all', views.A_All.a_all ,name='a_all'),
+    url(r'^ajax_gettestidlist',views.A_All.ajax_gettestidlist,name='ajax_gettestidlist'),
+    url(r'^ajax_gettestidresult',views.A_All.ajax_gettestidresult,name='ajax_gettestidresult'),
+    # A_Bunya　分野ごとのテスト結果
+    url(r'^a_bunya', views.A_Bunya.a_bunya ,name='a_bunya'),
+    url(r'^ajax_getresultbunya/$',views.A_Bunya.ajax_getresultbunya,name='ajax_getresultbunya'),
+    # Miss_Question　間違った問題のみ印刷
+    url(r'^miss_question/$', views.Miss_Question.miss_question, name='miss_question'),
+    url(r'^ajax_miss_question/$', views.Miss_Question.ajax_miss_question, name='ajax_miss_question'),
+    # TestMake
+    url(r'^testmake/$',views.TestMake.testmake,name='testmake'),
+    url(r'^ajax_getclass/$', views.TestMake.ajax_getclass, name='ajax_getclass'),
+    url(r'^ajax_getquestion/$', views.TestMake.ajax_getquestion, name='ajax_getquestion'),
+    #TestPrint　テストを印刷する
+    url(r'^testprint/$', views.TestPrint.testprint, name='testprint'),
+    url(r'^ajax_gettestprint/$', views.TestPrint.ajax_gettestprint, name='ajax_gettestprint'),
+
+
     url(r'^ajax_getquestion_period/$',views.ajax_getquestion_period,name='ajax_getquestion_period'),
     url(r'^ajax_getquestion_classify/$', views.ajax_getquestion_classify, name='ajax_getquestion_classify'),
-    url(r'^analysis', views.analysis,name='analysis'),
-    url(r'^a_all', views.a_all ,name='a_all'),
-    url(r'^a_bunya', views.a_bunya ,name='a_bunya'),
-    url(r'^answersheetprint/$', views.answersheetprint, name='answersheetprint'),
-    url(r'^answersheetprint_conf/$', views.answersheetprint_conf, name='answersheetprint_conf'),
     url(r'^addlicense/$', views.addlicense, name='addlicense'),
     url(r'^addlicense_conf/$', views.addlicense_conf, name='addlicense_conf'),
-    url(r'^getclass/$', views.getclass, name='getclass'),
     url(r'^getperiod/$', views.getperiod, name='getperiod'),
-    url(r'^getquestion/$', views.getquestion, name='getquestion'),
-    url(r'^gettestprint/$', views.gettestprint, name='gettestprint'),
-    url(r'^getresult/$', views.getresult, name='getresult'),
-    url(r'^get_result_bunya/$',views.get_result_bunya,name='get_result_bunya'),
     url(r'^get_m_list',views.get_m_list,name='get_m_list'),
     url(r'^get_s_list',views.get_m_list,name='get_m_list'),
-    url(r'^get_test_id_list',views.get_test_id_list,name='get_test_id_list'),
-    url(r'^get_test_id_result',views.get_test_id_result,name='get_test_id_result'),
-    url(r'^gettid/$', views.gettid, name='gettid'),
     url(r'^inquiry/$', views.inquiry, name='inquiry'),
     url(r'^logoff/$',views.logoff,name="logoff"),
     url(r'^mainpage/$', views.mainpage, name='mainpage'),
@@ -36,10 +50,9 @@ urlpatterns = [
     url(r'^orgregister/$',views.orgregister,name='orgregister'),
     url(r'^passchange/$',views.passchange,name='passchange'),
     url(r'^passchange_finish',views.passchange_finish,name='passchange_finish'),
-    url(r'^testmake/$',views.testmake,name='testmake'),
     url(r'^testmakeperiod/$',views.testmakeperiod,name='testmakeperiod'),
-    url(r'^testprint/$',views.testprint,name='testprint'),
-    url(r'^testdelete/$',views.testdelete,name='testdelete'),
+    url(r'^testdelete/$',views.TestDelete.testdelete,name='testdelete'),
+    url(r'^ajax_testdelete/$',views.TestDelete.ajax_testdelete,name='ajax_testdelete'),
     url(r'^testupdate/$',views.testupdate,name='testupdate'),
     url(r'^userregistercsv/$', views.userregistercsv, name='userregistercsv'),
     url(r'^userregisterweb/$', views.userregisterweb, name='userregisterweb'),
@@ -52,9 +65,6 @@ urlpatterns = [
     url(r'^ajax_getquestionpm/$',views.ajax_getquestionpm,name='ajax_questionpm'),
     url(r'^question_am_upload/$',views.question_am_upload,name='question_am_upload'),
     url(r'^ajax_question_am_upload/$',views.question_am_upload,name='ajax_question_am_upload'),
-    url(r'^miss_question/$',views.miss_question,name='miss_question'),
-    url(r'^ajax_miss_question/$',views.ajax_miss_question,name='ajax_miss_question'),
-
 ]
 
 from django.conf import settings

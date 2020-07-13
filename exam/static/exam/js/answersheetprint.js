@@ -17,7 +17,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/answersheetprint_conf/",
+            url:"/exam/ajax_answersheetprint/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),

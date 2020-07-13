@@ -9,6 +9,7 @@ $(function(){
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
         return csrftoken;
     }
+
     $("#formControlRange").val( 800 / 1400 * 100 );
 
     $("#s_test").on('change',function(){
@@ -54,20 +55,23 @@ $(function(){
                 //alert( data.length );
                 if( data.length <= 20 ){
                     //console.log( data[i]['t_num']);
-                    $tr3 = $('<tr>').append(
-                        $("<td>").text( data[i]['t_num']),
-                        $("<td>").text( data[i]['q_answer'])
-                    );
-                    if( i > data.length ){
-                        break;
+                    if( i < data.length ){
+                        $tr3 = $('<tr>').append(
+                            $("<td>").text( data[i]['t_num']),
+                            $("<td>").text( data[i]['q_answer'])
+                        );
                     }
+
                 } else if( data.length <= 40 ){
                     $tr3 = $("<tr>");
                     $tr3.append( $("<td>").text(data[i]['t_num']) ,$("<td>").text(data[i]['q_answer']) );
+
                     if( (i + 20 ) < data.length ) {
                         $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']));
                     }
+
                 } else if( data.length <= 60 ){
+
                     $tr3 = $("<tr>");
                     $tr3.append( $("<td>").text(data[i]['t_num']) , $("<td>").text(data[i]['q_answer']) );
                     $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']) );
@@ -102,6 +106,7 @@ $(function(){
         var result = window.confirm('選択しているテストを削除しますか？');
 
         if( result ){
+            query = {'s_test':$("#s_test").val() };
             $.ajaxSetup({
                 beforeSend : function(xhr,settings ){
                     xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
@@ -115,9 +120,20 @@ $(function(){
                 contentType: 'charset=utf-8',
                 data: getJsonStr( query ),
             }).done( (data) => {
+                console.log( data );
+                if(data.error){
+
+                    alert( data.error );
+                    return;
+                }
                 $s_test = $('#s_test')
                 $s_test.children().remove();
                 $s_test.append( $('<option>') );
+                $.each(data,function(index,elem){
+                    $option = $('<option>').val(elem.t_id).text(elem.t_id + ":" + elem.u_id);
+                    $s_test.append( $option );
+                });
+
 
             }).fail( (data)=>{
                 alert('fail');
@@ -126,11 +142,8 @@ $(function(){
             });
 
         }else{
-
+            alert('キャンセルしました。');
         }
-
-        query = {'t_id':$("#s_test").val() };
-
 
     });
 

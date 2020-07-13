@@ -51,7 +51,7 @@ $(function(){
 
         $.ajax({
             type:"POST",
-            url:"/exam/getclass/",
+            url:"/exam/ajax_getclass/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
@@ -79,7 +79,7 @@ $(function(){
         });
         $.ajax({
             type:"POST",
-            url:"/exam/getquestion/",
+            url:"/exam/ajax_getquestion/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
@@ -252,99 +252,19 @@ $(function(){
     });
 
     //ダブルクリック
-    $('#a_que').on('dblclick',function(){
+    $('#sq').on('dblclick',function(){
         //var txt = $('#a_que option:selected').text();
         //alert( txt );
-        alert('dblclick');
+        value = $(this).val();
+        $(this).children('[value=' + value + ']').remove();
+
+        $(this).children().each(function(index,value){
+            value.val = getcode4(index+1);
+            console.log( value.val );
+        });
+
     });
 
-    //問題選択ボタンのクリック
-    //table ver
-    /*
-    $("#q_select").on('click',function(){
-        $('#sq').children().remove();
-        $('#msq').children().remove();
-        $q_qua = $('#q_quantity');
-
-        var max = $('#a_que').children().length;
-        var num = $q_qua.val();
-
-        //全てを追加する
-        if( num == 0 ){
-            $('#a_que').children().each(function(){
-                $tr = $("<tr id='" + $(this).id + "'>");
-                $option = $('<option>');
-                cnt = 0;
-                $(this).children().each(function(){
-                    $td = $('<td>').text( $(this).text() );
-                    $tr.append( $td );
-                    if(cnt==0){
-                        $mtr1 = $("<tr>");
-                        $mtd = $('<td>').text( $(this).text() );
-                        $mtr1.append( $mtd );
-                        $('#msq').append( $mtr1 );
-                    }
-                    if(cnt == 1){
-                        $mtd = $("<td>")
-                        $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "'>");
-                        $mtd.append( $img );
-                        //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
-                        $mtr2 = $("<tr>").append( $mtd )
-                        $('#msq').append( $mtr2 );
-                    }
-                    cnt = cnt + 1;
-                });
-                $('#sq').append( $tr );
-            });
-            $('#qcnt2').text( "問題数:" + $("#sq").children().length );
-        }else{
-            //問題数が選択問題数を超えているかチェック
-            if( max >= num ){
-                //排他的ランダム数を取得するジェネリック
-                var gen = getrandom(max)
-                for( var i = 1 ; i <= num ; i++){
-
-                    code4 = getcode4( i );
-                    $str = $('#a_que tr:nth-child(' + gen.next().value + ')');
-                    //ランダムに選ばれた問題に追加
-                    $dtr = $("<tr id='" + code4 + "'>");
-                    $td1 = $('<td>').text( code4 );
-                    $dtr.append( $td1 );
-
-                    //モダールに追加
-                    $mtr1 = $("<tr id='" + code4 + "'>");
-                    $mtd1 = $('<td>').text( code4 );
-                    $mtr1.append( $mtd1 );
-
-                    $('#msq').append( $mtr1 );
-                    cnt = 0;
-                    $str.children().each(function(){
-                        if(cnt > 0){
-                            $td = $('<td>').text( $(this).text() );
-                            $dtr.append( $td );
-                        }
-                        if(cnt == 1){
-                            $mtd2 = $("<td>")
-                            $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "' style='width:400px;'>");
-                            $mtd2.append( $img );
-                            //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
-                            $mtr2 = $("<tr>").append( $mtd2 )
-                            $('#msq').append( $mtr2 );
-                        }
-                        cnt = cnt + 1;
-                    });
-
-                    $('#sq').append( $dtr );
-
-                }
-                //console.log( num );
-                $('#qcnt2').text( '問題数:' + num );
-            }else{
-                alert( '問題数が足りません。');
-            }
-        }
-    });
-    */
     //問題の追加
     $("#q_add").on('click',function(){
         $('#question').children().each(function(){
@@ -360,71 +280,6 @@ $(function(){
         });
         $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
     });
-
-    //table ver
-    /*
-    $("#q_add").on('click',function(){
-        $('#question').children().each(function(){
-            $tr = $("<tr id='" + $(this).attr('id') + "' class='tr1'>");
-            var cnt = 0;
-            $(this).children().each(function(){
-                $td = $('<td>').text( $(this).text() );
-                $tr.append( $td );
-                if(cnt==0){
-                    $mtr1 = $("<tr>");
-                    $mtd = $('<td>').text( $(this).text() );
-                    $mtr1.append( $mtd );
-                    $('#msq').append( $mtr1 );
-                }
-                if(cnt == 1){
-                    $mtd = $("<td>")
-                    $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "'>");
-                    $mtd.append( $img );
-                    //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
-                    $mtr2 = $("<tr>").append( $mtd )
-                    $('#msq').append( $mtr2 );
-                }
-                cnt = cnt + 1;
-            });
-            $('#a_que').append( $tr );
-        });
-        $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
-    });
-    */
-    //問題の新規
-    //table ver
-    /*
-    $("#q_renew").on('click',function(){
-        $('#a_que').children().remove();
-        $('#msq').children().remove();
-
-        $('#question').children().each(function(){
-            $tr = $("<tr id='" + $(this).attr('id') + "' class='tr1'>");
-            var cnt = 0;
-            $(this).children().each(function(){
-                $td = $('<td>').text( $(this).text() );
-                $tr.append( $td );
-                if(cnt==0){
-                    $mtr1 = $("<tr>");
-                    $mtd = $('<td>').text( $(this).text() );
-                    $mtr1.append( $mtd );
-                    $('#msq').append( $mtr1 );
-                }
-                if(cnt == 1){
-                    $mtd = $("<td>")
-                    $img = $("<img src='" + '/static/exam/image/question/' + $(this).text() + '.png' + "'>");
-                    $mtd.append( $img );
-                    //console.log('/static/exam/image/question/' + $(this).text() + '.png' );
-                    $mtr2 = $("<tr>").append( $mtd )
-                    $('#msq').append( $mtr2 );
-                }
-                cnt = cnt + 1;
-            });
-            $('#a_que').append( $tr );
-        });
-        $('#a_qcnt').text( "問題数:" + $("#a_que").children().length );
-    });
-    */
 
     //テストの作成
     $("#q_make").on('click',function(){

@@ -87,6 +87,7 @@ class ResultTest( models.Model ):
     r_answer = models.CharField( max_length=1 )
     r_date = models.DateTimeField()
 
+
 class SuperUser( models.Model ):
     u_id = models.CharField( max_length=40 , primary_key=True)
     u_pass = models.CharField( max_length=40 )
