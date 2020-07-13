@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^testmake/$',views.testmake,name='testmake'),
     url(r'^testmakeperiod/$',views.testmakeperiod,name='testmakeperiod'),
     url(r'^testprint/$',views.testprint,name='testprint'),
+    url(r'^testdelete/$',views.testdelete,name='testdelete'),
     url(r'^testupdate/$',views.testupdate,name='testupdate'),
     url(r'^userregistercsv/$', views.userregistercsv, name='userregistercsv'),
     url(r'^userregisterweb/$', views.userregisterweb, name='userregisterweb'),
@@ -53,6 +54,7 @@ urlpatterns = [
     url(r'^ajax_question_am_upload/$',views.question_am_upload,name='ajax_question_am_upload'),
     url(r'^miss_question/$',views.miss_question,name='miss_question'),
     url(r'^ajax_miss_question/$',views.ajax_miss_question,name='ajax_miss_question'),
+
 ]
 
 from django.conf import settings

@@ -439,6 +439,23 @@ def testprint( request ):
         test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date']})
     return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
 
+#テスト印刷画面
+def testdelete( request ):
+    securecheck( request )
+    user = User.objects.get(pk=request.session['u_id'])
+    o_id = user.o_id
+
+    test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
+    test_list = []
+    for t in test:
+        t_id = t['t_id']
+        mt = MakeLittletest.objects.get(pk="%s%s"%(o_id,t_id))
+
+        print( mt.u_id )
+
+        test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date']})
+    return render( request,'exam/testdelete.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
+
 #間違った問題を印刷
 def miss_question( request ):
     securecheck( request )
@@ -1225,8 +1242,8 @@ def gettestprint( request ):
         dic['m_name'] = c.m_name
         dic['s_name'] = c.s_name
         list.append(dic)
-
     return HttpResponseJson( list )
+
 
 def ajax_answerupload( request ):
 
