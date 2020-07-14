@@ -591,7 +591,7 @@ class A_All():
                 t_list.append( t_id )
                 t_num = r.t_num
                 r_answer = r.r_answer
-                l_list = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+                l_list = LittleTest.objects.filter(t_id=t_id,t_num=t_num,o_id=o_id)
                 q_id = l_list[0].q_id
                 q_list = Question.objects.filter(q_id=q_id)
                 q_answer = q_list[0].q_answer
@@ -657,7 +657,7 @@ class A_All():
                 t_list.append( t_id )
                 t_num = r.t_num
                 r_answer = r.r_answer
-                l_list = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+                l_list = LittleTest.objects.filter(t_id=t_id,t_num=t_num,o_id=o_id)
                 q_id = l_list[0].q_id
                 q_list = Question.objects.filter(q_id=q_id)
                 q_answer = q_list[0].q_answer
@@ -764,6 +764,7 @@ class Analysis():
     # u_idとt_idからテストの結果を取得する ajax
     def ajax_getresult( request):
         c_dic = byteToDic( request.body )
+        o_id = request.session['o_id']
         #print( c_dic )
         if 'u_id' in c_dic:
             u_id = c_dic['u_id']
@@ -776,7 +777,7 @@ class Analysis():
             for r in resulttest:
                 t_num = r.t_num
                 r_answer = r.r_answer
-                littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num)
+                littletest = LittleTest.objects.filter(t_id=t_id,t_num=t_num,o_id=o_id)
                 q_id = littletest.order_by('t_key').first().q_id
                 #q_id = littletest[0].q_id
                 dics['q_id'].append( q_id )
@@ -990,6 +991,7 @@ class TestMake():
                 dic = {c["s_id"]: c["s_name"]}
                 dics.update(dic)
         return HttpResponseJson(dics)
+
     # 問題を取得する ajax
     def ajax_getquestion(request):
         q_dic = byteToDic(request.body)
