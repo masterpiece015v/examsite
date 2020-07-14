@@ -115,7 +115,7 @@ def newuser( request ):
         con = """
         新規ユーザ登録をしていただきありがとうございました。
         24時間以内に、下記URLから本登録にお進みください。
-        http://examsite.room.kaikei.ac.jp:8000/exam/orgregister/?auth_key=%s
+        http://examsite.room.kaikei.ac.jp+/exam/orgregister/?auth_key=%s
         """ % (auth_key)
         EmailMessage(sub, con, to=[u_email, ]).send()
         return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
@@ -410,16 +410,6 @@ def addlicense_conf( request ):
 def logoff( request ):
     request.session['u_id'] = ""
     return render( request,'exam/index.html')
-
-#年度期ごとの問題を作成する画面
-def testmakeperiod( request ):
-    #セッションを持っていない
-    if 'u_id' not in request.session:
-        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
-
-    q_test = Question.objects.values('q_test').distinct()
-    q_period_list = Question.objects.filter(q_test='fe').values('q_period').distinct()
-    return render(request,'exam/testmakeperiod.html',{'q_period_list':q_period_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
 
 #テスト印刷画面
 class TestPrint():
@@ -1065,6 +1055,92 @@ class TestMake():
 
         return HttpResponseJson(ary)
 
+    # 作ったテストをデータベースにアップする
+    def ajax_testupdate(request):
+        securecheck(request)
+        u_id = request.session['u_id']
+        if '@' in u_id:
+            user = User.objects.get(u_email=u_id)
+        else:
+            user = User.objects.get(u_id=u_id)
+
+        o_id = user.o_id
+
+        num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().count()
+
+        t_id = code4(num + 1)
+        test_dic = byteToDic(request.body)
+        q_list = test_dic['q_list']
+        t_date = datetime.datetime.now()
+        for item in q_list:
+            print(item)
+            t_num = item['t_num']
+            t_key = o_id + t_id + t_num
+            q_id = item['q_id']
+            l_test = LittleTest(t_key=t_key, t_id=t_id, t_num=t_num, t_date=t_date, o_id=o_id, q_id=q_id)
+            l_test.save()
+
+        m_test = MakeLittletest(m_key="%s%s" % (o_id, t_id), o_id=o_id, t_id=t_id, u_id=u_id)
+        m_test.save()
+
+        return HttpResponse(json.dumps({"state": "ok"}, ensure_ascii=False, indent=2), content_type='application/json',
+                            charset='utf-8')
+#年度期ごとの問題を作成する画面
+class TestMakePeriod():
+    def testmakeperiod( request ):
+        #セッションを持っていない
+        if 'u_id' not in request.session:
+            return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+
+        q_test = Question.objects.values('q_test').distinct()
+        q_period_list = Question.objects.filter(q_test='fe').values('q_period').distinct()
+        return render(request,'exam/testmakeperiod.html',{'q_period_list':q_period_list , 'q_test':q_test,'u_admin':request.session['u_admin']})
+    # 年度期を取得する
+    def ajax_getperiod(request):
+        c_dic = byteToDic(request.body)
+        ary = []
+        if 'q_test' in c_dic:
+            q_test = c_dic['q_test']
+            classify = Question.objects.filter(q_test=q_test).values('q_period').distinct()
+            dics = {}
+            for c in classify:
+                dic = {'q_period': c["q_period"]}
+                ary.append(dic)
+        print(ary)
+        return HttpResponseJson(ary)
+#午後問題表示
+class Question_Pm():
+    # ページ表示
+    def questionpm( request ):
+        #セッションを持っていない
+        if 'u_id' not in request.session:
+            return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+
+        u_admin = request.session['u_admin']
+        qpm = QuestionPm.objects.values('q_classify').distinct().order_by('q_classify')
+        return render( request,'exam/questionpm.html',{'q_list':qpm,'u_admin':u_admin})
+    #ajax
+    def ajax_getquestionpm(request):
+        c_dic = byteToDic(request.body)
+        classify = c_dic['classify']
+        qpm = QuestionPm.objects.filter(q_classify=classify).values()
+        q_list = []
+        static_dir = settings.STATIC_ROOT
+        for q in qpm:
+            qfn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + q['q_title'] + ".pdf"
+            afn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + "ans.pdf"
+            dict = {}
+            dict['qfn'] = qfn
+            afn_path = os.path.join(static_dir, 'exam', 'pdf', 'question_pm', afn)
+            print(afn_path)
+            if (os.path.exists(afn_path)):
+                dict['afn'] = afn
+            else:
+                dict['afn'] = "ファイルなし"
+            q_list.append(dict)
+
+        return HttpResponseJson({'q_list': q_list})
+
 
 #サイト管理者ログイン
 def salogin( request ):
@@ -1262,16 +1338,6 @@ def userregisterweb( request ):
         return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
     return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
-#午後問題表示
-def questionpm( request ):
-    #セッションを持っていない
-    if 'u_id' not in request.session:
-        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
-
-    u_admin = request.session['u_admin']
-    qpm = QuestionPm.objects.values('q_classify').distinct().order_by('q_classify')
-    return render( request,'exam/questionpm.html',{'q_list':qpm,'u_admin':u_admin})
-
 def question_am_upload( request ):
     securecheck(request)
     u_admin = request.session['u_admin']
@@ -1300,29 +1366,6 @@ def question_am_upload( request ):
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
 def ajax_question_am_upload( request ):
     return HttpResponseJson( {} )
-
-def ajax_getquestionpm( request ):
-    c_dic = byteToDic( request.body )
-    classify = c_dic['classify']
-    qpm = QuestionPm.objects.filter(q_classify=classify).values()
-    q_list = []
-    static_dir = settings.STATIC_ROOT
-    for q in qpm:
-        qfn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + q['q_title'] +".pdf"
-        afn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + "ans.pdf"
-        dict = {}
-        dict['qfn'] = qfn
-        afn_path = os.path.join( static_dir,'exam','pdf','question_pm',afn)
-        print( afn_path )
-        if (os.path.exists(afn_path)):
-            dict['afn'] = afn
-        else:
-            dict['afn'] = "ファイルなし"
-        q_list.append( dict )
-
-    return HttpResponseJson({'q_list':q_list})
-
-
 
 # u_idとt_idから結果を取得する
 def ajax_getquestion_period( request):
@@ -1410,47 +1453,3 @@ def get_s_list( request):
                 s_dics[s_id] = s_name
 
         return HttpResponseJson( s_dics )
-
-#分類名を取得する
-def getperiod( request ):
-    c_dic = byteToDic( request.body )
-    ary = []
-    if 'q_test' in c_dic:
-        q_test = c_dic['q_test']
-        classify = Question.objects.filter(q_test=q_test).values('q_period').distinct()
-        dics = {}
-        for c in classify:
-            dic = { 'q_period' : c["q_period"] }
-            ary.append( dic )
-    print( ary )
-    return HttpResponseJson(ary)
-
-#作ったテストをデータベースにアップする
-def testupdate( request ):
-    securecheck( request )
-    u_id = request.session['u_id']
-    if '@' in u_id:
-        user = User.objects.get(u_email=u_id)
-    else:
-        user = User.objects.get(u_id=u_id)
-
-    o_id = user.o_id
-
-    num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().count()
-
-    t_id = code4(num+1)
-    test_dic = byteToDic( request.body)
-    q_list = test_dic['q_list']
-    t_date = datetime.datetime.now()
-    for item in q_list:
-        print( item )
-        t_num = item['t_num']
-        t_key = o_id + t_id + t_num
-        q_id = item['q_id']
-        l_test = LittleTest(t_key=t_key,t_id=t_id,t_num=t_num,t_date=t_date,o_id=o_id,q_id=q_id)
-        l_test.save()
-
-    m_test = MakeLittletest(m_key="%s%s"%(o_id,t_id),o_id=o_id,t_id=t_id,u_id=u_id)
-    m_test.save()
-
-    return HttpResponse(json.dumps({"state":"ok"}, ensure_ascii=False, indent=2), content_type='application/json', charset='utf-8')

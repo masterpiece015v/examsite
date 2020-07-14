@@ -20,6 +20,7 @@ cur.execute( sql )
 
 rows = cur.fetchall()
 datas = []
+
 for row in rows:
     if int(row[2]) < 10:
         content = row[3][2:len( row[3] )]

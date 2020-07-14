@@ -1,6 +1,8 @@
+# static/exam/pdf/question_pmに
+# fe_h2101_01セキュリティ_パケットフィルタリング.pdf
+# の形式で保存しておけばデータベースに登録される
+
 import MySQLdb,os
-
-
 
 if __name__ == "__main__":
 

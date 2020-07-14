@@ -31,16 +31,21 @@ urlpatterns = [
     url(r'^testmake/$',views.TestMake.testmake,name='testmake'),
     url(r'^ajax_getclass/$', views.TestMake.ajax_getclass, name='ajax_getclass'),
     url(r'^ajax_getquestion/$', views.TestMake.ajax_getquestion, name='ajax_getquestion'),
+    url(r'^ajax_testupdate/$', views.TestMake.ajax_testupdate, name='ajax_testupdate'),
     #TestPrint　テストを印刷する
     url(r'^testprint/$', views.TestPrint.testprint, name='testprint'),
     url(r'^ajax_gettestprint/$', views.TestPrint.ajax_gettestprint, name='ajax_gettestprint'),
-
+    # Question_Pm　午後問題
+    url(r'^questionpm/$', views.Question_Pm.questionpm, name='questionpm'),
+    url(r'^ajax_getquestionpm/$', views.Question_Pm.ajax_getquestionpm, name='ajax_questionpm'),
+    #TestMakePeriod　年度期ごとにテストを作る
+    url(r'^testmakeperiod/$',views.TestMakePeriod.testmakeperiod,name='testmakeperiod'),
+    url(r'^ajax_getperiod/$', views.TestMakePeriod.ajax_getperiod, name='ajax_getperiod'),
 
     url(r'^ajax_getquestion_period/$',views.ajax_getquestion_period,name='ajax_getquestion_period'),
     url(r'^ajax_getquestion_classify/$', views.ajax_getquestion_classify, name='ajax_getquestion_classify'),
     url(r'^addlicense/$', views.addlicense, name='addlicense'),
     url(r'^addlicense_conf/$', views.addlicense_conf, name='addlicense_conf'),
-    url(r'^getperiod/$', views.getperiod, name='getperiod'),
     url(r'^get_m_list',views.get_m_list,name='get_m_list'),
     url(r'^get_s_list',views.get_m_list,name='get_m_list'),
     url(r'^inquiry/$', views.inquiry, name='inquiry'),
@@ -50,10 +55,9 @@ urlpatterns = [
     url(r'^orgregister/$',views.orgregister,name='orgregister'),
     url(r'^passchange/$',views.passchange,name='passchange'),
     url(r'^passchange_finish',views.passchange_finish,name='passchange_finish'),
-    url(r'^testmakeperiod/$',views.testmakeperiod,name='testmakeperiod'),
+
     url(r'^testdelete/$',views.TestDelete.testdelete,name='testdelete'),
     url(r'^ajax_testdelete/$',views.TestDelete.ajax_testdelete,name='ajax_testdelete'),
-    url(r'^testupdate/$',views.testupdate,name='testupdate'),
     url(r'^userregistercsv/$', views.userregistercsv, name='userregistercsv'),
     url(r'^userregisterweb/$', views.userregisterweb, name='userregisterweb'),
     url(r'^salogin/$',views.salogin,name='salogin'),
@@ -61,8 +65,6 @@ urlpatterns = [
     url(r'^saaddlicense/$',views.saaddlicense,name='saaddlicense'),
     url(r'^saaddlicense_filter/$',views.saaddlicense_filter,name='saaddlicense_filter'),
     url(r'^saaddlicense_conf/$',views.saaddlicense_conf,name='saaddlicense_conf'),
-    url(r'^questionpm/$',views.questionpm,name='questionpm'),
-    url(r'^ajax_getquestionpm/$',views.ajax_getquestionpm,name='ajax_questionpm'),
     url(r'^question_am_upload/$',views.question_am_upload,name='question_am_upload'),
     url(r'^ajax_question_am_upload/$',views.question_am_upload,name='ajax_question_am_upload'),
 ]

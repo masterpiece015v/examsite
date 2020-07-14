@@ -10,7 +10,7 @@ import math
 #from django.conf import settings
 #from .logger import log_write
 
-PATH= "C:/users/mnt/documents/pythonproject/examsite"
+PATH= "/"
 #STATIC_PATH = os.path.join( PATH , 'static' , "exam", "data")
 STATIC_PATH = os.path.join( PATH,"static" , "exam" , "data")
 class Ainum:
