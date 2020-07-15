@@ -110,5 +110,11 @@ $(function(){
 
     });
 
+    //解答用紙印刷画面へ
+    $('#btnKaitou').on('click',function(){
+        t_id = $('#s_test').val();
+        console.log( t_id );
+        window.location.href = "/exam/answersheetprint/?t_id=" + t_id;
+    });
 
 });

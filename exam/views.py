@@ -424,10 +424,10 @@ class TestPrint():
         for t in test:
             t_id = t['t_id']
             mt = MakeLittletest.objects.get(pk="%s%s"%(o_id,t_id))
+            cnt = ResultTest.objects.filter(t_id=t_id,u__o_id=o_id).values('t_id','u_id').distinct().count();
+            #print( mt.u_id )
+            test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date'],'cnt':cnt})
 
-            print( mt.u_id )
-
-            test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date']})
         return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
     #テストの印刷用データをajaxで取得する
     def ajax_gettestprint( request ):
@@ -491,6 +491,7 @@ class TestDelete():
             dict['u_id'] = m.u_id
             test_list.append( dict )
         return HttpResponseJson( test_list )
+
 #間違った問題を印刷
 class Miss_Question():
     #ページの表示
@@ -511,7 +512,7 @@ class Miss_Question():
         resulttest = ResultTest.objects.filter(u_id=c_dic['u_id'])
         list = []
         for item in resulttest:
-            littletest = LittleTest.objects.filter(t_id=item.t_id,t_num=item.t_num)
+            littletest = LittleTest.objects.filter(t_id=item.t_id,t_num=item.t_num,o_id=o_id)
             q_id = littletest[0].q_id
             question = Question.objects.get(pk=q_id)
             if item.r_answer != question.q_answer:
@@ -534,6 +535,37 @@ class AnswerSheetPrint():
     # ページの表示
     def answersheetprint( request ):
         o_id = request.session['o_id']
+        if 't_id' in request.GET:
+            t_id = request.GET.get('t_id')
+            test = LittleTest.objects.filter(o_id=o_id, t_id=t_id)
+            user = User.objects.filter(o_id=o_id)
+
+            t_list = []
+            for t in test:
+                dic = {}
+                dic['t_num'] = t.t_num
+                dic['q_id'] = t.q_id
+                t_list.append(dic)
+
+            u_list = []
+            for u in user:
+                dic = {}
+                dic['u_id'] = u.u_id
+                dic['u_name'] = u.u_name
+                u_list.append(dic)
+
+            list = {'t_list': t_list, 'u_list': u_list, 'o_id': o_id}
+
+            test = LittleTest.objects.filter(o_id=o_id).values('t_id', 't_date').distinct()
+            t_list = []
+            for t in test:
+                dic = {}
+                dic['t_id'] = t['t_id']
+                dic['t_date'] = t['t_date']
+                t_list.append(dic)
+
+            return render(request, 'exam/answersheetprint.html', {'test': t_list, 'u_admin': request.session['u_admin'] , 't_id':t_id , 'list':list })
+
         test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
         list = []
         for t in test:
@@ -541,7 +573,8 @@ class AnswerSheetPrint():
             dic['t_id'] = t['t_id']
             dic['t_date'] = t['t_date']
             list.append( dic )
-        return render( request, 'exam/answersheetprint.html',{'test':list,'u_admin':request.session['u_admin']})
+
+        return render( request, 'exam/answersheetprint.html',{'test':list,'u_admin':request.session['u_admin'] })
 
     # ajax
     def ajax_answersheetprint( request ):
@@ -566,7 +599,7 @@ class AnswerSheetPrint():
             u_list.append( dic )
 
         list = {'t_list':t_list,'u_list':u_list , 'o_id':o_id }
-        print( list )
+        #print( list )
         return HttpResponseJson( list )
 # 分析ページ(全員)
 class A_All():
@@ -1110,6 +1143,36 @@ class TestMakePeriod():
                 ary.append(dic)
         print(ary)
         return HttpResponseJson(ary)
+    # 作ったテストをデータベースにアップする
+    def ajax_testupdateperiod(request):
+        securecheck(request)
+        u_id = request.session['u_id']
+        if '@' in u_id:
+            user = User.objects.get(u_email=u_id)
+        else:
+            user = User.objects.get(u_id=u_id)
+
+        o_id = user.o_id
+
+        num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().count()
+
+        t_id = code4(num + 1)
+        test_dic = byteToDic(request.body)
+        q_list = test_dic['q_list']
+        t_date = datetime.datetime.now()
+        for item in q_list:
+            print(item)
+            t_num = item['t_num']
+            t_key = o_id + t_id + t_num
+            q_id = item['q_id']
+            l_test = LittleTest(t_key=t_key, t_id=t_id, t_num=t_num, t_date=t_date, o_id=o_id, q_id=q_id)
+            l_test.save()
+
+        m_test = MakeLittletest(m_key="%s%s" % (o_id, t_id), o_id=o_id, t_id=t_id, u_id=u_id)
+        m_test.save()
+
+        return HttpResponse(json.dumps({"state": "ok"}, ensure_ascii=False, indent=2), content_type='application/json',charset='utf-8')
+
 #午後問題表示
 class Question_Pm():
     # ページ表示

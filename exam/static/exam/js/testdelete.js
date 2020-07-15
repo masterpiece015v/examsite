@@ -26,7 +26,7 @@ $(function(){
 
         $.ajax({
             type:"POST",
-            url:"/exam/gettestprint/",
+            url:"/exam/ajax_gettestprint/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
