@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^testdelete/$', views.TestDelete.testdelete, name='testdelete'),
     url(r'^ajax_testdelete/$', views.TestDelete.ajax_testdelete, name='ajax_testdelete'),
 
+    # Addlicense
     url(r'^ajax_getquestion_period/$',views.ajax_getquestion_period,name='ajax_getquestion_period'),
     url(r'^ajax_getquestion_classify/$', views.ajax_getquestion_classify, name='ajax_getquestion_classify'),
     url(r'^addlicense/$', views.addlicense, name='addlicense'),
