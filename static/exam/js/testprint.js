@@ -40,7 +40,7 @@ $(function(){
 
         $.ajax({
             type:"POST",
-            url:"/exam/gettestprint/",
+            url:"/exam/ajax_gettestprint/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
@@ -69,12 +69,11 @@ $(function(){
                 //alert( data.length );
                 if( data.length <= 20 ){
                     //console.log( data[i]['t_num']);
-                    $tr3 = $('<tr>').append(
-                        $("<td>").text( data[i]['t_num']),
-                        $("<td>").text( data[i]['q_answer'])
-                    );
-                    if( i > data.length ){
-                        break;
+                    if( i < data.length) {
+                        $tr3 = $('<tr>').append(
+                            $("<td>").text( data[i]['t_num']),
+                            $("<td>").text( data[i]['q_answer'])
+                        );
                     }
                 } else if( data.length <= 40 ){
                     $tr3 = $("<tr>");
@@ -111,42 +110,11 @@ $(function(){
 
     });
 
-
-   $("#btnDelete").on('click',function(){
-
-        var result = window.confirm('選択しているテストを削除しますか？');
-
-        if( result ){
-            $.ajaxSetup({
-                beforeSend : function(xhr,settings ){
-                    xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
-                }
-            });
-
-            $.ajax({
-                type:"POST",
-                url:"/exam/ajax_testdelete/",
-                dataType:'json',
-                contentType: 'charset=utf-8',
-                data: getJsonStr( query ),
-            }).done( (data) => {
-                $s_test = $('#s_test')
-                $s_test.children().remove();
-                $s_test.append( $('<option>') );
-
-            }).fail( (data)=>{
-                alert('fail');
-            }).always( (data) => {
-
-            });
-
-        }else{
-
-        }
-
-        query = {'t_id':$("#s_test").val() };
-
-
+    //解答用紙印刷画面へ
+    $('#btnKaitou').on('click',function(){
+        t_id = $('#s_test').val();
+        console.log( t_id );
+        window.location.href = "/exam/answersheetprint/?t_id=" + t_id;
     });
 
 });

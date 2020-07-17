@@ -18,7 +18,7 @@
             </select>
 
             <label for="lst_test" style="font-size:9pt;">テストID</label>
-            <select id="lst_test" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control">
+            <select id="lst_test" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control" data-toggle="modal" data-target="#modal-progress">
 
             </select>
         </div>
@@ -40,7 +40,13 @@
 
 </div>
 {% csrf_token %}
-
+<div class="modal" id="modal-progress" tabindex="-1" style="position:fixed;top:10px;left:10px;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-body">作成中です。しばらくお待ちください</div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block script %}
 <script type="text/javascript" src="{% static 'exam/js/a_all.js' %}" charset="utf-8"></script>

@@ -10,10 +10,10 @@
         <div class="col">
             <form class="form-inline">
                 <div class="form-group">
-                    <select class="form-control d-print-none" id="s_test">
+                    <select class="form-control d-print-none" id="s_test" style="width:300px;">
                         <option></option>
                         {% for test in test_list %}
-                            <option value="{{ test.t_id }}">{{ test.t_id }} : {{test.u_id}} : ({{ test.cnt }}人)</option>
+                            <option value="{{ test.t_id }}">{{ test.t_id }} : {{test.u_id}} : ({{ test.cnt }}人) : {{ test.m_name }}</option>
                         {% endfor %}
                     </select>
                 </div>

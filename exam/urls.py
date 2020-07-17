@@ -5,7 +5,7 @@ from . import views
 app_name = "exam"
 
 urlpatterns = [
-    url(r'^$',views.index , name="index" ),
+    url(r'^$',views.Index.index , name="index" ),
     url(r'^admin/',admin.site.urls),
     # AnswerUpload 解答用紙アップロード
     url(r'^answerupload/$',views.AnswerUpload.answerupload,name='answerupload'),
@@ -45,30 +45,63 @@ urlpatterns = [
     #TestDelete テストを削除する
     url(r'^testdelete/$', views.TestDelete.testdelete, name='testdelete'),
     url(r'^ajax_testdelete/$', views.TestDelete.ajax_testdelete, name='ajax_testdelete'),
+    #MainPage メインページ
+    url(r'^mainpage/$', views.MainPage.mainpage, name='mainpage'),
+    url(r'^mainpage_ajax_getperiod/$', views.MainPage.mainpage_ajax_getperiod, name='mainpage_ajax_getperiod'),
+    url(r'^ajax_getquestion_period/$', views.MainPage.ajax_getquestion_period, name='ajax_getquestion_period'),
+    url(r'^ajax_getquestion_classify/$', views.MainPage.ajax_getquestion_classify, name='ajax_getquestion_classify'),
 
     # Addlicense
-    url(r'^ajax_getquestion_period/$',views.ajax_getquestion_period,name='ajax_getquestion_period'),
-    url(r'^ajax_getquestion_classify/$', views.ajax_getquestion_classify, name='ajax_getquestion_classify'),
-    url(r'^addlicense/$', views.addlicense, name='addlicense'),
-    url(r'^addlicense_conf/$', views.addlicense_conf, name='addlicense_conf'),
-    url(r'^get_m_list',views.get_m_list,name='get_m_list'),
-    url(r'^get_s_list',views.get_m_list,name='get_m_list'),
-    url(r'^inquiry/$', views.inquiry, name='inquiry'),
-    url(r'^logoff/$',views.logoff,name="logoff"),
-    url(r'^mainpage/$', views.mainpage, name='mainpage'),
-    url(r'^newuser/$', views.newuser, name='newuser'),
-    url(r'^orgregister/$',views.orgregister,name='orgregister'),
-    url(r'^passchange/$',views.passchange,name='passchange'),
-    url(r'^passchange_finish',views.passchange_finish,name='passchange_finish'),
-    url(r'^userregistercsv/$', views.userregistercsv, name='userregistercsv'),
-    url(r'^userregisterweb/$', views.userregisterweb, name='userregisterweb'),
-    url(r'^salogin/$',views.salogin,name='salogin'),
-    url(r'^sapage/$',views.sapage,name='sapage'),
-    url(r'^saaddlicense/$',views.saaddlicense,name='saaddlicense'),
-    url(r'^saaddlicense_filter/$',views.saaddlicense_filter,name='saaddlicense_filter'),
-    url(r'^saaddlicense_conf/$',views.saaddlicense_conf,name='saaddlicense_conf'),
-    url(r'^question_am_upload/$',views.question_am_upload,name='question_am_upload'),
-    url(r'^ajax_question_am_upload/$',views.question_am_upload,name='ajax_question_am_upload'),
+    url(r'^addlicense/$', views.Addlicense.addlicense, name='addlicense'),
+
+    # AddlicenseConf
+    url(r'^addlicense_conf/$', views.AddlicenseConf.addlicense_conf, name='addlicense_conf'),
+
+    # Inquiry
+    url(r'^inquiry/$', views.Inquiry.inquiry, name='inquiry'),
+
+    # Logoff
+    url(r'^logoff/$',views.Logoff.logoff,name="logoff"),
+
+    # NewUser
+    url(r'^newuser/$', views.NewUser.newuser, name='newuser'),
+
+    # OrgRegister
+    url(r'^orgregister/$',views.OrgRegister.orgregister,name='orgregister'),
+
+    # PassChange
+    url(r'^passchange/$',views.PassChange.passchange,name='passchange'),
+
+    # PassChangeFinish
+    url(r'^passchange_finish',views.PassChangeFinish.passchange_finish,name='passchange_finish'),
+
+    # UserRegisterCsv
+    url(r'^userregistercsv/$', views.UserRegisterCsv.userregistercsv, name='userregistercsv'),
+
+    # UserRegisterWeb
+    url(r'^userregisterweb/$', views.UserRegisterWeb.userregisterweb, name='userregisterweb'),
+
+    # SaLogin
+    url(r'^salogin/$',views.SaLogin.salogin,name='salogin'),
+
+    # SaPage
+    url(r'^sapage/$',views.SaPage.sapage,name='sapage'),
+
+    # SaAddlicense
+    url(r'^saaddlicense/$',views.SaAddlicense.saaddlicense,name='saaddlicense'),
+
+    # SaAddlicenseFilter
+    url(r'^saaddlicense_filter/$',views.SaAddlicenseFilter.saaddlicense_filter,name='saaddlicense_filter'),
+
+    #SaAddlicenseConf
+    url(r'^saaddlicense_conf/$',views.SaAddlicenseConf.saaddlicense_conf,name='saaddlicense_conf'),
+
+    # QuestionAmUpLoad
+    url(r'^question_am_upload/$',views.QuestioinAmUpload.question_am_upload,name='question_am_upload'),
+
+    url(r'^get_m_list', views.get_m_list, name='get_m_list'),
+    url(r'^get_s_list', views.get_m_list, name='get_m_list'),
+
 ]
 
 from django.conf import settings

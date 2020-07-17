@@ -62,6 +62,7 @@ $(function(){
                 $tr.append( $td3 );
                 $('#resultdata').append( $tr );
             }
+            $('#modal-progress').modal('hide');
         }).fail( (data)=>{
             alert( data );
         }).always( (data) => {

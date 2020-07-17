@@ -8,6 +8,7 @@ $(function(){
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
         return csrftoken;
     }
+
     $("#t_id").on('change',function(){
         query = {'t_id':$(this).val()};
         $.ajaxSetup({

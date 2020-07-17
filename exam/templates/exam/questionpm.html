@@ -7,14 +7,24 @@
 {% block main %}
 
 <div class="row" style="margin-top:20px">
-    <div class="col-md-3">
+    <div class="col-md-6">
         <div class="form-group">
-            <label for="classify" style="font-size:9pt;">分野</label>
-            <select id="classify" style="width:180px;font-size:9pt" class="form-control">
-                {% for c in q_list %}
-                <option value="{{ c.q_classify }}">{{ c.q_classify }}</option>
-                {% endfor %}
-            </select>
+            <form class="form-inline">
+                <label for="test" style="font-size:12pt;">試験区分：</label>
+                <select id="test" style="width:180px;font-size:9pt" class="form-control">
+                    {% for t in test %}
+                    <option value="{{ t.test }}">{{t.test}}({{ t.name }})</option>
+                    {% endfor %}
+                </select>
+
+
+                <label for="classify" style="font-size:12pt;margin-left:10px;">分野：</label>
+                <select id="classify" style="width:180px;font-size:9pt" class="form-control">
+                    {% for c in q_list %}
+                    <option value="{{ c.q_classify }}">{{ c.q_classify }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
     </div>
 </div>

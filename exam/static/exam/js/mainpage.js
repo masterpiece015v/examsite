@@ -72,16 +72,48 @@ $(function(){
         });
     }
 
+    function ajax_getperiod(child_class,json){
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings){
+                xhr.setRequestHeader( 'X-CSRFToken',getCSRFToken());
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"/exam/mainpage_ajax_getperiod/",
+            dataType:'json',
+            contentType:'charset=utf-8',
+            data:getJsonStr( json ),
+        }).done( (data) => {
+            $(child_class).children().remove();
+            for( i = 0 ; i < data.length ; i++){
+                $op = $('<option>').val(data[i]['period']).text(data[i]['name']);
+                $(child_class).append( $op );
+            }
+        }).fail((data)=>{
+
+        }).always((data)=>{
+
+        });
+    }
+
+    //テストをクリック
+    $('#test').on('click',function(){
+        var json = {'q_test':$('#test').val() };
+        ajax_getperiod('#period',json);
+    });
+
     //年度期をクリック
     $("#period").on('click',function(){
         //ユーザのidを送信する
-        var json = {'q_period' : $('#period').val() }
+        var json = {'q_period' : $('#period').val() ,'q_test':$('#test').val() };
+        console.log( json );
         ajax_getquestion_period( '#question' , json );
     });
 
     //中分類をクリック
     $('#classify').on('click',function(){
-        var json = {'m_id' : $('#classify').val() };
+        var json = {'m_id' : $('#classify').val(),'q_test':$('#test').val() };
         ajax_getquestion_classify( '#question' , json );
     });
 });

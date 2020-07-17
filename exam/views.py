@@ -65,7 +65,7 @@ def checkBruteforce(u_id,a_page):
         return False
 #ajaxのPOSTデータをDictionaryに変換する
 def byteToDic( data ):
-    return  ast.literal_eval( data.decode() )
+    return ast.literal_eval( data.decode() )
 #セッションにu_idを含むかをチェックする
 def securecheck( request ):
     if 'u_id' not in request.session:
@@ -94,222 +94,307 @@ def list_in_dict_sort( list , key1 , key2 ):
 
 #-*-*-*-*-*-ページ-*-*-*-*-*-*-*-*-*
 #ログイン
-def index( request):
-    request.session.clear()
-    return render(request, 'exam/index.html')
+class Index():
+    def index( request):
+        request.session.clear()
+        return render(request, 'exam/index.html')
 
 #新規ユーザ登録
-def newuser( request ):
-    if request.method != "POST":
-        return render(request,'exam/newuser.html')
+class NewUser():
+    def newuser( request ):
+        if request.method != "POST":
+            return render(request,'exam/newuser.html')
 
-    u_email = request.POST['u_email']
-    # メールアドレスチェック
-    try:
-        user = User.objects.get(u_email=u_email)
-    except ObjectDoesNotExist:
-        #存在しないので登録できる
-        auth_key = auth_add('newuser', u_email)
+        u_email = request.POST['u_email']
+        # メールアドレスチェック
+        try:
+            user = User.objects.get(u_email=u_email)
+        except ObjectDoesNotExist:
+            #存在しないので登録できる
+            auth_key = auth_add('newuser', u_email)
 
-        sub = '新規ユーザ登録'
-        con = """
-        新規ユーザ登録をしていただきありがとうございました。
-        24時間以内に、下記URLから本登録にお進みください。
-        http://examsite.room.kaikei.ac.jp+/exam/orgregister/?auth_key=%s
-        """ % (auth_key)
-        EmailMessage(sub, con, to=[u_email, ]).send()
-        return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
+            sub = '新規ユーザ登録'
+            con = """
+            新規ユーザ登録をしていただきありがとうございました。
+            24時間以内に、下記URLから本登録にお進みください。
+            http://examsite.room.kaikei.ac.jp+/exam/orgregister/?auth_key=%s
+            """ % (auth_key)
+            EmailMessage(sub, con, to=[u_email, ]).send()
+            return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
 
-    #メールアドレスが存在したので登録できない
-    return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
+        #メールアドレスが存在したので登録できない
+        return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
 
 #アカウント登録
-def orgregister( request ):
-    #入力フォームを取得するリクエスト
-    if request.method != "POST":
-        auth_key = request.GET['auth_key']
+class OrgRegister():
+    def orgregister( request ):
+        #入力フォームを取得するリクエスト
+        if request.method != "POST":
+            auth_key = request.GET['auth_key']
+            try:
+                Auth.objects.get(pk=auth_key)
+                return render( request,'exam/orgregister.html',{'auth_key':auth_key})
+            except:
+                return render( request,'exam/message.html',{'message':'不正なアクセス'})
+
+        #登録用のリクエスト
+        auth_key = request.POST['auth_key']
+        u_email = request.POST['u_email']
         try:
-            Auth.objects.get(pk=auth_key)
-            return render( request,'exam/orgregister.html',{'auth_key':auth_key})
-        except:
-            return render( request,'exam/message.html',{'message':'不正なアクセス'})
+            auth = Auth.objects.get(pk=auth_key)
+        except ObjectDoesNotExist:
+            return render(request, 'exam/newuser.html', {'message': '有効期限が切れました'})
 
-    #登録用のリクエスト
-    auth_key = request.POST['auth_key']
-    u_email = request.POST['u_email']
-    try:
-        auth = Auth.objects.get(pk=auth_key)
-    except ObjectDoesNotExist:
-        return render(request, 'exam/newuser.html', {'message': '有効期限が切れました'})
+        #時間チェック
+        if auth.auth_date_check() != True:
+            auth.delete()
+            return render( request,'exam/orgregister.html',{'auth_key':auth_key,'message':'有効期限が切れました'})
+        #メールアドレスチェック
+        if auth.auth_value != u_email:
+            return render( request,'exam/orgregister.html',{'auth_key':auth_key,'message':'メールアドレスが違います。'})
 
-    #時間チェック
-    if auth.auth_date_check() != True:
+        u_id = request.POST['u_id']
+        u_pass = request.POST['u_pass']
+        o_name = request.POST['o_name']
+        u_name = request.POST['u_name']
+        o_count = len( Org.objects.all() ) + 1
+
+        if o_count < 10:
+            o_id = '000'+str(o_count)
+        elif o_count < 100:
+            o_id = '00'+str(o_count)
+        elif o_count < 1000:
+            o_id = '0'+str(o_count)
+        else:
+            o_id = str(o_count)
+
+        org = Org(o_id=o_id,o_name=o_name,l_num=1)
+        org.save()
+
+        org = Org.objects.get(o_id=o_id)
+        #メディアディレクトリを作成する
+        media_dir = os.path.join( settings.STATIC_ROOT ,"exam","answer",o_id)
+        #media_dir = "static/exam/answer/" + o_id
+
+        os.mkdir( media_dir )
+
+        try:
+            org.user_set.create(u_id=u_id,u_pass=u_pass,u_name=u_name,u_email=u_email,u_admin=1,u_enable=1,u_hidden=0,u_date=datetime.datetime.now())
+        except IntegrityError:
+            return render( request,'exam/orgregister.html',{'auth_key':auth_key,'message':'そのユーザIDはすでに存在しています。'})
+        #不要な認証キーの削除
         auth.delete()
-        return render( request,'exam/orgregister.html',{'auth_key':auth_key,'message':'有効期限が切れました'})
-    #メールアドレスチェック
-    if auth.auth_value != u_email:
-        return render( request,'exam/orgregister.html',{'auth_key':auth_key,'message':'メールアドレスが違います。'})
+        return HttpResponseRedirect('/exam/')
 
-    u_id = request.POST['u_id']
-    u_pass = request.POST['u_pass']
-    o_name = request.POST['o_name']
-    u_name = request.POST['u_name']
-    o_count = len( Org.objects.all() ) + 1
+# パスワードを変更する
+class PassChange():
+    def passchange( request ):
+        return render( request, 'exam/passchange.html')
 
-    if o_count < 10:
-        o_id = '000'+str(o_count)
-    elif o_count < 100:
-        o_id = '00'+str(o_count)
-    elif o_count < 1000:
-        o_id = '0'+str(o_count)
-    else:
-        o_id = str(o_count)
+# パスワードの変更完了
+class PassChangeFinish():
+    def passchange_finish( request):
+        u_id = request.session['u_id']
+        old_pass = request.POST['old_pass']
+        new_pass = request.POST['new_pass1']
+        user = User.objects.get(pk=u_id)
+        #print( user.u_pass )
+        if old_pass == user.u_pass:
+            #print('パスワード変更')
+            user.u_pass = new_pass
+            user.save()
+            return render(request, 'exam/passchange_finish.html',{'message':'パスワードの変更ができました。'})
+        else:
+            #print('パスワードが違う')
+            return render(request, 'exam/passchange.html',{'message':'パスワードが違うので変更できません。'})
 
-    org = Org(o_id=o_id,o_name=o_name,l_num=1)
-    org.save()
+#管理者問い合わせ
+class Inquiry():
+    def inquiry( request ):
+        #POSTでない
+        if request.method!='POST':
+            return render( request,'exam/inquiry.html')
+        #POST送信
+        if "lock_u_id" in request.POST :
+            u_id = request.POST["lock_u_id"]
+            u_pass = request.POST["lock_u_pass"]
+            user = User.objects.get(pk=u_id)
+            #ブルートフォース検出
+            if checkBruteforce(u_id,'inquiry'):
+                user.u_enable = 0
+                user.save()
+                con = """
+                不正なアクセスを検知したので、アカウントをロックしました。
+                解除申請をしてください。
+                """
+                EmailMessage('アカウントロック', con, to=[user.u_email, ]).send()
+                return render(request,'exam/errorpage.html',{'message':'不正なログインを検知しました。アカウントをロックします。'})
 
-    org = Org.objects.get(o_id=o_id)
-    #メディアディレクトリを作成する
-    media_dir = os.path.join( settings.STATIC_ROOT ,"exam","answer",o_id)
-    #media_dir = "static/exam/answer/" + o_id
+            # パスワードが一致
+            if user.u_pass == u_pass:
+                user.u_enable = 1
+                user.save()
+                addAccessLog(request, 'inquiry', 's')
+                return render( request,'exam/index.html')
+            else:
+                addAccessLog(request,'inquiry','f')
+                return render(request,'exam/errorpage.html',{'message':'解除できません'})
 
-    os.mkdir( media_dir )
-
-    try:
-        org.user_set.create(u_id=u_id,u_pass=u_pass,u_name=u_name,u_email=u_email,u_admin=1,u_enable=1,u_hidden=0,u_date=datetime.datetime.now())
-    except IntegrityError:
-        return render( request,'exam/orgregister.html',{'auth_key':auth_key,'message':'そのユーザIDはすでに存在しています。'})
-    #不要な認証キーの削除
-    auth.delete()
-    return HttpResponseRedirect('/exam/')
-
-#メインページ
-def mainpage( request ):
-    #セッションIDがある(戻るボタンなどで帰ってきたとき用)
-    if 'u_id' in request.session:
-        if request.session['u_id'] != "":
-            u_id = request.session['u_id']
+        #パスワードのリセット
+        if 'pass_u_id' in request.POST:
+            u_id = request.POST['pass_u_id']
+            u_email = request.POST['pass_u_email']
             try:
                 user = User.objects.get(pk=u_id)
             except:
-                return render(request,'exam/errorpage.html',{'message':'不正なアクセスです。'})
-            #request.session['u_id'] = u_id
-            u_name = user.u_name
-            u_admin = user.u_admin
-            request.session['u_admin'] = u_admin
-            period = Question.objects.values_list('q_period').distinct()
-            periodlist = []
-            for p in period:
-                periodlist.append(p[0])
+                return render( request,'exam/errorpage.html',{'message':'ユーザIDとメールアドレスが一致しません。'})
 
-            classify = Classify.objects.values_list('m_id','m_name').distinct()
-            print( classify )
-            classifylist = []
-            for c in classify:
-                dict = {}
-                dict['m_id'] = c[0]
-                dict['m_name'] = c[1]
-                classifylist.append( dict )
+            if user.u_email == u_email:
+                #except:
+                    #メールアドレスが存在しない
+                #    return errorpage(request,'メールアドレスが存在しません。')
 
-            return render( request,'exam/mainpage.html',{'u_id':u_id,'u_name':u_name,'u_admin':u_admin,'period':periodlist,'classify':classifylist})
+                #仮パスワードの設定
+                damypass = randomCharacter(10)
+                user.u_pass = damypass
+                user.save()
+                con = """
+                仮のパスワードを設定しました。
+                【仮パスワード】%s
+               ログイン後変更してください。
+                """%damypass
+                EmailMessage('仮パスワードの設定',con,to=[u_email,]).send()
+                content = "仮パスワードを設定しました。登録メールアドレスに仮パスワードを送りましたので、確認してください。"
+                return render( request,'exam/message.html',{'message':content})
 
-    #u_idやパスワードを持っていない
-    if request.method != "POST":
-        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです。'})
+            return render( request,'exam/errorpage.html',{'message':'ユーザIDとメールアドレスが一致しません。'})
 
-    u_id = request.POST["u_id"]
-    u_pass = request.POST["u_pass"]
-    ipa = request.environ['REMOTE_ADDR']    #IP-Address
+        if 'fgid_u_email' in request.POST:
+            u_email = request.POST['fgid_u_email']
 
-    #アカウントが有効かをチェック
-    try:
-        print( u_id )
-        user = User.objects.get(pk=u_id)
-    except:
-        return render( request , 'exam/errorpage.html',{'message':'不正なアクセスです。'})
+            try:
+                user = User.objects.get(u_email=u_email)
+            except:
+                return render( request,'exam/errorpage.html',{'message':'登録されていないメールアドレスです。'})
 
-    if user.u_enable==False:
-        return render(request,'exam/errorpage.html',{'message':'アカウントが有効ではありません。管理者に問い合わせてください。'})
+            u_id = user.u_id
 
-    #ブルートフォース対策10分間に100回以上のログイン失敗
-    if checkBruteforce(u_id,'mainpage'):
-        user.u_enable = 0
-        user.save()
-        con = """
-        不正なアクセスを検知したので、アカウントをロックしました。
-        解除申請をしてください。
+            con = """
+            ユーザIDは
+            %s
+            です。
+            """%u_id
+
+            EmailMessage('ユーザID',con,to=[u_email,]).send()
+
+            return render( request,'exam/message.html',{'message':'登録されているメールアドレスにユーザIDをお送りしました。'})
+
+#ライセンスの購入
+class Addlicense():
+    def addlicense( request ):
+        #セッションにユーザIDの記録がない
+        securecheck( request )
+
+        o_id = request.session['o_id']
+        org = Org.objects.get(o_id=o_id)
+        o_name = org.o_name
+        return render( request,'exam/addlicense.html',{'o_id':o_id,'o_name':o_name,'u_admin':request.session['u_admin']})
+
+#ライセンスの購入
+class AddlicenseConf():
+    def addlicense_conf( request ):
+        message = """
+        購入処理をしております。
+        終わりましたら、登録のメールアドレスにご連絡いたします。
+        しばらくお待ちください。
         """
-        EmailMessage('アカウントロック',con, to=[user.u_email, ]).send()
-        return render(request,'exam/errorpage.html',{'message':'不正なログインを検知しました。アカウントをロックします。'})
+        o_id = request.POST['o_id']
+        l_num = request.POST['l_num']
 
-    #u_idが存在するか
-    try:
-        user = User.objects.get(u_id=u_id)
-    except ObjectDoesNotExist:
-        #メールアドレスが存在するか
+        adr = AddLicenseRequest(o_id=o_id,l_num=l_num,check=False,adr_date=datetime.datetime.now())
+        adr.save()
+
+        bodystr = "o_id:%s,l_num:%s"%(o_id,l_num)
+        EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['mstp015v@gmail.com',]).send()
+
+        return render( request, 'exam/message.html',{'message':message})
+
+#ログオフ
+class Logoff():
+    def logoff( request ):
+        request.session['u_id'] = ""
+        return render( request,'exam/index.html')
+
+
+# メインページ
+class MainPage():
+    def mainpage(request):
+        t_dict = {'fe': '基本情報', 'ap': '応報情報', 'sc': 'セキュリティ'}
+        # セッションIDがある(戻るボタンなどで帰ってきたとき用)
+        if 'u_id' in request.session:
+            if request.session['u_id'] != "":
+
+                u_id = request.session['u_id']
+                try:
+                    user = User.objects.get(pk=u_id)
+                except:
+                    return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
+                # request.session['u_id'] = u_id
+                u_name = user.u_name
+                u_admin = user.u_admin
+                request.session['u_admin'] = u_admin
+                test = Question.objects.values_list('q_test').distinct()
+                testlist = []
+                for t in test:
+                    dict = {}
+                    dict['test'] = t[0]
+                    dict['name'] = t_dict[t[0]]
+                    testlist.append(dict)
+
+                period = Question.objects.values_list('q_period').distinct()
+                periodlist = []
+                for p in period:
+                    dict = {}
+                    dict["period"] = p[0]
+                    if p[0][3:5]=="01":
+                        dict["name"] = p[0][0:3] + "(春)"
+                    else:
+                        dict["name"] = p[0][0:3] + "(秋)"
+                    periodlist.append( dict )
+
+                classify = Classify.objects.values_list('m_id', 'm_name').distinct()
+                print(classify)
+                classifylist = []
+                for c in classify:
+                    dict = {}
+                    dict['m_id'] = c[0]
+                    dict['m_name'] = c[1]
+                    classifylist.append(dict)
+
+                return render(request, 'exam/mainpage.html',
+                              {'u_id': u_id, 'u_name': u_name, 'u_admin': u_admin, 'period': periodlist,
+                               'classify': classifylist, 'test': testlist})
+
+        # u_idやパスワードを持っていない
+        if request.method != "POST":
+            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
+
+        u_id = request.POST["u_id"]
+        u_pass = request.POST["u_pass"]
+        ipa = request.environ['REMOTE_ADDR']  # IP-Address
+
+        # アカウントが有効かをチェック
         try:
-            user = User.objects.get(u_email=u_id)
-        except ObjectDoesNotExist:
-            #どちらも存在しない（ログイン失敗)
-            addAccessLog(request,'mainpage','f')
-            return render(request, 'exam/index.html', {'message': 'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
+            print(u_id)
+            user = User.objects.get(pk=u_id)
+        except:
+            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
 
-    if user.pass_check(u_pass=u_pass):
-        addAccessLog(request,'mainpage','s')
-        request.session['u_id'] = u_id
-        u_name = user.u_name
-        u_admin = user.u_admin
-        request.session['o_id'] = user.o_id
-        request.session['u_admin'] = u_admin
-        period = Question.objects.values_list('q_period').distinct()
-        periodlist = []
-        for p in period:
-            periodlist.append(p[0])
+        if user.u_enable == False:
+            return render(request, 'exam/errorpage.html', {'message': 'アカウントが有効ではありません。管理者に問い合わせてください。'})
 
-        classify = Classify.objects.values_list('m_id', 'm_name').distinct()
-        print(classify)
-        classifylist = []
-        for c in classify:
-            dict = {}
-            dict['m_id'] = c[0]
-            dict['m_name'] = c[1]
-            classifylist.append(dict)
-        return render(request, 'exam/mainpage.html',
-                      {'u_id': u_id, 'u_name': u_name, 'u_admin': u_admin, 'period': periodlist,'classify': classifylist})
-    else:
-        addAccessLog(request,'mainpage','f')
-        return render( request,'exam/index.html',{'message':'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
-
-def passchange( request ):
-    return render( request, 'exam/passchange.html')
-
-def passchange_finish( request):
-    u_id = request.session['u_id']
-    old_pass = request.POST['old_pass']
-    new_pass = request.POST['new_pass1']
-    user = User.objects.get(pk=u_id)
-    #print( user.u_pass )
-    if old_pass == user.u_pass:
-        #print('パスワード変更')
-        user.u_pass = new_pass
-        user.save()
-        return render(request, 'exam/passchange_finish.html',{'message':'パスワードの変更ができました。'})
-    else:
-        #print('パスワードが違う')
-        return render(request, 'exam/passchange.html',{'message':'パスワードが違うので変更できません。'})
-
-#管理者問い合わせ
-def inquiry( request ):
-    #POSTでない
-    if request.method!='POST':
-        return render( request,'exam/inquiry.html')
-    #POST送信
-    if "lock_u_id" in request.POST :
-        u_id = request.POST["lock_u_id"]
-        u_pass = request.POST["lock_u_pass"]
-        user = User.objects.get(pk=u_id)
-        #ブルートフォース検出
-        if checkBruteforce(u_id,'inquiry'):
+        # ブルートフォース対策10分間に100回以上のログイン失敗
+        if checkBruteforce(u_id, 'mainpage'):
             user.u_enable = 0
             user.save()
             con = """
@@ -317,99 +402,116 @@ def inquiry( request ):
             解除申請をしてください。
             """
             EmailMessage('アカウントロック', con, to=[user.u_email, ]).send()
-            return render(request,'exam/errorpage.html',{'message':'不正なログインを検知しました。アカウントをロックします。'})
+            return render(request, 'exam/errorpage.html', {'message': '不正なログインを検知しました。アカウントをロックします。'})
 
-        # パスワードが一致
-        if user.u_pass == u_pass:
-            user.u_enable = 1
-            user.save()
-            addAccessLog(request, 'inquiry', 's')
-            return render( request,'exam/index.html')
+        # u_idが存在するか
+        try:
+            user = User.objects.get(u_id=u_id)
+        except ObjectDoesNotExist:
+            # メールアドレスが存在するか
+            try:
+                user = User.objects.get(u_email=u_id)
+            except ObjectDoesNotExist:
+                # どちらも存在しない（ログイン失敗)
+                addAccessLog(request, 'mainpage', 'f')
+                return render(request, 'exam/index.html', {'message': 'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
+
+        if user.pass_check(u_pass=u_pass):
+            addAccessLog(request, 'mainpage', 's')
+            request.session['u_id'] = u_id
+            u_name = user.u_name
+            u_admin = user.u_admin
+            request.session['o_id'] = user.o_id
+            request.session['u_admin'] = u_admin
+            test = Question.objects.values_list('q_test').distinct()
+            testlist = []
+            for t in test:
+                dict = {}
+                dict['test'] = t[0]
+                dict['name'] = t_dict[t[0]]
+                testlist.append(dict)
+
+            period = Question.objects.values_list('q_period').distinct()
+            periodlist = []
+            for p in period:
+                dict = {}
+                dict["period"] = p[0]
+                if p[0][3:5] == "01":
+                    dict["name"] = p[0][0:3] + "(春)"
+                else:
+                    dict["name"] = p[0][0:3] + "(秋)"
+                periodlist.append(dict)
+
+            classify = Classify.objects.values_list('m_id', 'm_name').distinct()
+
+            classifylist = []
+            for c in classify:
+                dict = {}
+                dict['m_id'] = c[0]
+                dict['m_name'] = c[1]
+                classifylist.append(dict)
+            return render(request, 'exam/mainpage.html',
+                          {'u_id': u_id, 'u_name': u_name, 'u_admin': u_admin, 'period': periodlist,
+                           'classify': classifylist,'test':testlist})
         else:
-            addAccessLog(request,'inquiry','f')
-            return render(request,'exam/errorpage.html',{'message':'解除できません'})
+            addAccessLog(request, 'mainpage', 'f')
+            return render(request, 'exam/index.html', {'message': 'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
 
-    #パスワードのリセット
-    if 'pass_u_id' in request.POST:
-        u_id = request.POST['pass_u_id']
-        u_email = request.POST['pass_u_email']
-        try:
-            user = User.objects.get(pk=u_id)
-        except:
-            return render( request,'exam/errorpage.html',{'message':'ユーザIDとメールアドレスが一致しません。'})
+    # 試験区分が送られてくるので、年度期を返す
+    def mainpage_ajax_getperiod( request ):
 
-        if user.u_email == u_email:
-            #except:
-                #メールアドレスが存在しない
-            #    return errorpage(request,'メールアドレスが存在しません。')
+        securecheck( request )
+        dic = byteToDic(request.body)
+        q_test = dic['q_test']
 
-            #仮パスワードの設定
-            damypass = randomCharacter(10)
-            user.u_pass = damypass
-            user.save()
-            con = """
-            仮のパスワードを設定しました。
-            【仮パスワード】%s
-           ログイン後変更してください。
-            """%damypass
-            EmailMessage('仮パスワードの設定',con,to=[u_email,]).send()
-            content = "仮パスワードを設定しました。登録メールアドレスに仮パスワードを送りましたので、確認してください。"
-            return render( request,'exam/message.html',{'message':content})
+        json = []
+        period = Question.objects.filter(q_test=q_test).values_list('q_period').distinct()
+        for p in period:
+            dict = {'period':p[0]}
+            if p[0][3:5] == "01":
+                dict['name'] = p[0][0:3] + "(春)"
+            else:
+                dict['name'] = p[0][0:3] + "(秋)"
+            json.append( dict )
 
-        return render( request,'exam/errorpage.html',{'message':'ユーザIDとメールアドレスが一致しません。'})
+        return HttpResponseJson(json)
 
-    if 'fgid_u_email' in request.POST:
-        u_email = request.POST['fgid_u_email']
+    # 試験区分と年度期が送られてくるので、問題を返す
+    def ajax_getquestion_period( request):
+        c_dic = byteToDic( request.body )
+        if 'q_period' in c_dic:
+            q_period = c_dic['q_period']
+            q_test = c_dic['q_test']
+            question = Question.objects.filter(q_period=q_period,q_test=q_test).values_list('q_id','q_answer')
 
-        try:
-            user = User.objects.get(u_email=u_email)
-        except:
-            return render( request,'exam/errorpage.html',{'message':'登録されていないメールアドレスです。'})
+            questionlist = []
+            for q in question:
+                dict = {}
+                dict['q_id'] = q[0]
+                dict['q_answer'] = q[1]
+                questionlist.append( dict )
 
-        u_id = user.u_id
+            return HttpResponseJson( questionlist )
 
-        con = """
-        ユーザIDは
-        %s
-        です。
-        """%u_id
+    # 試験区分と分野が送られてくるので、問題を返す
+    def ajax_getquestion_classify( request):
+        c_dic = byteToDic( request.body )
+        if 'm_id' in c_dic:
+            m_id = c_dic['m_id']
+            q_test = c_dic['q_test']
+            question = Question.objects.filter(q_test=q_test).values()
 
-        EmailMessage('ユーザID',con,to=[u_email,]).send()
-
-        return render( request,'exam/message.html',{'message':'登録されているメールアドレスにユーザIDをお送りしました。'})
-
-#ライセンスの購入
-def addlicense( request ):
-    #セッションにユーザIDの記録がない
-    securecheck( request )
-
-    o_id = request.session['o_id']
-    org = Org.objects.get(o_id=o_id)
-    o_name = org.o_name
-    return render( request,'exam/addlicense.html',{'o_id':o_id,'o_name':o_name,'u_admin':request.session['u_admin']})
-
-#ライセンスの購入
-def addlicense_conf( request ):
-    message = """
-    購入処理をしております。
-    終わりましたら、登録のメールアドレスにご連絡いたします。
-    しばらくお待ちください。
-    """
-    o_id = request.POST['o_id']
-    l_num = request.POST['l_num']
-
-    adr = AddLicenseRequest(o_id=o_id,l_num=l_num,check=False,adr_date=datetime.datetime.now())
-    adr.save()
-
-    bodystr = "o_id:%s,l_num:%s"%(o_id,l_num)
-    EmailMessage(subject="ライセンス購入のお知らせ",body=bodystr,to=['mstp015v@gmail.com',]).send()
-
-    return render( request, 'exam/message.html',{'message':message})
-
-#ログオフ
-def logoff( request ):
-    request.session['u_id'] = ""
-    return render( request,'exam/index.html')
+            questionlist = []
+            for q in question:
+                c_id = q['c_id']
+                if c_id[2:4] == m_id:
+                    #print( c_id + "," + c_id[2:4] )
+                    dict = {}
+                    dict['q_id'] = q['q_id']
+                    dict['q_answer'] = q['q_answer']
+                    questionlist.append( dict )
+            print( questionlist )
+            return HttpResponseJson( questionlist )
 
 #テスト印刷画面
 class TestPrint():
@@ -421,12 +523,18 @@ class TestPrint():
 
         test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
         test_list = []
+
         for t in test:
             t_id = t['t_id']
             mt = MakeLittletest.objects.get(pk="%s%s"%(o_id,t_id))
             cnt = ResultTest.objects.filter(t_id=t_id,u__o_id=o_id).values('t_id','u_id').distinct().count();
             #print( mt.u_id )
-            test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date'],'cnt':cnt})
+            m_name_set = LittleTest.objects.filter(o_id=o_id,t_id=t_id).values('q__c__m_name').distinct()
+            m_name_marge = m_name_set[0]['q__c__m_name']
+            for i in range(1,len( m_name_set )):
+                m_name_marge = "%s,%s"%(m_name_marge,m_name_set[i]['q__c__m_name'])
+            print( m_name_marge )
+            test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date'],'cnt':cnt,'m_name':m_name_marge})
 
         return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
     #テストの印刷用データをajaxで取得する
@@ -447,6 +555,7 @@ class TestPrint():
             dic['s_name'] = c.s_name
             list.append(dic)
         return HttpResponseJson( list )
+
 #テスト削除
 class TestDelete():
     def testdelete( request ):
@@ -530,6 +639,7 @@ class Miss_Question():
                 list.append(dic)
 
         return HttpResponseJson( list )
+
 #解答用紙印刷
 class AnswerSheetPrint():
     # ページの表示
@@ -601,6 +711,7 @@ class AnswerSheetPrint():
         list = {'t_list':t_list,'u_list':u_list , 'o_id':o_id }
         #print( list )
         return HttpResponseJson( list )
+
 # 分析ページ(全員)
 class A_All():
     # ページを表示
@@ -702,6 +813,7 @@ class A_All():
             # print("%s,%s,%s,%d\n" % (u_id, u_name,t_id,positive))
             # print( result_list )
         return HttpResponseJson( result_list )
+
 # 分析ページ(分野ごと)
 class A_Bunya():
     # ページを表示する
@@ -766,6 +878,7 @@ class A_Bunya():
 
 
             return HttpResponseJson( list )
+
 # 分析ページ
 class Analysis():
     # ページの表示
@@ -831,6 +944,7 @@ class Analysis():
 
             #print( dics )
             return HttpResponseJson( dics )
+
 # 解答のアップロード
 class AnswerUpload():
     # ページの表示
@@ -987,6 +1101,7 @@ class AnswerUpload():
                 # os.remove( os.path.join(media_path, file ) )
         c_dic['message'] = "登録できました。"
         return HttpResponseJson( c_dic )
+
 # 問題作成メイン画面
 class TestMake():
     def testmake(request):
@@ -1120,6 +1235,7 @@ class TestMake():
 
         return HttpResponse(json.dumps({"state": "ok"}, ensure_ascii=False, indent=2), content_type='application/json',
                             charset='utf-8')
+
 #年度期ごとの問題を作成する画面
 class TestMakePeriod():
     def testmakeperiod( request ):
@@ -1181,14 +1297,22 @@ class Question_Pm():
         if 'u_id' not in request.session:
             return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
 
+        tests = {'fe':'基本情報','ap':'応報情報','sc':'情報セキュリティ'}
         u_admin = request.session['u_admin']
         qpm = QuestionPm.objects.values('q_classify').distinct().order_by('q_classify')
-        return render( request,'exam/questionpm.html',{'q_list':qpm,'u_admin':u_admin})
+        test = QuestionPm.objects.values('q_test').distinct()
+        testlist = []
+        for t in test:
+            dict={'test':t['q_test'],'name':tests[t['q_test']]}
+            testlist.append( dict )
+
+        return render( request,'exam/questionpm.html',{'q_list':qpm,'u_admin':u_admin ,'test':testlist})
     #ajax
     def ajax_getquestionpm(request):
         c_dic = byteToDic(request.body)
         classify = c_dic['classify']
-        qpm = QuestionPm.objects.filter(q_classify=classify).values()
+        test = c_dic['test']
+        qpm = QuestionPm.objects.filter(q_classify=classify,q_test=test).values()
         q_list = []
         static_dir = settings.STATIC_ROOT
         for q in qpm:
@@ -1206,265 +1330,239 @@ class Question_Pm():
 
         return HttpResponseJson({'q_list': q_list})
 
-
 #サイト管理者ログイン
-def salogin( request ):
-    return render( request,'exam/salogin.html')
+class SaLogin():
+    def salogin( request ):
+        return render( request,'exam/salogin.html')
 
 #サイト管理者ページ
-def sapage( request ):
-    #u_idやパスワードを持っていない
-    if request.method != "POST" and 'sa_id' not in request.session:
-        return render( request,'exam/errorpage.html',{'message':'不正なアクセスです。'})
+class SaPage():
+    def sapage( request ):
+        #u_idやパスワードを持っていない
+        if request.method != "POST" and 'sa_id' not in request.session:
+            return render( request,'exam/errorpage.html',{'message':'不正なアクセスです。'})
 
-    if "POST" in request.method:
-        u_id = request.POST['u_id']
-        u_pass = request.POST['u_pass']
-        request.session['sa_id'] = u_id
+        if "POST" in request.method:
+            u_id = request.POST['u_id']
+            u_pass = request.POST['u_pass']
+            request.session['sa_id'] = u_id
 
-    if "sa_id" in request.session:
-        u_id = request.session['sa_id']
-        return render(request, 'exam/sapage.html')
+        #if "sa_id" in request.session:
+        #    u_id = request.session['sa_id']
+        #    return render(request, 'exam/sapage.html')
 
-    #u_idが存在するか
-    try:
-        s_user = SuperUser.objects.get(u_id=u_id)
-    except ObjectDoesNotExist:
-        addAccessLog(request,'sapage','f')
-        return render(request, 'exam/salogin.html', {'message': 'ユーザID（メールアドレス）、パスワードのいずれかが違います。'})
+        #u_idが存在するか
+        try:
+            s_user = SuperUser.objects.get(u_id=u_id)
+        except ObjectDoesNotExist:
+            addAccessLog(request,'sapage','f')
+            return render(request, 'exam/salogin.html', {'message': 'ユーザID、パスワードのいずれかが違います。'})
 
-    #ブルートフォースチェック
-    if checkBruteforce(u_id,'sapage'):
-        return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
+        #ブルートフォースチェック
+        if checkBruteforce(u_id,'sapage'):
+            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
 
-    if s_user.u_pass == u_pass:
-        addAccessLog(request, 'sapage','s')
-        return render( request,'exam/sapage.html')
+        if s_user.u_pass == u_pass:
+            addAccessLog(request, 'sapage','s')
+            return render( request,'exam/sapage.html')
 
-    addAccessLog(request, 'sapage', 'f')
-    return render( request, 'exam/errorpage.html',{'message','ログインできません。'})
+        addAccessLog(request, 'sapage', 'f')
+        return render( request, 'exam/errorpage.html',{'message','ログインできません。'})
 
 #スーパーユーザがライセンス追加を許可する
-def saaddlicense( request ):
-    org = Org.objects.all()
-    list = []
-    for o in org:
-        dic = {}
-        dic['o_id'] = o.o_id
-        dic['o_name'] = o.o_name
-        dic['l_num'] = o.l_num
-        list.append( dic )
-    return render( request,'exam/saaddlicense.html',{'org_list':list})
+class SaAddlicense():
+    def saaddlicense( request ):
+        org = Org.objects.all()
+        list = []
+        for o in org:
+            dic = {}
+            dic['o_id'] = o.o_id
+            dic['o_name'] = o.o_name
+            dic['l_num'] = o.l_num
+            list.append( dic )
+        return render( request,'exam/saaddlicense.html',{'org_list':list})
 
 #組織ごとのフィルタ
-def saaddlicense_filter( request ):
-    dic = byteToDic( request.body )
+class SaAddlicenseFilter():
+    def saaddlicense_filter( request ):
+        dic = byteToDic( request.body )
 
-    adr_list = AddLicenseRequest.objects.filter(o_id=dic['o_id'])
-    list = []
-    for adr in adr_list:
-        d = {}
-        d['id'] = adr.id
-        d['l_num'] = adr.l_num
-        d['adr_date'] = adr.adr_date.strftime('%Y/%m/%d %H:%M:%S')
-        d['check'] = adr.check
-        list.append( d )
-    jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
-    return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
+        adr_list = AddLicenseRequest.objects.filter(o_id=dic['o_id'])
+        list = []
+        for adr in adr_list:
+            d = {}
+            d['id'] = adr.id
+            d['l_num'] = adr.l_num
+            d['adr_date'] = adr.adr_date.strftime('%Y/%m/%d %H:%M:%S')
+            d['check'] = adr.check
+            list.append( d )
+        jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
+        return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
 
 #ライセンス追加confirm
-def saaddlicense_conf( request ):
-    dics = byteToDic(request.body)
-    adr = AddLicenseRequest.objects.get(pk=dics['id'])
-    o_id = adr.o_id
-    org = Org.objects.get(pk=o_id)
-    org.l_num = org.l_num + adr.l_num
-    adr.check = True
-    adr.save()
-    org.save()
-    adr_list = AddLicenseRequest.objects.all()
-    list = []
-    for adr in adr_list:
-        dict = {}
-        dict['id'] = adr.id
-        dict['o_id'] = adr.o_id
-        dict['l_num'] = adr.l_num
-        dict['adr_date'] = adr.adr_date.strftime('%Y/%m/%d %H:%M:%S')
-        dict['check'] = adr.check
-        list.append( dict )
-    jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
-    return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
+class SaAddlicenseConf():
+    def saaddlicense_conf( request ):
+        dics = byteToDic(request.body)
+        adr = AddLicenseRequest.objects.get(pk=dics['id'])
+        o_id = adr.o_id
+        org = Org.objects.get(pk=o_id)
+        org.l_num = org.l_num + adr.l_num
+        adr.check = True
+        adr.save()
+        org.save()
+        adr_list = AddLicenseRequest.objects.all()
+        list = []
+        for adr in adr_list:
+            dict = {}
+            dict['id'] = adr.id
+            dict['o_id'] = adr.o_id
+            dict['l_num'] = adr.l_num
+            dict['adr_date'] = adr.adr_date.strftime('%Y/%m/%d %H:%M:%S')
+            dict['check'] = adr.check
+            list.append( dict )
+        jsonStr = json.dumps(list, ensure_ascii=False, indent=2)
+        return HttpResponse(jsonStr,content_type='application/json',charset='utf-8')
 
 #組織内ユーザの追加csv番
-def userregistercsv( request ):
-    securecheck( request )
+class UserRegisterCsv():
+    def userregistercsv( request ):
+        securecheck( request )
 
-    if request.method != 'POST':
-        return render( request, 'exam/userregistercsv.html',{'users':[],'ng_users':[],'ok_users':[] , 'u_admin':request.session['u_admin']})
+        if request.method != 'POST':
+            return render( request, 'exam/userregistercsv.html',{'users':[],'ng_users':[],'ok_users':[] , 'u_admin':request.session['u_admin']})
 
-    #リクエストにfileが含まれている
-    if 'file' in request.FILES:
+        #リクエストにfileが含まれている
+        if 'file' in request.FILES:
+            o_id = request.session['o_id']
+            u_num = User.objects.filter(o_id=o_id).count()
+
+            file = TextIOWrapper(request.FILES['file'],encoding="utf-8")
+            csv_file = csv.reader(file)
+            header = next(csv_file)
+            users = []
+
+            for i,row in enumerate(csv_file):
+                users.append({'u_id':o_id + code4(i+u_num+1),'u_name':row[0],'u_pass':row[1],'u_email':row[2],'u_admin':row[3],'u_enable':row[4]})
+
+            return render( request, 'exam/userregistercsv.html',{'o_id':o_id,'users':users,'u_admin':request.session['u_admin']})
+
+        #アップデート
+        l_num = int( request.POST['u_num'])
+
+        #登録できるアカウント数の計算
         o_id = request.session['o_id']
-        u_num = User.objects.filter(o_id=o_id).count()
+        org = Org.objects.get(pk=o_id)
+        ng_users = []
+        ok_users = []
+        #人数クリア追加可能
+        if org.u_num_check(l_num=l_num):
+            for i in range( l_num ):
+                u_id = request.POST['u_id_%d'%i]
+                u_name = request.POST['u_name_%d'%i]
+                u_pass = request.POST['u_pass_%d'%i]
+                u_email = request.POST['u_email_%d'%i]
+                u_admin = request.POST['u_admin_%d'%i]
+                u_enable = request.POST['u_enable_%d'%i]
 
-        file = TextIOWrapper(request.FILES['file'],encoding="utf-8")
-        csv_file = csv.reader(file)
-        header = next(csv_file)
-        users = []
+                create_date = timezone.now()
+                org_id = request.POST['o_id_%d'%i]
+                user = {'u_id':u_id,'u_pass':u_pass,'u_name':u_name,'u_email':u_email,'u_admin':u_admin,'u_enable':u_enable}
+                obj,created = User.objects.get_or_create(u_id=u_id,u_name=u_name,u_pass=u_pass,u_email=u_email,u_admin=u_admin,u_enable=u_enable,u_hidden=False,u_date=create_date,o_id=org_id)
+                print( created )
+                if created:
+                    ok_users.append(user)
+                else:
+                    ng_users.append(user)
 
-        for i,row in enumerate(csv_file):
-            users.append({'u_id':o_id + code4(i+u_num+1),'u_name':row[0],'u_pass':row[1],'u_email':row[2],'u_admin':row[3],'u_enable':row[4]})
+        if len(ng_users) > 0 and len(ok_users) > 0:
+            print( '両方' )
+            return render( request,'exam/userregistercsv.html',{'ok_users':ok_users,'ng_users':ng_users})
+        elif len(ng_users) > 0:
+            print( 'NG' )
+            return render( request,'exam/userregistercsv.html',{'ng_users':ng_users})
+        elif len(ok_users) > 0:
+            print( 'OK' )
+            return render( request,'exam/userregistercsv.html',{'ok_users':ok_users})
+        else:
+            return render(request, 'exam/userregistercsv.html',{'error_message':'登録数が越えています'})
+        return render( request , 'exam/userregistercsv.html',{'u_admin':request.session['u_admin']})
 
-        return render( request, 'exam/userregistercsv.html',{'o_id':o_id,'users':users,'u_admin':request.session['u_admin']})
+#組織内ユーザの追加Web版
+class UserRegisterWeb():
+    def userregisterweb( request ):
+        securecheck(request)
 
-    #アップデート
-    l_num = int( request.POST['u_num'])
+        if request.method != 'POST':
+            return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
-    #登録できるアカウント数の計算
-    o_id = request.session['o_id']
-    org = Org.objects.get(pk=o_id)
-    ng_users = []
-    ok_users = []
-    #人数クリア追加可能
-    if org.u_num_check(l_num=l_num):
-        for i in range( l_num ):
-            u_id = request.POST['u_id_%d'%i]
-            u_name = request.POST['u_name_%d'%i]
-            u_pass = request.POST['u_pass_%d'%i]
-            u_email = request.POST['u_email_%d'%i]
-            u_admin = request.POST['u_admin_%d'%i]
-            u_enable = request.POST['u_enable_%d'%i]
+        o_id = request.session['o_id']
+
+        #登録できるアカウント数の計算
+        org = Org.objects.get(pk=o_id)
+        ng_users = []
+        ok_users = []
+        #人数クリア追加可能
+        if org.u_num_check(l_num=1):
+            u_id = request.POST['u_id']
+            u_id = o_id + u_id
+            u_name = request.POST['u_name']
+            u_pass = request.POST['u_pass']
+            u_email = request.POST['u_email']
+            u_admin = '0'
+            u_enable = '1'
 
             create_date = timezone.now()
-            org_id = request.POST['o_id_%d'%i]
             user = {'u_id':u_id,'u_pass':u_pass,'u_name':u_name,'u_email':u_email,'u_admin':u_admin,'u_enable':u_enable}
-            obj,created = User.objects.get_or_create(u_id=u_id,u_name=u_name,u_pass=u_pass,u_email=u_email,u_admin=u_admin,u_enable=u_enable,u_hidden=False,u_date=create_date,o_id=org_id)
+            obj,created = User.objects.get_or_create(u_id=u_id,u_name=u_name,u_pass=u_pass,u_email=u_email,u_admin=u_admin,u_enable=u_enable,u_hidden=False,u_date=create_date,o_id=o_id)
             print( created )
             if created:
                 ok_users.append(user)
             else:
                 ng_users.append(user)
 
-    if len(ng_users) > 0 and len(ok_users) > 0:
-        print( '両方' )
-        return render( request,'exam/userregistercsv.html',{'ok_users':ok_users,'ng_users':ng_users})
-    elif len(ng_users) > 0:
-        print( 'NG' )
-        return render( request,'exam/userregistercsv.html',{'ng_users':ng_users})
-    elif len(ok_users) > 0:
-        print( 'OK' )
-        return render( request,'exam/userregistercsv.html',{'ok_users':ok_users})
-    else:
-        return render(request, 'exam/userregistercsv.html',{'error_message':'登録数が越えています'})
-    return render( request , 'exam/userregistercsv.html',{'u_admin':request.session['u_admin']})
-
-#組織内ユーザの追加Web版
-def userregisterweb( request ):
-    securecheck(request)
-
-    if request.method != 'POST':
+        if len(ng_users) > 0 and len(ok_users) > 0:
+            print( '両方' )
+            return render( request,'exam/userregisterweb.html',{'ok_users':ok_users,'ng_users':ng_users})
+        elif len(ng_users) > 0:
+            print( 'NG' )
+            return render( request,'exam/userregisterweb.html',{'ng_users':ng_users})
+        elif len(ok_users) > 0:
+            print( 'OK' )
+            return render( request,'exam/userregisterweb.html',{'ok_users':ok_users})
+        else:
+            return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
         return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
 
-    o_id = request.session['o_id']
+class QuestioinAmUpload():
+    def question_am_upload( request ):
+        securecheck(request)
+        u_admin = request.session['u_admin']
 
-    #登録できるアカウント数の計算
-    org = Org.objects.get(pk=o_id)
-    ng_users = []
-    ok_users = []
-    #人数クリア追加可能
-    if org.u_num_check(l_num=1):
-        u_id = request.POST['u_id']
-        u_id = o_id + u_id
-        u_name = request.POST['u_name']
-        u_pass = request.POST['u_pass']
-        u_email = request.POST['u_email']
-        u_admin = '0'
-        u_enable = '1'
+        # リクエストにfileが含まれている
+        if 'file' in request.FILES:
+            # アップするファイルのパス
+            o_id = request.session['o_id']
+            media_path = os.path.join(settings.STATIC_ROOT, "exam", "image", "question")
 
-        create_date = timezone.now()
-        user = {'u_id':u_id,'u_pass':u_pass,'u_name':u_name,'u_email':u_email,'u_admin':u_admin,'u_enable':u_enable}
-        obj,created = User.objects.get_or_create(u_id=u_id,u_name=u_name,u_pass=u_pass,u_email=u_email,u_admin=u_admin,u_enable=u_enable,u_hidden=False,u_date=create_date,o_id=o_id)
-        print( created )
-        if created:
-            ok_users.append(user)
-        else:
-            ng_users.append(user)
+            upfiles = request.FILES.getlist('file')
 
-    if len(ng_users) > 0 and len(ok_users) > 0:
-        print( '両方' )
-        return render( request,'exam/userregisterweb.html',{'ok_users':ok_users,'ng_users':ng_users})
-    elif len(ng_users) > 0:
-        print( 'NG' )
-        return render( request,'exam/userregisterweb.html',{'ng_users':ng_users})
-    elif len(ok_users) > 0:
-        print( 'OK' )
-        return render( request,'exam/userregisterweb.html',{'ok_users':ok_users})
-    else:
-        return render(request, 'exam/userregisterweb.html',{'error_message':'登録数が越えています'})
-    return render( request , 'exam/userregisterweb.html',{'u_admin':request.session['u_admin']})
+            # 複数のファイルがアップロードされる
+            filelist = []
+            for uf in upfiles:
+                filepath = os.path.join(media_path, uf.name)
+                dest = open(filepath, 'wb+')
+                #print( filepath )
+                for chunk in uf:
+                    dest.write(chunk)
+                filelist.append( uf.name )
+            return render(request, 'exam/question_am_upload.html',{'u_admin':u_admin,'filelist':filelist} )
 
-def question_am_upload( request ):
-    securecheck(request)
-    u_admin = request.session['u_admin']
+        return render( request, 'exam/question_am_upload.html',{'u_admin':u_admin} )
 
-    # リクエストにfileが含まれている
-    if 'file' in request.FILES:
-        # アップするファイルのパス
-        o_id = request.session['o_id']
-        media_path = os.path.join(settings.STATIC_ROOT, "exam", "image", "question")
-
-        upfiles = request.FILES.getlist('file')
-
-        # 複数のファイルがアップロードされる
-        filelist = []
-        for uf in upfiles:
-            filepath = os.path.join(media_path, uf.name)
-            dest = open(filepath, 'wb+')
-            #print( filepath )
-            for chunk in uf:
-                dest.write(chunk)
-            filelist.append( uf.name )
-        return render(request, 'exam/question_am_upload.html',{'u_admin':u_admin,'filelist':filelist} )
-
-    return render( request, 'exam/question_am_upload.html',{'u_admin':u_admin} )
+    def ajax_question_am_upload( request ):
+        return HttpResponseJson( {} )
 
 #-*-*-*-*-*-*-*-*-ajaxの応答-*-*-*-*-*-*-*-*-*-
-def ajax_question_am_upload( request ):
-    return HttpResponseJson( {} )
-
-# u_idとt_idから結果を取得する
-def ajax_getquestion_period( request):
-    c_dic = byteToDic( request.body )
-    if 'q_period' in c_dic:
-        q_period = c_dic['q_period']
-        question = Question.objects.filter(q_period=q_period).values_list('q_id','q_answer')
-
-        questionlist = []
-        for q in question:
-            dict = {}
-            dict['q_id'] = q[0]
-            dict['q_answer'] = q[1]
-            questionlist.append( dict )
-
-        return HttpResponseJson( questionlist )
-
-def ajax_getquestion_classify( request):
-    c_dic = byteToDic( request.body )
-    if 'm_id' in c_dic:
-        m_id = c_dic['m_id']
-        question = Question.objects.values()
-
-        questionlist = []
-        for q in question:
-            c_id = q['c_id']
-            if c_id[2:4] == m_id:
-                #print( c_id + "," + c_id[2:4] )
-                dict = {}
-                dict['q_id'] = q['q_id']
-                dict['q_answer'] = q['q_answer']
-                questionlist.append( dict )
-        print( questionlist )
-        return HttpResponseJson( questionlist )
 
 # u_idから分野を取得する
 def get_m_list( request):

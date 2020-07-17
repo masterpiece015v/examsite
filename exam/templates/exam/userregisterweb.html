@@ -2,30 +2,31 @@
 {% block title %}ユーザ登録{% endblock %}
 {% block header %}ユーザ登録{% endblock %}
 {% block main %}
-<form method="POST" action="{% url 'exam:userregisterweb' %}" >
+<form method="POST" action="{% url 'exam:userregisterweb' %}">
     {% csrf_token %}
-    <ul class="newuser">
-        <li>ユーザIDを数字4桁で決めてください。</li>
+    <div class="form-group">
+
         {% if u_id_error %}<strong class="error">{{ u_id_error }}</strong><br>{% endif %}
-        <label for="u_id">ユーザID</label>
-        <input type="text" maxlength="8" name="u_id" id="u_id"><br>
-
-        <li>パスワードを英数字20文字以内で決めてください。</li>
+        <label for="u_id">ユーザID：</label>
+        <input type="text" maxlength="8" name="u_id" id="u_id" class="form-control" placeholder="ユーザIDは数字4桁"><br>
+    </div>
+    <div class="form-group">
         {% if u_pass_error %}<strong class="error">{{ u_pass_error }}</strong><br>{% endif %}
-        <label for="u_pass">ユーザパスワード</label>
-        <input type="text" maxlength="20" name="u_pass" id="u_pass"><br>
+        <label for="u_pass">ユーザパスワード：</label>
+        <input type="text" maxlength="20" name="u_pass" id="u_pass" class="form-control" placeholder="パスワードは20文字以内"><br>
+    </div>
 
-        <li>ユーザ名をフルネームで入力してください。</li>
+    <div class="form-group">
         {% if u_name_error %}<strong class="error">{{ u_name_error }}</strong><br>{% endif %}
-        <label for="u_name">ユーザ名</label>
-        <input type="text" maxlength="20" name="u_name" id="u_name"><br>
-
-        <li>ユーザのメールアドレスを入力してください。</li>
+        <label for="u_name">ユーザ名：</label>
+        <input type="text" maxlength="20" name="u_name" id="u_name" class="form-control" placeholder="フルネーム"><br>
+    </div>
+    <div class="form-group">
         {% if o_email_error %}<strong class="error">{{ o_email_error }}</strong><br>{% endif %}
-        <label for="u_email">メールアドレス</label>
-        <input type="email" maxlength="100" name="u_email" id="u_email">
+        <label for="u_email">メールアドレス：</label>
+        <input type="email" maxlength="100" name="u_email" id="u_email" class="form-control" placeholder="ユーザのE-mail">
+    </div>
+    <input type="submit" value="作成" class="btn btn-primary">
 
-        <li><input type="submit" value="作成"></li>
-    </ul>
 </form>
 {% endblock %}

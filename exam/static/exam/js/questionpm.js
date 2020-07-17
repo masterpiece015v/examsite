@@ -64,7 +64,7 @@ $(function(){
     //
     $("#classify").on('change',function(){
         //ユーザのidを送信する
-        var json = {'classify' : $('#classify').val() }
+        var json = {'classify' : $('#classify').val() ,'test':$('#test').val() }
         ajax_getquestionpm( '#questionpm' , json );
     });
 

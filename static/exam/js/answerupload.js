@@ -50,36 +50,9 @@ $(function(){
         }).done( (data) => {
 
             $(child_class).children().remove();
+            $('#modal-progress').modal('hide');
             alert( data['message'] );
 
-            //console.log( data );
-
-            /*
-            for( var i = 0 , len=data['t_num'].length; i<len;++i){
-                code4 = getcode4(i+1);
-                $tr = $("<tr id='tr" + code4 + "'>");
-                //Object.keys(data[i]).forEach( function( key ){
-                //    $td = $('<td>').text( data[i][key] );
-                //    $tr.append( $td );
-                //});
-                $td = $('<td>').text( data['t_num'][i]);
-                $tr.append( $td );
-                $td = $("<td>").text( data['q_id'][i]);
-                $tr.append( $td );
-                $td = $('<td>').text( data['r_answer'][i]);
-                $tr.append( $td );
-                $td = $('<td>').text( data['q_answer'][i]);
-                $tr.append( $td );
-                $td = $('<td>').text( data['mb'][i])
-                if( data['mb'][i]=='0'){
-                    $tr.attr('style','background-color:red;color:white;')
-                }
-                $tr.append( $td );
-
-                $('#resultdata').append( $tr );
-
-            }
-            */
         }).fail( (data)=>{
             alert( data );
         }).always( (data) => {
