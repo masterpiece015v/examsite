@@ -12,7 +12,11 @@
                 <label style="margin-left:10px;">試験:</label>
                 <select id="q_test" class="form-control">
                     {% for test in q_test %}
+                    {% if test.q_test == 'fe' %}
+                    <option value="{{ test.q_test }}" selected>{{ test.q_test }}</option>
+                    {% else %}
                     <option value="{{ test.q_test }}">{{ test.q_test }}</option>
+                    {% endif %}
                     {% endfor %}
                 </select>
             </div>
