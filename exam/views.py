@@ -851,11 +851,12 @@ class A_Bunya():
         c_dic = byteToDic( request.body )
         if 'u_id' in c_dic:
             u_id = c_dic['u_id']
+            o_id = request.session['o_id']
             list = []
             resulttest = ResultTest.objects.filter(u_id=u_id)
             for r in resulttest:
                 dict = {'u_id': u_id}
-                litteltest = LittleTest.objects.filter( t_id=r.t_id,t_num=r.t_num)
+                litteltest = LittleTest.objects.filter( t_id=r.t_id,t_num=r.t_num,o_id=o_id)
                 for l in litteltest:
                     question = Question.objects.get(pk=l.q_id)
                     classify = Classify.objects.get(pk=question.c_id)

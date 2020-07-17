@@ -51,6 +51,8 @@ $(function(){
                     $tr.append($td);
                     $td = $('<td>').text(count);
                     $tr.append( $td );
+                    $td = $('<td>').text( Math.round( (resultcount /count ) *100) / 100 )
+                    $tr.append( $td );
                     $r.append( $tr );
                     old_s_name = data[i]['s_name'];
 
