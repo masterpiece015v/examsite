@@ -15,6 +15,9 @@ from django.conf import settings
 import glob
 from .logger import log_write
 
+#グローバル変数
+testdic = {'fe':'基本情報','ap':'応用情報','sc':'情報セキュリティ'}
+
 #関数
 #アクセスログに追加する
 def addAccessLog(request,a_page,a_state):
@@ -512,6 +515,46 @@ class MainPage():
                     questionlist.append( dict )
             print( questionlist )
             return HttpResponseJson( questionlist )
+
+#テスト印刷画面
+class TrainPrint():
+    #ページを表示する
+    def trainprint( request ):
+        securecheck( request )
+
+        user = User.objects.get(pk=request.session['u_id'])
+        o_id = user.o_id
+
+        test = Question.objects.values('q_test').distinct()
+        test_list = []
+        for t in test:
+            dic = {'test':t['q_test'],'name':testdic[ t['q_test']]}
+            test_list.append( dic )
+        middle = Question.objects.values('c__m_id','c__m_name').distinct()
+        m_list = []
+        for m in middle:
+            dict= {'m_id':m['c__m_id'],'m_name':m['c__m_name']}
+            m_list.append( dict )
+        return render( request,'exam/trainprint.html',{'test':test_list,'u_admin':request.session['u_admin'],'m_list':m_list})
+
+    #テストの印刷用データをajaxで取得する
+    def ajax_gettrainprint( request ):
+        t_id_dic = byteToDic( request.body )
+        o_id = request.session['o_id']
+        test = LittleTest.objects.filter(o_id=o_id,t_id=t_id_dic['t_id'])
+        list = []
+        for item in test:
+            dic={}
+            dic['t_id']=item.t_id
+            dic['t_num']=item.t_num
+            dic['q_id']=item.q_id
+            dic['q_answer'] = item.get_q_answer()
+            c = item.get_classify()
+            dic['l_name'] = c.l_name
+            dic['m_name'] = c.m_name
+            dic['s_name'] = c.s_name
+            list.append(dic)
+        return HttpResponseJson( list )
 
 #テスト印刷画面
 class TestPrint():
@@ -1217,9 +1260,14 @@ class TestMake():
 
         o_id = user.o_id
 
-        num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().count()
+        num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct()
 
-        t_id = code4(num + 1)
+        numlist=[]
+        for n in num:
+            numlist.append( int(n['t_id']) )
+
+        t_id = code4(max(numlist) + 1)
+
         test_dic = byteToDic(request.body)
         q_list = test_dic['q_list']
         t_date = datetime.datetime.now()

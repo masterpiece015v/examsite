@@ -99,6 +99,10 @@ urlpatterns = [
     # QuestionAmUpLoad
     url(r'^question_am_upload/$',views.QuestioinAmUpload.question_am_upload,name='question_am_upload'),
 
+    # TrainPrint
+    url(r'^trainprint/$',views.TrainPrint.trainprint,name='trainprint'),
+    url(r'^ajax_gettrainprint/$',views.TrainPrint.ajax_gettrainprint,name='ajax_gettrainprint'),
+
     url(r'^get_m_list', views.get_m_list, name='get_m_list'),
     url(r'^get_s_list', views.get_m_list, name='get_m_list'),
 
