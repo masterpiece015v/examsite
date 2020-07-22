@@ -899,27 +899,26 @@ class A_Bunya():
             resulttest = ResultTest.objects.filter(u_id=u_id)
             for r in resulttest:
                 dict = {'u_id': u_id}
-                litteltest = LittleTest.objects.filter( t_id=r.t_id,t_num=r.t_num,o_id=o_id)
+                litteltest = LittleTest.objects.values('q_id','q__c__l_id','q__c__l_name','q__c__m_id','q__c__m_name','q__c__s_id','q__c__s_name','q__q_answer').filter( t_id=r.t_id,t_num=r.t_num,o_id=o_id).order_by('q__c__m_id','q__c__s_id')
                 for l in litteltest:
-                    question = Question.objects.get(pk=l.q_id)
-                    classify = Classify.objects.get(pk=question.c_id)
-                    dict['q_id'] = l.q_id
-                    dict['l_id'] = classify.l_id
-                    dict['l_name'] = classify.l_name
-                    dict['m_id'] = classify.m_id
-                    dict['m_name'] = classify.m_name
-                    dict['s_id'] = classify.s_id
-                    dict['s_name'] = classify.s_name
+                    # question = Question.objects.get(pk=l.q_id)
+                    # classify = Classify.objects.get(pk=question.c_id)
+                    dict['q_id'] = l['q_id']
+                    dict['l_id'] = l['q__c__l_id']
+                    dict['l_name'] = l['q__c__l_name']
+                    dict['m_id'] = l['q__c__m_id']
+                    dict['m_name'] = l['q__c__m_name']
+                    dict['s_id'] = l['q__c__s_id']
+                    dict['s_name'] = l['q__c__s_name']
                     dict['r_answer'] = r.r_answer
-                    dict['q_answer'] = question.q_answer
-                    if r.r_answer == question.q_answer:
+                    dict['q_answer'] = l['q__q_answer']
+                    if r.r_answer == l['q__q_answer']:
                         dict['result'] = 1
                     else:
                         dict['result'] = 0
                     list.append( dict )
 
             list = list_in_dict_sort(list,'m_id','s_id')
-
 
             return HttpResponseJson( list )
 
@@ -1266,7 +1265,10 @@ class TestMake():
         for n in num:
             numlist.append( int(n['t_id']) )
 
-        t_id = code4(max(numlist) + 1)
+        if len( numlist ) == 0:
+            t_id = '0001'
+        else:
+            t_id = code4(max(numlist) + 1)
 
         test_dic = byteToDic(request.body)
         q_list = test_dic['q_list']
