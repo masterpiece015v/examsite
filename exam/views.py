@@ -569,16 +569,21 @@ class TestPrint():
 
         for t in test:
             t_id = t['t_id']
-            mt = MakeLittletest.objects.get(pk="%s%s"%(o_id,t_id))
+            #print( "%s%s"%(o_id,t_id))
+
+            mt = MakeLittletest.objects.filter(t_id=t_id).values('u_id')
+            for m in mt:
+                u_id = m['u_id']
+                print( u_id )
             cnt = ResultTest.objects.filter(t_id=t_id,u__o_id=o_id).values('t_id','u_id').distinct().count();
             #print( mt.u_id )
             m_name_set = LittleTest.objects.filter(o_id=o_id,t_id=t_id).values('q__c__m_name').distinct()
             m_name_marge = m_name_set[0]['q__c__m_name']
             for i in range(1,len( m_name_set )):
                 m_name_marge = "%s,%s"%(m_name_marge,m_name_set[i]['q__c__m_name'])
-            print( m_name_marge )
-            test_list.append( {'t_id':t_id,'u_id':mt.u_id,'t_date':t['t_date'],'cnt':cnt,'m_name':m_name_marge})
-
+            #print( m_name_marge )
+            test_list.append( {'t_id':t_id,'u_id':u_id,'t_date':t['t_date'],'cnt':cnt,'m_name':m_name_marge})
+            #test_list.append({'t_id': t_id,'t_date': t['t_date'], 'cnt': cnt, 'm_name': m_name_marge})
         return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
     #テストの印刷用データをajaxで取得する
     def ajax_gettestprint( request ):

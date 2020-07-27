@@ -25,7 +25,7 @@ if __name__ == "__main__":
             data = ( fns[0]+fns[1]+fns[2][0:2] , fns[0],fns[1],int(fns[2][0:2]),fns[2],fns[3][0:len(fns[3])-4])
             datas.append( data )
     print( datas )
-    sql = "insert into exam_questionpm values ( %s , %s , %s , %s , %s, %s)"
+    sql = "insert ignore into exam_questionpm values ( %s , %s , %s , %s , %s, %s)"
     c = conn.cursor()
     c.executemany(sql, datas)
     c.close()
