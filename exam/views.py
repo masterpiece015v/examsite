@@ -1327,7 +1327,7 @@ class TestMakePeriod():
             for c in classify:
                 dic = {'q_period': c["q_period"]}
                 ary.append(dic)
-        print(ary)
+        #print(ary)
         return HttpResponseJson(ary)
     # 作ったテストをデータベースにアップする
     def ajax_testupdateperiod(request):
@@ -1340,14 +1340,17 @@ class TestMakePeriod():
 
         o_id = user.o_id
 
-        num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().count()
+        t_id_max = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().order_by('t_id').reverse().first()
 
-        t_id = code4(num + 1)
+        t_id_int = int( t_id_max['t_id'])
+
+        t_id = code4(t_id_int + 1)
+        #print( t_id )
         test_dic = byteToDic(request.body)
         q_list = test_dic['q_list']
         t_date = datetime.datetime.now()
         for item in q_list:
-            print(item)
+            #print(item)
             t_num = item['t_num']
             t_key = o_id + t_id + t_num
             q_id = item['q_id']
