@@ -564,9 +564,19 @@ class TestPrint():
         user = User.objects.get(pk=request.session['u_id'])
         o_id = user.o_id
 
-        test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
+        mt = MakeLittletest.objects.filter(o_id=o_id,u_id=user.u_id)
         test_list = []
+        for m in mt:
+            test = LittleTest.objects.filter(t_id=m.t_id).values('t_id','q__c__m_name','t_date').distinct()
+            m_name_marge = test[0]['q__c__m_name']
+            for i in range(1,len( test )):
+                m_name_marge = "%s,%s"%(m_name_marge,test[i]['q__c__m_name'])
+            cnt = ResultTest.objects.filter(t_id=m.t_id,u__o_id=o_id).values('t_id','u_id').distinct().count()
+            test_list.append({'t_id':m.t_id,'u_id':user.u_id,'t_date':test[0]['t_date'],'cnt':cnt,'m_name':m_name_marge} )
 
+        #test = LittleTest.objects.filter(o_id=o_id).values('t_id','t_date').distinct()
+
+        """
         for t in test:
             t_id = t['t_id']
             #print( "%s%s"%(o_id,t_id))
@@ -575,7 +585,7 @@ class TestPrint():
             for m in mt:
                 u_id = m['u_id']
                 print( u_id )
-            cnt = ResultTest.objects.filter(t_id=t_id,u__o_id=o_id).values('t_id','u_id').distinct().count();
+            cnt = ResultTest.objects.filter(t_id=t_id,u__o_id=o_id).values('t_id','u_id').distinct().count()
             #print( mt.u_id )
             m_name_set = LittleTest.objects.filter(o_id=o_id,t_id=t_id).values('q__c__m_name').distinct()
             m_name_marge = m_name_set[0]['q__c__m_name']
@@ -584,7 +594,11 @@ class TestPrint():
             #print( m_name_marge )
             test_list.append( {'t_id':t_id,'u_id':u_id,'t_date':t['t_date'],'cnt':cnt,'m_name':m_name_marge})
             #test_list.append({'t_id': t_id,'t_date': t['t_date'], 'cnt': cnt, 'm_name': m_name_marge})
+        """
+
         return render( request,'exam/testprint.html',{'test_list':test_list,'u_admin':request.session['u_admin']})
+
+
     #テストの印刷用データをajaxで取得する
     def ajax_gettestprint( request ):
         t_id_dic = byteToDic( request.body )
