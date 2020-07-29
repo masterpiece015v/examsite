@@ -110,23 +110,23 @@ class NewUser():
 
         u_email = request.POST['u_email']
         # メールアドレスチェック
-        try:
-            user = User.objects.get(u_email=u_email)
-        except ObjectDoesNotExist:
-            #存在しないので登録できる
-            auth_key = auth_add('newuser', u_email)
+        #try:
+        #    user = User.objects.get(u_email=u_email)
+        #except ObjectDoesNotExist:
+        #存在しないので登録できる
+        auth_key = auth_add('newuser', u_email)
 
-            sub = '新規ユーザ登録'
-            con = """
+        sub = '新規ユーザ登録'
+        con = """
             新規ユーザ登録をしていただきありがとうございました。
             24時間以内に、下記URLから本登録にお進みください。
             http://examsite.room.kaikei.ac.jp+/exam/orgregister/?auth_key=%s
             """ % (auth_key)
-            EmailMessage(sub, con, to=[u_email, ]).send()
-            return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
+        EmailMessage(sub, con, to=[u_email, ]).send()
+        return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
 
         #メールアドレスが存在したので登録できない
-        return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
+        #return render( request,'exam/newuser.html',{'message':'そのメールアドレスはすでに登録されています。'})
 
 #アカウント登録
 class OrgRegister():
