@@ -61,6 +61,8 @@ class Question( models.Model ):
     q_title = models.CharField( max_length=100 )
     q_answer = models.CharField( max_length=1 )
     c = models.ForeignKey(Classify,on_delete=models.CASCADE )
+    q_content = models.TextField(default="")
+
     def getclassify(self):
         classify = Classify.objects.get(pk=self.c_id)
         return classify
@@ -123,3 +125,11 @@ class QuestionPm( models.Model):
     q_num = models.IntegerField()
     q_classify = models.CharField( max_length=20)
     q_title = models.CharField( max_length=40 )
+
+class QuestionJs( models.Model ):
+    q_id = models.CharField(max_length=10,primary_key=True)
+    q_period = models.CharField(max_length=6)
+    q_subject = models.CharField( max_length=2)
+    q_num = models.CharField(max_length=2)
+    q_title = models.CharField(max_length=20)
+    q_content = models.CharField(max_length=80)

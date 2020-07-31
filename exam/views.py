@@ -120,7 +120,7 @@ class NewUser():
         con = """
             新規ユーザ登録をしていただきありがとうございました。
             24時間以内に、下記URLから本登録にお進みください。
-            http://examsite.room.kaikei.ac.jp+/exam/orgregister/?auth_key=%s
+            http://examsite.room.kaikei.ac.jp/exam/orgregister/?auth_key=%s
             """ % (auth_key)
         EmailMessage(sub, con, to=[u_email, ]).send()
         return render(request, 'exam/message.html', {'message': 'メールアドレス宛に登録サイトのURLを送信しました。'})
@@ -160,16 +160,17 @@ class OrgRegister():
         u_pass = request.POST['u_pass']
         o_name = request.POST['o_name']
         u_name = request.POST['u_name']
-        o_count = len( Org.objects.all() ) + 1
 
-        if o_count < 10:
-            o_id = '000'+str(o_count)
-        elif o_count < 100:
-            o_id = '00'+str(o_count)
-        elif o_count < 1000:
-            o_id = '0'+str(o_count)
+        num = Org.objects.values('o_id')
+
+        numlist=[]
+        for n in num:
+            numlist.append( int(n['o_id']) )
+
+        if len( numlist ) == 0:
+            o_id = '0001'
         else:
-            o_id = str(o_count)
+            o_id = code4(max(numlist) + 1)
 
         org = Org(o_id=o_id,o_name=o_name,l_num=1)
         org.save()
@@ -1340,11 +1341,17 @@ class TestMakePeriod():
 
         o_id = user.o_id
 
-        t_id_max = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct().order_by('t_id').reverse().first()
+        num = LittleTest.objects.filter(o_id=o_id).values('t_id').distinct()
 
-        t_id_int = int( t_id_max['t_id'])
+        numlist=[]
+        for n in num:
+            numlist.append( int(n['t_id']) )
 
-        t_id = code4(t_id_int + 1)
+        if len( numlist ) == 0:
+            t_id = '0001'
+        else:
+            t_id = code4(max(numlist) + 1)
+
         #print( t_id )
         test_dic = byteToDic(request.body)
         q_list = test_dic['q_list']
