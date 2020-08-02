@@ -50,7 +50,10 @@ urlpatterns = [
     url(r'^mainpage_ajax_getperiod/$', views.MainPage.mainpage_ajax_getperiod, name='mainpage_ajax_getperiod'),
     url(r'^ajax_getquestion_period/$', views.MainPage.ajax_getquestion_period, name='ajax_getquestion_period'),
     url(r'^ajax_getquestion_classify/$', views.MainPage.ajax_getquestion_classify, name='ajax_getquestion_classify'),
-
+    #QuestionJs
+    url(r'^questionjs/$', views.Question_Js.questionjs, name='questionjs'),
+    url(r'^ajax_getquestionjs/$', views.Question_Js.ajax_getquestionjs, name='ajax_getquestionjs'),
+    url(r'^ajax_gettitle/$', views.Question_Js.ajax_gettitle, name='ajax_gettitle'),
     # Addlicense
     url(r'^addlicense/$', views.Addlicense.addlicense, name='addlicense'),
 

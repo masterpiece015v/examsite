@@ -3,7 +3,7 @@ from django.shortcuts import render,HttpResponseRedirect
 from django.http import HttpResponse
 from django.core.mail import EmailMessage
 import re,string,random,datetime,os,csv
-from .models import Auth,User,Org,AccessLog,Classify,Question,LittleTest,SuperUser,AddLicenseRequest,AnswerImage,ResultTest,MakeLittletest,CompQuestion,QuestionPm
+from .models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.urls import reverse
@@ -1368,6 +1368,48 @@ class TestMakePeriod():
         m_test.save()
 
         return HttpResponse(json.dumps({"state": "ok"}, ensure_ascii=False, indent=2), content_type='application/json',charset='utf-8')
+#午後問題表示
+class Question_Js():
+    # ページ表示
+    def questionjs( request ):
+        #セッションを持っていない
+        if 'u_id' not in request.session:
+            return render( request,'exam/errorpage.html',{'message':'不正なアクセスです'})
+
+        subjects = [{'key':'01','name':'基本スキル'},{'key':'02','name':'プログラミングスキル'},{'key':'03','name':'システムデザインスキル'}]
+        u_admin = request.session['u_admin']
+        m_titles = QuestionJs.objects.filter(q_subject='01').values('q_num','q_title').distinct()
+        titles = []
+        for title in m_titles:
+            titles.append({'q_num':title['q_num'] , 'q_title':title['q_title']})
+        m_contents = QuestionJs.objects.filter(q_subject='01',q_num='01').values('q_id','q_period','q_subject','q_num','q_content').distinct()
+        contents = []
+        for content in m_contents:
+            contents.append( {'q_id':content['q_id'],'filename':"%s_%s_%s.pdf"%(content['q_period'],content['q_subject'],content['q_num']),'q_content':content['q_content']})
+
+        return render( request,'exam/questionjs.html',{'u_admin':u_admin ,'subjects':subjects , 'titles':titles,'contents':contents})
+    #ajax
+    def ajax_gettitle( request ):
+        c_dic = byteToDic(request.body)
+        q_subject = c_dic['subject']
+        print( q_subject )
+        m_titles = QuestionJs.objects.filter(q_subject=q_subject).values('q_num','q_title').distinct()
+        titles = []
+        for title in m_titles:
+            titles.append({'q_num':title['q_num'],'q_title':title['q_title']})
+        print( titles )
+        return HttpResponseJson(titles)
+
+    def ajax_getquestionjs(request):
+        c_dic = byteToDic(request.body)
+        subject = c_dic['subject']
+        title = c_dic['title']
+        m_contents = QuestionJs.objects.filter(q_subject=subject,q_num=title).values('q_id','q_period','q_subject','q_num','q_content').distinct()
+        contents = []
+        for content in m_contents:
+            contents.append( {'q_id':content['q_id'],'filename':"%s_%s_%s.pdf"%(content['q_period'],content['q_subject'],content['q_num']),'q_content':content['q_content']})
+        print( contents )
+        return HttpResponseJson(contents)
 
 #午後問題表示
 class Question_Pm():
@@ -1379,14 +1421,34 @@ class Question_Pm():
 
         tests = {'fe':'基本情報','ap':'応報情報','sc':'情報セキュリティ'}
         u_admin = request.session['u_admin']
-        qpm = QuestionPm.objects.values('q_classify').distinct().order_by('q_classify')
+        qpm = QuestionPm.objects.filter(q_test='fe').values('q_classify').distinct().order_by('q_classify')
         test = QuestionPm.objects.values('q_test').distinct()
         testlist = []
         for t in test:
             dict={'test':t['q_test'],'name':tests[t['q_test']]}
             testlist.append( dict )
+        classifylist = []
+        for c in qpm:
+            dict={'classify':c['q_classify']}
+            classifylist.append(dict)
 
-        return render( request,'exam/questionpm.html',{'q_list':qpm,'u_admin':u_admin ,'test':testlist})
+        qpm = QuestionPm.objects.filter(q_classify='01セキュリティ',q_test='fe').values()
+        q_list = []
+        static_dir = settings.STATIC_ROOT
+        for q in qpm:
+            qfn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + q['q_title'] + ".pdf"
+            afn = q['q_test'] + "_" + q['q_period'] + "_" + q['q_classify'] + "_" + "ans.pdf"
+            dict = {}
+            dict['qfn'] = qfn
+            afn_path = os.path.join(static_dir, 'exam', 'pdf', 'question_pm', afn)
+            print(afn_path)
+            if (os.path.exists(afn_path)):
+                dict['afn'] = afn
+            else:
+                dict['afn'] = "ファイルなし"
+            q_list.append(dict)
+
+        return render( request,'exam/questionpm.html',{'classify':classifylist,'u_admin':u_admin ,'test':testlist,'question':q_list})
     #ajax
     def ajax_getquestionpm(request):
         c_dic = byteToDic(request.body)
