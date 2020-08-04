@@ -18,3 +18,6 @@ Pillowをpipでインストール
 matplotlibをpipでインストール
 
 gmailの二段階認証とアプリパスワードの設定
+
+rootにWeb.config
+root\staticにweb.config
