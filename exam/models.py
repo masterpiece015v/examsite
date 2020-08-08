@@ -31,7 +31,6 @@ class User( models.Model ):
     u_enable = models.SmallIntegerField(default=1)  #ユーザの有効（期限切れまたはロックに使用）
     u_hidden = models.SmallIntegerField(default=0)  #ユーザを隠す
     u_date = models.DateField()
-
     def pass_check(self,u_pass):
         return self.u_pass == u_pass
     def get_o_id(self):
