@@ -66,6 +66,12 @@ class Question( models.Model ):
         classify = Classify.objects.get(pk=self.c_id)
         return classify
 
+class ContentKeyWord( models.Model ):
+    k_id = models.CharField( max_length=12,primary_key=True)
+    q = models.ForeignKey( Question,on_delete=models.CASCADE )
+    k_num = models.CharField( max_length=3)
+    k_keyword = models.CharField( max_length=20)
+
 class LittleTest( models.Model ):
     t_key = models.CharField( max_length=16,primary_key=True)
     t_id = models.CharField( max_length=4)
