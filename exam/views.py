@@ -536,7 +536,17 @@ class TrainPrint():
         for m in middle:
             dict= {'m_id':m['c__m_id'],'m_name':m['c__m_name']}
             m_list.append( dict )
-        return render( request,'exam/trainprint.html',{'test':test_list,'u_admin':request.session['u_admin'],'m_list':m_list})
+        small = Question.objects.values('c__s_id','c__s_name').filter(c__m_id='01').distinct()
+        s_list = []
+        for s in small:
+            dict = {'s_id':s['c__s_id'],'s_name':s['c__s_name']}
+            s_list.append( dict )
+        question = Question.objects.values('q_id','q_title','q_answer').filter(c__m_id='01',q_test='fe')
+        q_list = []
+        for q in question:
+            dict = {'q_id':q['q_id'],'q_title':q['q_title'],'q_answer':q['q_answer']}
+            q_list.append( dict )
+        return render( request,'exam/trainprint.html',{'test':test_list,'u_admin':request.session['u_admin'],'m_list':m_list,'s_list':s_list,'q_list':q_list })
 
     #テストの印刷用データをajaxで取得する
     def ajax_gettrainprint( request ):
@@ -557,6 +567,61 @@ class TrainPrint():
             list.append(dic)
         return HttpResponseJson( list )
 
+    #基本、応用が切り替わった
+    def ajax_testchange(request ):
+        dict = byteToDic( request.body )
+        test = dict['test']
+        list = []
+        if 'm_id' in dict and 's_id' in dict:
+            m_id = dict['m_id']
+            s_id = dict['s_id']
+            question = Question.objects.values('q_id','q_title','q_answer').filter(q_test=test,c__s_id=s_id,c__m_id=m_id)
+        elif 'm_id' in dict:
+            m_id = dict['m_id']
+            question = Question.objects.values('q_id', 'q_title','q_answer').filter(q_test=test, c__m_id=m_id)
+        for q in question:
+            dict = {'q_id': q['q_id'], 'q_title': q['q_title'],'q_answer':q['q_answer']}
+            list.append(dict)
+
+        return HttpResponseJson(list)
+
+    def ajax_m_id_change(request ):
+        dict = byteToDic( request.body )
+        test = dict['test']
+        list1 = []
+        if 'm_id' in dict:
+            m_id = dict['m_id']
+            question = Question.objects.values('q_id', 'q_title','q_answer').filter(q_test=test, c__m_id=m_id)
+        for q in question:
+            dict = {'q_id': q['q_id'], 'q_title': q['q_title'],'q_answer':q['q_answer']}
+            list1.append(dict)
+        list2 = []
+        classify = Classify.objects.values('s_id','s_name').filter(m_id=m_id)
+        for c in classify:
+            dict = {'s_id':c['s_id'], 's_name':c['s_name']}
+            list2.append( dict )
+
+        return HttpResponseJson({'list1':list1,'list2':list2})
+
+    def ajax_s_id_change(request):
+        dict = byteToDic( request.body )
+        print( dict )
+        test = dict['test']
+        list = []
+        if 'm_id' in dict and 's_id' in dict:
+            m_id = dict['m_id']
+            s_id = dict['s_id']
+            question = Question.objects.values('q_id','q_title','q_answer').filter(q_test=test,c__s_id=s_id,c__m_id=m_id)
+        elif 'm_id' in dict:
+            m_id = dict['m_id']
+            question = Question.objects.values('q_id', 'q_title','q_answer').filter(q_test=test, c__m_id=m_id)
+
+        for q in question:
+            dict = {'q_id': q['q_id'], 'q_title': q['q_title'],'q_answer':q['q_answer']}
+            list.append(dict)
+
+        #print( list )
+        return HttpResponseJson(list)
 #テスト印刷画面
 class TestPrint():
     #ページを表示する

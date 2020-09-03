@@ -105,7 +105,9 @@ urlpatterns = [
     # TrainPrint
     url(r'^trainprint/$',views.TrainPrint.trainprint,name='trainprint'),
     url(r'^ajax_gettrainprint/$',views.TrainPrint.ajax_gettrainprint,name='ajax_gettrainprint'),
-
+    url(r'^ajax_testchange/$',views.TrainPrint.ajax_testchange,name='ajax_testchange'),
+    url(r'^ajax_m_id_change/$', views.TrainPrint.ajax_m_id_change, name='ajax_m_id_change'),
+    url(r'^ajax_s_id_change/$', views.TrainPrint.ajax_s_id_change, name='ajax_s_id_change'),
     url(r'^get_m_list', views.get_m_list, name='get_m_list'),
     url(r'^get_s_list', views.get_m_list, name='get_m_list'),
 
