@@ -51,7 +51,7 @@ $(function(){
             for( var i = 0 ;  i < data.length ; i++){
 
                 $td1 = $('<td>').text(data[i]['t_num'] + ",【試験番号】" + data[i]['q_id'] + ",【中分類】" + data[i]['m_name'] + ",【小分類】" + data[i]['s_name']);
-                $td1.attr("style","font-size:10pt;");
+                $td1.attr("style","font-size:14pt;");
                 $tr1 = $("<tr>").append( $td1 );
 
                 $img = $("<img src='/static/exam/image/question/" + data[i]['q_id'] + ".png'>" );

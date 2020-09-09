@@ -58,6 +58,7 @@ $(function(){
         }).done( (data) => {
             //全クリア
             $( child_class ).children().remove();
+            $( child_class).append( $('<option>'));
             //追加
             Object.keys(data).forEach( function( key ){
                 $option = $('<option>').val( key ).text( data[key] );
@@ -128,6 +129,7 @@ $(function(){
         }).always( (data) => {
         });
     }
+
     function setModal( list_id ){
         $msq = $('#msq');
         $msq.children().remove();
@@ -245,7 +247,23 @@ $(function(){
 
         setModal("#sq");
     });
+    //問題にするリストをダブルクリック
+    $('#question').on('dblclick',function(){
+        //var txt = $('#a_que option:selected').text();
+        //alert( txt );
+        value = $(this).val();
+        $(this).children('[value=' + value + ']').remove();
 
+        //$(this).children().each(function(index,value){
+            //$('#sq').append( $('<option>').val(getcode4(index+1)).text(value.text));
+            //$(this).remove();
+            //value.val = getcode4(index+1);
+            //console.log( value.text );
+        //});
+
+        $("#qcnt1").text( "テスト問題数:" + $(this).children().length );
+        //setModal("#sq");
+    });
     //問題にするリストをダブルクリック
     $('#sq').on('dblclick',function(){
         //var txt = $('#a_que option:selected').text();
@@ -340,4 +358,17 @@ $(function(){
 
     });
 
+    //フィルタボタン
+    $("#q_filter_button").on('click',function(){
+        pattern = $("#q_filter_text").val();
+        $('#question').children().each(function(){
+            source = $(this).val();
+            if( source.indexOf(pattern)===0){
+                console.log( $(this).val() );
+            }else{
+                $(this).remove();
+            }
+        });
+        $('#qcnt1').text( "問題数:" + $("#question").children().length );
+    });
 });
