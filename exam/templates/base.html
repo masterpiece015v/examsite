@@ -63,6 +63,17 @@
 
                         </div>
                     </li>
+                    <!--CBT-->
+                    <!--
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown4" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">CBT</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown4">
+                            <a class="dropdown-item" href="{% url 'exam:cbtammain' %}">CBT_AM_Main</a>
+                            <a class="dropdown-item" href="{% url 'exam:cbtpmmain' %}">CBT_PM_Main</a>
+
+                        </div>
+                    </li>
+                    -->
                     <!--結果分析-->
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown3" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">結果分析</a>
@@ -74,10 +85,10 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'exam:questionpm' %}">午後問題</a>
+                        <a class="nav-link" href="{% url 'exam:questionpm' %}">午後問題印刷</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'exam:questionjs' %}">情報システム試験</a>
+                        <a class="nav-link" href="{% url 'exam:questionjs' %}">情報システム試験印刷</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav my-2 my-lg-0">
@@ -110,7 +121,10 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'exam:questionpm' %}">午後問題</a>
+                        <a class="nav-link" href="{% url 'exam:questionpm' %}">午後問題印刷</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'exam:questionjs' %}">情報システム試験印刷</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav my-2 my-lg-0">

@@ -138,3 +138,15 @@ class QuestionJs( models.Model ):
     q_num = models.CharField(max_length=2)
     q_title = models.CharField(max_length=20)
     q_content = models.CharField(max_length=80)
+
+class QuestionCbtPm( models.Model ):
+    q_id = models.CharField( max_length=12,primary_key=True)
+    q_test = models.CharField( max_length=2 )
+    q_period = models.CharField( max_length=5 )
+    q_q = models.CharField(max_length=2)
+    q_question = models.CharField(max_length=2)
+    q_symbol = models.CharField(max_length=1)
+    q_answer = models.CharField(max_length=1)
+    q_lastanswer = models.CharField(max_length=1,blank=True)
+    q_remarks = models.CharField(max_length=1,blank=True)
+    q_allocation = models.IntegerField(default=0)

@@ -738,33 +738,54 @@ class Miss_Question():
         o_id = user.o_id
 
         users = User.objects.filter(o_id=o_id).values()
+        makeusers = MakeLittletest.objects.filter(o_id=o_id).values('u_id').distinct()
 
         print( users )
+        print( makeusers )
 
-        return render( request,'exam/miss_question.html',{'u_admin':request.session['u_admin'] , 'users':users})
+        return render( request,'exam/miss_question.html',{'u_admin':request.session['u_admin'] , 'users':users , 'makeusers':makeusers })
     #テストの印刷用データをajaxで取得する
     def ajax_miss_question( request ):
         c_dic = byteToDic( request.body )
         o_id = request.session['o_id']
-        resulttest = ResultTest.objects.filter(u_id=c_dic['u_id'])
+        m_u_id = c_dic['m_u_id']
+
+        makelittletest = MakeLittletest.objects.filter(o_id=o_id,u_id=m_u_id).values('t_id')
+        q_list = []
         list = []
-        for item in resulttest:
-            littletest = LittleTest.objects.filter(t_id=item.t_id,t_num=item.t_num,o_id=o_id)
-            q_id = littletest[0].q_id
-            question = Question.objects.get(pk=q_id)
-            if item.r_answer != question.q_answer:
-                dic={}
-                dic['t_id']=item.t_id
-                dic['t_num']=str( item.t_num )
-                dic['q_id']=q_id
-                dic['q_answer'] = question.q_answer
-                classify = Classify.objects.filter(c_id=question.c_id)
-                #c = question.get_classify()
-                dic['l_name'] = classify[0].l_name
-                dic['m_name'] = classify[0].m_name
-                dic['s_name'] = classify[0].s_name
-                print( dic )
-                list.append(dic)
+        for t in makelittletest:
+            #print( t['t_id'] )
+            resulttest = ResultTest.objects.filter(u_id=c_dic['u_id'],t_id=t['t_id']).values('t_id','t_num','r_answer')
+            #print( resulttest )
+            for item in resulttest:
+                littletest = LittleTest.objects.filter(t_id=item['t_id'] , t_num=item['t_num'] , o_id=o_id)
+                q_id = littletest[0].q_id
+                question = Question.objects.get(pk=q_id)
+                if item['r_answer'] != question.q_answer:
+
+                    q_list.append(question.q_id)
+
+        q_list.sort()
+
+        for i in range(len(q_list)):
+            question = Question.objects.get(pk=q_list[i])
+            dic={}
+            #dic['t_id']=item['t_id']
+            #dic['t_num']=str( item['t_num'] )
+            dic['q_id']=q_list[i]
+            dic['q_answer'] = question.q_answer
+            classify = Classify.objects.filter(c_id=question.c_id)
+            #c = question.get_classify()
+            dic['l_name'] = classify[0].l_name
+            dic['m_name'] = classify[0].m_name
+            dic['s_name'] = classify[0].s_name
+
+            #dic['l_name'] = question_c__l_name
+            #dic['m_name'] = question_c__m_name
+            #dic['s_name'] = question_c__s_name
+
+            print( dic )
+            list.append(dic)
 
         return HttpResponseJson( list )
 
@@ -1084,11 +1105,6 @@ class AnswerUpload():
         o_id = request.session['o_id']
         media_path = os.path.join(settings.STATIC_ROOT,"exam","answer",o_id)
 
-        #if 't_id' in request.POST:
-        #    print( "post" )
-        #    dic = byteToDic(request.body )
-        #    return HttpResponseJson(dic)
-
         if request.method != 'POST':
             answerimage = AnswerImage.objects.all()
             #リストの再取得
@@ -1103,10 +1119,11 @@ class AnswerUpload():
             upfiles = request.FILES.getlist('file')
 
             #複数ファイルのアップは拒否
-            if len(upfiles)>1:
-                return render(request, 'exam/answerupload.html',{"message": "ファイルのアップロードは1つずつにしてください。",'u_admin':u_admin})
+            #if len(upfiles)>1:
+            #    return render(request, 'exam/answerupload.html',{"message": "ファイルのアップロードは1つずつにしてください。",'u_admin':u_admin})
 
             #複数のファイルがアップロードされる
+            list = []
             for uf in upfiles:
                 files = os.listdir( media_path )
                 if len(files)+1 < 10:
@@ -1136,7 +1153,9 @@ class AnswerUpload():
                     #for file in answerimage:
                     #    filelist.append(file)
                     #msg = msg + uf.name
-                    return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。", "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist ,'u_admin':u_admin})
+                    #return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。", "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist ,'u_admin':u_admin})
+                    dict = {'t_id':test_id,'u_id':user_id,'exists':1}
+                    list.append( dict )
                 else:
                     # 画像をデータベースに登録する
                     #add_answerimage = AnswerImage( image=filename , o_id=org_id , t_id=test_id , u_id=user_id )
@@ -1164,8 +1183,9 @@ class AnswerUpload():
                     for file in filelist:
                         print( os.path.join(media_path,file))
                         #os.remove( os.path.join(media_path, file ) )
-
-            return render(request, 'exam/answerupload.html' , { "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist ,'u_admin':u_admin})
+                    dict = {'t_id':test_id,'u_id':user_id,'exists':0}
+                    list.append( dict )
+            return render(request, 'exam/answerupload.html' , { 'list':list ,'u_admin':u_admin})
 
         elif 'del' in request.POST:
             image = request.POST['del']
@@ -1229,6 +1249,50 @@ class AnswerUpload():
                 # os.remove( os.path.join(media_path, file ) )
         c_dic['message'] = "登録できました。"
         return HttpResponseJson( c_dic )
+# cbtam
+class CbtAmMain():
+    def cbtammain(request):
+        return render( request,'exam/cbtammain.html', {'u_admin':request.session['u_admin']})
+
+# cbtpm
+class CbtPmMain():
+    def cbtpmmain(request):
+        questioncbtpm = QuestionCbtPm.objects.values('q_test','q_period').distinct()
+        return render( request,'exam/cbtpmmain.html',{'u_admin':request.session['u_admin'] , 'questioncbtpm':questioncbtpm})
+
+# cbtpm
+class CbtPm():
+    def cbtpm(request):
+        q_id = request.GET.get('q_id')
+        q_test = q_id[0:2]
+        q_period = q_id[2:7]
+        question = QuestionCbtPm.objects.values('q_q').filter(q_test=q_test,q_period=q_period).distinct()
+        return render( request,'exam/cbtpm.html',{'u_admin':request.session['u_admin'] ,
+                                                  'q_test':q_test,'q_period':q_period,
+                                                  'question':question ,
+                                                  'r_id':random_id(10)})
+
+    def ajax_cbtpm_get_q(request):
+        c_dic = byteToDic( request.body )
+        #print( c_dic )
+        q_test = c_dic['q_test']
+        q_period = c_dic['q_period']
+        q_q = c_dic['q_q']
+
+        question = QuestionCbtPm.objects.values('q_question','q_symbol','q_lastanswer').filter(q_test=q_test,q_period=q_period,q_q=q_q)
+        list = []
+        for q in question:
+            dict = {}
+            dict['q_question'] = q['q_question']
+            dict['q_symbol'] = q['q_symbol']
+            dict['q_lastanswer'] = q['q_lastanswer']
+            list.append( dict )
+
+        return HttpResponseJson( {'pdf':"%s%s%s.pdf"%(q_test,q_period,q_q),'list':list} )
+
+def random_id(n):
+    randlst = [random.choice(string.ascii_letters + string.digits) for i in range(n)]
+    return ''.join(randlst)
 
 # 問題作成メイン画面
 class TestMake():
@@ -1244,9 +1308,7 @@ class TestMake():
                       {'l_class_list': l_class_list, 'q_test': q_test, 'u_admin': request.session['u_admin']})
     # 分類名を取得する ajax
     def ajax_getclass(request):
-
         c_dic = byteToDic(request.body)
-
         if 'l_class' in c_dic:
             l_id = c_dic['l_class']
             print(l_id)

@@ -102,6 +102,10 @@ urlpatterns = [
     # QuestionAmUpLoad
     url(r'^question_am_upload/$',views.QuestioinAmUpload.question_am_upload,name='question_am_upload'),
 
+    url(r'^cbtammain/$',views.CbtAmMain.cbtammain,name='cbtammain'),
+    url(r'^cbtpmmain/$',views.CbtPmMain.cbtpmmain,name='cbtpmmain'),
+    url(r'^cbtpm/$',views.CbtPm.cbtpm,name='cbtpm'),
+    url(r'^ajax_cbtpm_get_q/$',views.CbtPm.ajax_cbtpm_get_q,name='ajax_cbtpm_get_q'),
     # TrainPrint
     url(r'^trainprint/$',views.TrainPrint.trainprint,name='trainprint'),
     url(r'^ajax_gettrainprint/$',views.TrainPrint.ajax_gettrainprint,name='ajax_gettrainprint'),

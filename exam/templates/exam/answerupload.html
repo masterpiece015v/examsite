@@ -26,7 +26,11 @@
                 <input type="submit" value="upload" class="btn btn-primary" data-toggle="modal" data-target="#modal-progress">
             </div>
         </form>
-
+        <select class="form-control" id="select_id">
+            {% for l in list %}
+            <option value="{{ l.t_id }}_{{ l.u_id }}">{{ l.t_id }}_{{ l.u_id }}_{{ l.exists }}</option>
+            {% endfor %}
+        </select>
     </div>
     <form method="POST">
         <div class="col-md-6">

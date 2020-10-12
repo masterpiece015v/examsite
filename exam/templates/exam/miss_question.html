@@ -10,6 +10,12 @@
         <div class="col">
             <form class="form-inline">
                 <div class="form-group">
+                    <select class="form-control d-print-none" id="makeusers">
+                        <option></option>
+                        {% for user in makeusers %}
+                        <option value="{{ user.u_id }}">{{ user.u_id }}</option>
+                        {% endfor %}
+                    </select>
                     <select class="form-control d-print-none" id="users">
                         <option></option>
                         {% for user in users %}
@@ -46,7 +52,23 @@
     <div style="page-break-after: always;"></div>
     <div class="row" style="margin-top:10px;">
         <div class="col">
-            <table id="qanswer" class="table table-condensed" style="width:80px;">
+            <table id="qanswer1" class="table table-condensed" style="width:80px;">
+            </table>
+        </div>
+    </div>
+
+    <div style="page-break-after: always;"></div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col">
+            <table id="qanswer2" class="table table-condensed" style="width:80px;">
+            </table>
+        </div>
+    </div>
+
+    <div style="page-break-after: always;"></div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col">
+            <table id="qanswer3" class="table table-condensed" style="width:80px;">
             </table>
         </div>
     </div>

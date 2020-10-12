@@ -86,5 +86,34 @@ $(function(){
         ajax_getresult( '#answer_table' , json );
     });
 
+    $("#select_id").on('change',function(){
+
+        var id = $(this).val();
+        var t_id = id.split("_")[0];
+        var u_id = id.split("_")[1];
+        var query = {'t_id':t_id,'u_id': u_id };
+
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"/exam/ajax_getanswerlist/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr(  ),
+        }).done( (data) => {
+
+            $(child_class).children().remove();
+            $('#modal-progress').modal('hide');
+            alert( data['message'] );
+
+        }).fail( (data)=>{
+            alert( data );
+        }).always( (data) => {
+        });
+    });
 
 });

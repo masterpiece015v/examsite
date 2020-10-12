@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CBT_PM</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+<body>
+{% csrf_token %}
+<div class="container-fluid">
+    <div class="row" style="margin-top:20px;margin-left:20px">
+        <div class="col-md-12">
+            <p>試験区分:<strong id="q_test">{{ q_test }}</strong> 年度期:<strong id="q_period">{{ q_period }}</strong> 受験ID:<strong id="{{ r_id }}">{{ r_id }}</strong></p>
+
+            <p>
+                {% for q in question %}<spam> 問<input type="button" value="{{ q.q_q }}" class="q_q" class="btn"></spam>{% endfor %}
+            </p>
+
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;margin-left:20px">
+        <div class="col-md-8">
+            <iframe src="" width="100%" height="800px" id="iframe">
+                <p><b>表示されない時の表示</b>: <a href="pdf.pdf">PDF をダウンロード</a>.</p>
+            </iframe>
+        </div>
+        <div class="col-md-4" id="res">
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{% static 'exam/js/cbtpm.js' %}" charset="utf-8"></script>
+</body>
+</html>

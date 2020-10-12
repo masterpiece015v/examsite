@@ -28,7 +28,9 @@ $(function(){
 
     $("#users").on('change',function(){
 
-        query = {'u_id':$(this).val() };
+        query = {'u_id':$(this).val(),'m_u_id':$('#makeusers').val() };
+
+        console.log( query );
 
         //$("#u_id").text( "テストID:" + query['t_id'] );
 
@@ -46,11 +48,13 @@ $(function(){
             data: getJsonStr( query ),
         }).done( (data) => {
             $('#qtable').children().remove();
-            $('#qanswer').children().remove();
+            $('#qanswer1').children().remove();
+            $('#qanswer2').children().remove();
+            $('#qanswer3').children().remove();
 
             for( var i = 0 ;  i < data.length ; i++){
 
-                $td1 = $('<td>').text(data[i]['t_num'] + ",【試験番号】" + data[i]['q_id'] + ",【中分類】" + data[i]['m_name'] + ",【小分類】" + data[i]['s_name']);
+                $td1 = $('<td>').text("【試験番号】" + data[i]['q_id'] + ",【中分類】" + data[i]['m_name'] + ",【小分類】" + data[i]['s_name']);
                 $td1.attr("style","font-size:12pt;");
                 $tr1 = $("<tr>").append( $td1 );
 
@@ -65,42 +69,158 @@ $(function(){
 
             }
 
-            for( var i = 0 ; i < data.length ; i++ ){
-                //alert( data.length );
-                if( data.length <= 20 ){
-                    console.log( data[i]['t_num']);
-                    $tr3 = $('<tr>').append(
-                        $("<td>").text( data[i]['t_num']),
-                        $("<td>").text( data[i]['q_answer'])
-                    );
-                    if( i >= data.length ){
-                        break;
-                    }
-                } else if( data.length <= 40 ){
-                    $tr3 = $("<tr>");
-                    $tr3.append( $("<td>").text(data[i]['t_num']) ,$("<td>").text(data[i]['q_answer']) );
-                    if( (i + 20 ) < data.length ) {
-                        $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']));
-                    }
-                } else if( data.length <= 60 ){
-                    $tr3 = $("<tr>");
-                    $tr3.append( $("<td>").text(data[i]['t_num']) , $("<td>").text(data[i]['q_answer']) );
-                    $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']) );
-                    if((i+40) < data.length ){
-                        $tr3.append( $("<td>").text(data[i+40]['t_num']) , $("<td>").text(data[i+40]['q_answer']) );
-                    }
-                } else if ( data.length <= 80 ){
-                    $tr3 = $("<tr>");
-                    $tr3.append( $("<td>").text(data[i]['t_num']) , $("<td>").text(data[i]['q_answer']));
-                    $tr3.append( $("<td>").text(data[i+20]['t_num']) , $("<td>").text(data[i+20]['q_answer']));
-                    $tr3.append( $("<td>").text(data[i+40]['t_num']) , $("<td>").text(data[i+40]['q_answer']));
+            console.log( data.length );
 
-                    if((i+60) < data.length ){
-                        $tr3.append( $("<td>").text(data[i+60]['t_num']) , $("<td>").text(data[i+60]['q_answer']));
+            for( var i = 0 ; i < 25 ; i++ ){
+                if( data.length <= 25 ){
+                    $tr3 = $('<tr>');
+                    $tr3.append( $("<td>").text( data[i]['q_id']),$("<td>").text(data[i]['q_answer']));
+                } else if( data.length <= 50 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text( data[i]['q_id']),$("<td>").text(data[i]['q_answer']) );
+                    if( (i+25) < data.length ) {
+                        $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    }
+                } else if( data.length <= 75 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']) );
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']) );
+                    if((i+50) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']) );
+                    }
+                } else if ( data.length <= 100 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+
+                    if((i+75) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    }
+                } else if ( data.length <= 125 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    if((i+100) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    }
+                } else if ( data.length <= 150 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                } else if ( data.length <= 175 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                    $('#qanswer1').append($tr3);
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i+150]['q_id']) , $("<td>").text(data[i+150]['q_answer']));
+                } else if ( data.length <= 200 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                    $('#qanswer1').append($tr3);
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i+150]['q_id']) , $("<td>").text(data[i+150]['q_answer']));
+                    if((i+175) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+175]['q_id']) , $("<td>").text(data[i+175]['q_answer']));
+                    }
+                } else if ( data.length <= 225 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                    $('#qanswer1').append($tr3);
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i+150]['q_id']) , $("<td>").text(data[i+150]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+175]['q_id']) , $("<td>").text(data[i+175]['q_answer']));
+                    if((i+200) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+200]['q_id']) , $("<td>").text(data[i+200]['q_answer']));
+                    }
+                } else if ( data.length <= 250 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                    $('#qanswer1').append($tr3);
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i+150]['q_id']) , $("<td>").text(data[i+150]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+175]['q_id']) , $("<td>").text(data[i+175]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+200]['q_id']) , $("<td>").text(data[i+200]['q_answer']));
+                    if((i+225) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+225]['q_id']) , $("<td>").text(data[i+225]['q_answer']));
+                    }
+                } else if ( data.length <= 275 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                    $('#qanswer1').append($tr3);
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i+150]['q_id']) , $("<td>").text(data[i+150]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+175]['q_id']) , $("<td>").text(data[i+175]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+200]['q_id']) , $("<td>").text(data[i+200]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+225]['q_id']) , $("<td>").text(data[i+225]['q_answer']));
+                    if((i+250) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+250]['q_id']) , $("<td>").text(data[i+250]['q_answer']));
+                    }
+                } else if ( data.length <= 300 ){
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i]['q_id']) , $("<td>").text(data[i]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+25]['q_id']) , $("<td>").text(data[i+25]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+50]['q_id']) , $("<td>").text(data[i+50]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+75]['q_id']) , $("<td>").text(data[i+75]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+100]['q_id']) , $("<td>").text(data[i+100]['q_answer']));
+                    if((i+125) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+125]['q_id']) , $("<td>").text(data[i+125]['q_answer']));
+                    }
+                    $('#qanswer1').append($tr3);
+                    $tr3 = $("<tr>");
+                    $tr3.append( $("<td>").text(data[i+150]['q_id']) , $("<td>").text(data[i+150]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+175]['q_id']) , $("<td>").text(data[i+175]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+200]['q_id']) , $("<td>").text(data[i+200]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+225]['q_id']) , $("<td>").text(data[i+225]['q_answer']));
+                    $tr3.append( $("<td>").text(data[i+250]['q_id']) , $("<td>").text(data[i+250]['q_answer']));
+                    if((i+275) < data.length ){
+                        $tr3.append( $("<td>").text(data[i+275]['q_id']) , $("<td>").text(data[i+275]['q_answer']));
                     }
                 }
-
-                $('#qanswer').append($tr3);
+                $('#qanswer2').append($tr3);
             }
 
         }).fail( (data)=>{
