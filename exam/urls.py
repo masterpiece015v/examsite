@@ -7,12 +7,7 @@ app_name = "exam"
 urlpatterns = [
     url(r'^$',views.Index.index , name="index" ),
     url(r'^admin/',admin.site.urls),
-    # AnswerUpload 解答用紙アップロード
-    url(r'^answerupload/$',views.AnswerUpload.answerupload,name='answerupload'),
-    url(r'^ajax_answerupload/$',views.AnswerUpload.ajax_answerupload,name='ajax_answerupload'),
-    # AnswerSheetPrint 解答用紙印刷
-    url(r'^answersheetprint/$', views.AnswerSheetPrint.answersheetprint, name='answersheetprint'),
-    url(r'^ajax_answersheetprint/$', views.AnswerSheetPrint.ajax_answersheetprint, name='ajax_answersheetprint'),
+
     # Analysis テストNOごとに結果分析
     url(r'^analysis', views.Analysis.analysis,name='analysis'),
     url(r'^ajax_gettid/$', views.Analysis.ajax_gettid, name='ajax_gettid'),
@@ -27,29 +22,13 @@ urlpatterns = [
     # Miss_Question　間違った問題のみ印刷
     url(r'^miss_question/$', views.Miss_Question.miss_question, name='miss_question'),
     url(r'^ajax_miss_question/$', views.Miss_Question.ajax_miss_question, name='ajax_miss_question'),
-    # TestMake　テストを作る
-    url(r'^testmake/$',views.TestMake.testmake,name='testmake'),
-    url(r'^ajax_getclass/$', views.TestMake.ajax_getclass, name='ajax_getclass'),
-    url(r'^ajax_getquestion/$', views.TestMake.ajax_getquestion, name='ajax_getquestion'),
-    url(r'^ajax_testupdate/$', views.TestMake.ajax_testupdate, name='ajax_testupdate'),
-    #TestPrint　テストを印刷する
-    url(r'^testprint/$', views.TestPrint.testprint, name='testprint'),
-    url(r'^ajax_gettestprint/$', views.TestPrint.ajax_gettestprint, name='ajax_gettestprint'),
+
     # Question_Pm　午後問題
     url(r'^questionpm/$', views.Question_Pm.questionpm, name='questionpm'),
     url(r'^ajax_getquestionpm/$', views.Question_Pm.ajax_getquestionpm, name='ajax_questionpm'),
-    #TestMakePeriod　年度期ごとにテストを作る
-    url(r'^testmakeperiod/$',views.TestMakePeriod.testmakeperiod,name='testmakeperiod'),
-    url(r'^ajax_getperiod/$', views.TestMakePeriod.ajax_getperiod, name='ajax_getperiod'),
-    url(r'^ajax_testupdateperiod/$', views.TestMakePeriod.ajax_testupdateperiod, name='ajax_testupdateperiod'),
-    #TestDelete テストを削除する
-    url(r'^testdelete/$', views.TestDelete.testdelete, name='testdelete'),
-    url(r'^ajax_testdelete/$', views.TestDelete.ajax_testdelete, name='ajax_testdelete'),
+
     #MainPage メインページ
     url(r'^mainpage/$', views.MainPage.mainpage, name='mainpage'),
-    url(r'^mainpage_ajax_getperiod/$', views.MainPage.mainpage_ajax_getperiod, name='mainpage_ajax_getperiod'),
-    url(r'^ajax_getquestion_period/$', views.MainPage.ajax_getquestion_period, name='ajax_getquestion_period'),
-    url(r'^ajax_getquestion_classify/$', views.MainPage.ajax_getquestion_classify, name='ajax_getquestion_classify'),
     #QuestionJs
     url(r'^questionjs/$', views.Question_Js.questionjs, name='questionjs'),
     url(r'^ajax_getquestionjs/$', views.Question_Js.ajax_getquestionjs, name='ajax_getquestionjs'),

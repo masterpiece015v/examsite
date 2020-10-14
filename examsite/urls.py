@@ -21,5 +21,6 @@ from django.conf.urls import url
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^exam/',include( 'exam.urls')),
+    url(r'^fesite/',include('fesite.urls')),
     url(r'^manager/',include('manager.urls')),
 ]

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'exam.apps.ExamConfig',
+    'fesite.apps.FesiteConfig',
     'manager.apps.ManagerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
