@@ -1165,23 +1165,23 @@ class AnswerUpload():
                     date = datetime.datetime.now()
 
                     #テスト数を取得
-                    num = LittleTest.objects.filter( o_id=org_id,t_id=test_id ).count()
+                    #num = LittleTest.objects.filter( o_id=org_id,t_id=test_id ).count()
                     #num = record.count()
 
                     cnt = 0
                     for answer in answerlist:
-                        if cnt < num:
+                        if cnt < 80:
                             if answer[1] == "未回答" or answer[1] == "複数回答":
-                                add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=user_id)
+                                add_rt = ResultTestTemp(t_id=test_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=user_id)
                             else:
-                                add_rt = ResultTest(t_id=test_id,t_num=code4(answer[0]),r_answer=answer[1],r_date=date,u_id=user_id)
+                                add_rt = ResultTestTemp(t_id=test_id,t_num=code4(answer[0]),r_answer=answer[1],r_date=date,u_id=user_id)
                             add_rt.save()
                         cnt = cnt + 1
                     #ファイルを削除する
-                    filelist = glob.glob( media_path + '/*')
+                    #filelist = glob.glob( media_path + '/*')
 
-                    for file in filelist:
-                        print( os.path.join(media_path,file))
+                    #for file in filelist:
+                        #print( os.path.join(media_path,file))
                         #os.remove( os.path.join(media_path, file ) )
                     dict = {'t_id':test_id,'u_id':user_id,'exists':0}
                     list.append( dict )
@@ -1199,7 +1199,59 @@ class AnswerUpload():
                 filelist.append( file )
 
             return render( request, 'exam/answerupload.html' , { "filelist" : filelist ,'u_admin':u_admin})
-    # ajax
+
+    # insert
+    def ajax_answerinsert( request):
+        c_dic = byteToDic(request.body)
+        o_id = request.session['o_id']
+        print( c_dic )
+        old_t_id = c_dic['old_t_id']
+        old_u_id = c_dic['old_u_id']
+        new_t_id = c_dic['new_t_id']
+        new_u_id = c_dic['new_u_id']
+        answerlist = c_dic['answerlist']
+
+        media_path = os.path.join(settings.STATIC_ROOT, "exam", "answer", o_id)
+
+        # 登録チェック
+        check_answer = ResultTest.objects.filter(t_id=new_t_id, u_id=new_u_id)
+
+        # すでにテストID＋ユーザIDが存在する場合
+        if len(check_answer) >= 1:
+            for i, a in enumerate(answerlist):
+                result = ResultTest.objects.filter(t_id=new_t_id, u_id=new_u_id, t_num=code4(i + 1))
+                result.update(r_answer=a[1])
+            return HttpResponseJson({'message': '更新しました。'})
+        else:
+            # 解答をResultTestに登録する
+            date = datetime.datetime.now()
+            # テスト数を取得
+            num = LittleTest.objects.filter(o_id=o_id, t_id=new_t_id).count()
+
+            cnt = 0
+            for answer in answerlist:
+                if cnt < num:
+                    if answer[1] == "未回答" or answer[1] == "複数回答":
+                        add_rt = ResultTest(t_id=new_t_id, t_num=code4(answer[0]), r_answer='',r_date=date,u_id=new_u_id)
+                    else:
+                        add_rt = ResultTest(t_id=new_t_id, t_num=code4(answer[0]), r_answer=answer[1], r_date=date,u_id=new_u_id)
+                    add_rt.save()
+                cnt = cnt + 1
+
+            # ResultTestTempのデータを削除する
+            ResultTestTemp.objects.filter(t_id=old_t_id,u_id=old_u_id).delete()
+
+            # ファイルを削除する
+            #filelist = glob.glob(media_path + '/*')
+
+            #for file in filelist:
+                #print(os.path.join(media_path, file))
+                # os.remove( os.path.join(media_path, file ) )
+        c_dic['message'] = "追加できました。"
+        return HttpResponseJson(c_dic)
+
+
+    # upload
     def ajax_answerupload( request ):
 
         c_dic = byteToDic(request.body)
@@ -1242,13 +1294,36 @@ class AnswerUpload():
                     add_rt.save()
                 cnt = cnt + 1
             # ファイルを削除する
-            filelist = glob.glob(media_path + '/*')
+            # filelist = glob.glob(media_path + '/*')
 
-            for file in filelist:
-                print(os.path.join(media_path, file))
+            # for file in filelist:
+                # print(os.path.join(media_path, file))
                 # os.remove( os.path.join(media_path, file ) )
         c_dic['message'] = "登録できました。"
         return HttpResponseJson( c_dic )
+
+    # t_idとu_idからテストの結果を取得する
+    def ajax_getanswerlist(request):
+        c_dic = byteToDic(request.body)
+        o_id = request.session['o_id']
+
+        t_id = c_dic['t_id']
+        u_id = c_dic['u_id']
+        ex = c_dic['ex']
+
+        if ex == '未':
+            resulttest = ResultTestTemp.objects.filter(t_id=t_id,u_id=u_id).values('t_num','r_answer')
+        else:
+            resulttest = ResultTest.objects.filter(t_id=t_id, u_id=u_id).values('t_num', 'r_answer')
+
+        result = {'t_id':t_id,'u_id':u_id,'answerlist':[]}
+
+        for r in resulttest:
+            dict={'t_num':r['t_num'],'r_answer':r['r_answer']}
+            result['answerlist'].append( dict )
+
+        return HttpResponseJson( result )
+
 # cbtam
 class CbtAmMain():
     def cbtammain(request):

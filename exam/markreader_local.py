@@ -9,14 +9,15 @@ import math
 import pyocr , pyocr.builders
 #from .logger import log_write
 
-PATH= os.path.join( settings.BASE_DIR , "exam")
-STATIC_PATH = os.path.join( settings.STATIC_ROOT , "exam" , "data")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PATH= os.path.join( BASE_DIR , "exam")
+STATIC_PATH = os.path.join( BASE_DIR , "static" , "exam" )
 
 print( 'BASE_DIR %s'%PATH )
 print( 'STATIC_PATH %s'%STATIC_PATH )
 
 #Tesseract OCR
-t_path = os.path.join( settings.BASE_DIR , "Tesseract-OCR")
+t_path = os.path.join( BASE_DIR , "Tesseract-OCR")
 if t_path not in os.environ["PATH"].split(os.pathsep):
     os.environ["PATH"] += os.pathsep + t_path
 tools = pyocr.get_available_tools()
@@ -234,7 +235,7 @@ def get_answer_list(filename):
     #print( filename )
 
     #マーカーの読み込み
-    path = os.path.join( STATIC_PATH , "marker.png" )
+    path = os.path.join( STATIC_PATH , "data", "marker.png" )
 
     marker = cv2.imread(path, 0)
 
@@ -429,3 +430,12 @@ def get_answer_list(filename):
             answerlist.append(q)
 
     return o_n,t_n,u_n, answerlist
+
+if __name__ == "__main__":
+    #print( "test" )
+    o_n, t_n , u_n , list = get_answer_list( os.path.join(STATIC_PATH,"answer","0002","answer106.jpg"))
+
+    print( o_n )
+    print( t_n )
+    print( u_n )
+    print( list )

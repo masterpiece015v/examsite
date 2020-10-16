@@ -95,6 +95,13 @@ class ResultTest( models.Model ):
     r_answer = models.CharField( max_length=1 )
     r_date = models.DateTimeField()
 
+class ResultTestTemp( models.Model ):
+    u = models.ForeignKey( User,on_delete=models.CASCADE)
+    t_id = models.CharField( max_length=4 )
+    t_num = models.CharField( max_length=4 )
+    #t = models.ForeignKey( LittleTest, on_delete=models.CASCADE )
+    r_answer = models.CharField( max_length=1 )
+    r_date = models.DateTimeField()
 
 class SuperUser( models.Model ):
     u_id = models.CharField( max_length=40 , primary_key=True)

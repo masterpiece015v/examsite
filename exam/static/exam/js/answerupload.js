@@ -59,7 +59,7 @@ $(function(){
         });
     }
 
-    //ユーザのリストをクリック
+    //更新ボタン
     $("#btn_upload").on('click',function(){
         //ユーザのidを送信する
         var items = [];
@@ -84,14 +84,78 @@ $(function(){
         var json = {'t_id':$('#t_id').val(),'u_id':$("#u_id").val() , 'answerlist':items };
 
         ajax_getresult( '#answer_table' , json );
+
     });
 
+    //追加ボタン
+    $("#btn_insert").on('click',function(){
+        var id = $('#select_id').val();
+        var old_t_id = id.split("_")[0];
+        var old_u_id = id.split("_")[1];
+        var new_t_id = $('#t_id').val();
+        var new_u_id = $('#u_id').val();
+
+        //ユーザのidを送信する
+        var items = [];
+        var flg = 0;
+        $("#answer_table tr").each(function(i){
+            //var item = [$(this).cells(0) ,$(this).eq(2).text()];
+            //items.push( item );
+            var item = [];
+            $(this).children().each(function(i){
+                if( i == 0 ){
+
+                    item.push( $(this).text() );
+                    //console.log( $(this).text() );
+                }else{
+                    item.push( $(this).children('input').val() );
+                    //console.log( $(this).children('input').val());
+                }
+            });
+            items.push( item );
+        });
+
+        var json = {'old_t_id':old_t_id,'old_u_id':old_u_id,'new_t_id':$('#t_id').val(),'new_u_id':$("#u_id").val() , 'answerlist':items };
+
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"/exam/ajax_answerinsert/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( json ),
+        }).done( (data) => {
+
+            //$(child_class).children().remove();
+            $('#modal-progress').modal('hide');
+            alert( data['message'] );
+            $('#select_id option[value=' + id + ']').remove();
+            $('#select_id').append($('<option>').val( new_t_id + '_' + new_u_id + '_済' ).text(new_t_id + '_' + new_u_id + '_済') );
+        }).fail( (data)=>{
+            alert( data );
+        }).always( (data) => {
+        });
+
+    });
+
+    //リストボックスの変更イベント
     $("#select_id").on('change',function(){
 
         var id = $(this).val();
         var t_id = id.split("_")[0];
         var u_id = id.split("_")[1];
-        var query = {'t_id':t_id,'u_id': u_id };
+        var ex = id.split("_")[2];
+        var query = {'t_id':t_id,'u_id': u_id ,'ex':ex};
+
+        if( id.split("_")[2] == '未'){
+            $('#btn_upload').prop('disabled',true);
+        }else{
+            $('#btn_upload').prop('disabled',false);
+        }
 
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
@@ -103,12 +167,28 @@ $(function(){
             url:"/exam/ajax_getanswerlist/",
             dataType:'json',
             contentType: 'charset=utf-8',
-            data: getJsonStr(  ),
+            data: getJsonStr( query ),
         }).done( (data) => {
 
-            $(child_class).children().remove();
+            $('#answer_table').children().remove();
+
+            $('#t_id').val( data['t_id'] );
+            $('#u_id').val( data['u_id'] );
+
+            for(var i = 0 ; i < data['answerlist'].length ; i++ ){
+                $tr = $('<tr>');
+                $td1 = $('<td>').text(data['answerlist'][i]['t_num']);
+                $td2 = $('<td>');
+                $td2.append( $('<input>').attr('type','text').val(data['answerlist'][i]['r_answer']) );
+                $tr.append( $td1 );
+                $tr.append( $td2 );
+                $('#answer_table').append( $tr );
+                console.log( data['answerlist'][i] );
+            }
+
+
             $('#modal-progress').modal('hide');
-            alert( data['message'] );
+
 
         }).fail( (data)=>{
             alert( data );

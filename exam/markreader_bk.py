@@ -1,18 +1,19 @@
 import cv2
-#from .tensor import Ainum
 import tensorflow as tf
 from PIL import Image
 from matplotlib import pylab as plt
 import numpy as np
 import os
+from django.conf import settings
 import math
-
-#from django.conf import settings
 #from .logger import log_write
 
-PATH= "/"
-#STATIC_PATH = os.path.join( PATH , 'static' , "exam", "data")
-STATIC_PATH = os.path.join( PATH,"static" , "exam" , "data")
+PATH= os.path.join( settings.BASE_DIR , "exam")
+STATIC_PATH = os.path.join( settings.STATIC_ROOT , "exam" , "data")
+
+print( 'BASE_DIR %s'%PATH )
+print( 'STATIC_PATH %s'%STATIC_PATH )
+
 class Ainum:
     sess = tf.compat.v1.InteractiveSession()
     #入力データ
@@ -145,7 +146,7 @@ def img_center( img ):
                 c = c + 1
         for r in range( r_max ):
             c = c_right + c_mid + 1
-            #print( "c:%d",c)
+            print( "c:%d",c)
             while c < c_max:
                 img[r][c] = 255
                 c = c + 1
@@ -214,10 +215,9 @@ def get_answer_list(filename):
 
     #画像ファイルの読み込みとサイズ調整
     img = cv2.imread(filename, 0)
+    img = cv2.resize(img, (2100, 2964))
 
-    img = cv2.resize(img, (2100, 2970))
-
-    #角度を調整
+    #角度を調節する
     res_gaku = cv2.matchTemplate(img, marker, cv2.TM_CCOEFF_NORMED)
     threshold = 0.5
     loc = np.where(res_gaku >= threshold)
@@ -235,14 +235,12 @@ def get_answer_list(filename):
     print( rad )
     trans = cv2.getRotationMatrix2D((1050,1485), rad, 1.0)
     img = cv2.warpAffine(img,trans,(2100,2970))
-    #imgshow( img )
 
     #img = cv2.resize(img, (1000, 1500))
     # markeと同じ画像の位置を取得する
     res_gaku = cv2.matchTemplate(img, marker, cv2.TM_CCOEFF_NORMED)
     threshold = 0.5
     loc = np.where(res_gaku >= threshold)
-    #print( loc )
     x = min(loc[1])
     y = min(loc[0])
     mark_area = { 'x' : x , 'y' : y }
@@ -271,16 +269,12 @@ def get_answer_list(filename):
     test_id = cv2.resize(test_id,(350,100))
     user_id = cv2.resize(user_id,(350,100))
 
-    #imgshow(org_id)
-    #imgshow(test_id)
-    #imgshow(user_id)
-
     ainum = Ainum()
     #白黒チェンジ
     res , org_id = bwchange( org_id )
     o_n = ""
 
-
+    #imgshow( org_id )
     for c in range(4):
         o_num = org_id[10:90 , (c*42)+15:(c*42)+57]
         o_num = cv2.resize(o_num,(28,28))
@@ -404,10 +398,4 @@ def get_answer_list(filename):
 
     return o_n,t_n,u_n, answerlist
 
-if __name__ == "__main__":
-    filename = os.path.join(PATH,"static","exam","answer","0002","answer087.jpg")
-    print( filename )
-    o_n,t_n,u_n,answerlist = get_answer_list(filename )
 
-    print( "%s,%s,%s"%(o_n,t_n,u_n))
-    print( answerlist )
