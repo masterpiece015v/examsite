@@ -1250,6 +1250,52 @@ class AnswerUpload():
         c_dic['message'] = "追加できました。"
         return HttpResponseJson(c_dic)
 
+    # すべて追加
+    def ajax_answerallinsert(request):
+        c_dic = byteToDic(request.body)
+        o_id = request.session['o_id']
+
+        list = c_dic['list']
+        dict = {'list':[]}
+
+        for l in list:
+
+            # 登録チェック
+            t_id = l['t_id']
+            u_id = l['u_id']
+
+            check_answer = ResultTest.objects.filter(t_id=t_id, u_id=u_id)
+
+            # すでにテストID＋ユーザIDが存在する場合
+            if len(check_answer) >= 1:
+                print( t_id )
+                dic = {'t_id':t_id , 'u_id':u_id}
+                dict['list'].append( dic )
+
+            else:
+                # 解答をResultTestに登録する
+                date = datetime.datetime.now()
+                # テスト数を取得
+                num = LittleTest.objects.filter(o_id=o_id, t_id=t_id).count()
+
+                cnt = 0
+                resulttesttemp = ResultTestTemp.objects.filter(t_id=t_id,u_id=u_id).valuse()
+
+                for r in resulttesttemp:
+                    if cnt < num:
+                        if answer[1] == "未回答" or answer[1] == "複数回答":
+                            add_rt = ResultTest(t_id=r['t_id'], t_num=r['t_id'], r_answer='', r_date=date,u_id=r['u_id'])
+                        else:
+                            add_rt = ResultTest(t_id=r['t_id'], t_num=r['t_id'], r_answer=answer[1], r_date=date,u_id=r['u_id'])
+                        add_rt.save()
+                    cnt = cnt + 1
+
+                    # ResultTestTempのデータを削除する
+                    ResultTestTemp.objects.filter(t_id=old_t_id, u_id=old_u_id).delete()
+                dic = {'t_id': t_id, 'u_id': u_id}
+                dict['list'].append(dic)
+        print( dict )
+        return HttpResponseJson( dict )
 
     # upload
     def ajax_answerupload( request ):
@@ -1257,48 +1303,45 @@ class AnswerUpload():
         c_dic = byteToDic(request.body)
         o_id = request.session['o_id']
 
-        test_id = c_dic['t_id']
-        user_id = c_dic['u_id']
+        old_t_id = c_dic['old_t_id']
+        old_u_id = c_dic['old_u_id']
+        new_t_id = c_dic['new_t_id']
+        new_u_id = c_dic['new_u_id']
         answerlist = c_dic['answerlist']
 
         media_path = os.path.join(settings.STATIC_ROOT,"exam","answer",o_id)
 
-        # 登録チェック
-        check_answer = ResultTest.objects.filter(t_id=test_id, u_id=user_id)
+        # 新しいidと古いidが違えば、古いidのほうを消す
+        if new_t_id != old_t_id or new_u_id != old_u_id:
+            ResultTest.objects.filter(t_id=old_t_id,u_id=old_u_id).delete()
 
-        # すでにテストID＋ユーザIDが存在する場合
+        # 登録チェック
+        check_answer = ResultTest.objects.filter(t_id=new_t_id, u_id=new_u_id)
+
+        # すでにテストID＋ユーザIDが存在する場合は元のデータを更新
         if len(check_answer) >= 1:
             for i,a in enumerate( answerlist ):
-                result=ResultTest.objects.filter(t_id=test_id,u_id=user_id,t_num=code4(i+1))
+                result=ResultTest.objects.filter(t_id=new_t_id,u_id=new_u_id,t_num=code4(i+1))
                 result.update(r_answer=a[1])
-                #ret = resulttest.objects.filter(t_num=code4(i+1))
-                #print( ret.t_num )
 
             return HttpResponseJson( {'message':'更新しました。'})
         else:
-
+        #ない場合は追加する
             # 解答をResultTestに登録する
             date = datetime.datetime.now()
 
             # テスト数を取得
-            num = LittleTest.objects.filter(o_id=o_id, t_id=test_id).count()
+            num = LittleTest.objects.filter(o_id=o_id, t_id=new_t_id).count()
 
             cnt = 0
             for answer in answerlist:
                 if cnt < num:
                     if answer[1] == "未回答" or answer[1] == "複数回答":
-                        add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=user_id)
+                        add_rt = ResultTest(t_id=new_t_id, t_num=code4(answer[0]), r_answer='', r_date=date, u_id=new_u_id)
                     else:
-                        add_rt = ResultTest(t_id=test_id, t_num=code4(answer[0]), r_answer=answer[1], r_date=date,
-                                            u_id=user_id)
+                        add_rt = ResultTest(t_id=new_t_id, t_num=code4(answer[0]), r_answer=answer[1], r_date=date,u_id=new_u_id)
                     add_rt.save()
                 cnt = cnt + 1
-            # ファイルを削除する
-            # filelist = glob.glob(media_path + '/*')
-
-            # for file in filelist:
-                # print(os.path.join(media_path, file))
-                # os.remove( os.path.join(media_path, file ) )
         c_dic['message'] = "登録できました。"
         return HttpResponseJson( c_dic )
 

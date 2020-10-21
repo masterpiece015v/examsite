@@ -24,6 +24,7 @@
 
             <div class="form-group">
                 <input type="submit" value="画像up" class="btn btn-primary" data-toggle="modal" data-target="#modal-progress">
+                <input type="button" value="全追加" class="btn btn-primary" id="btn_all_insert" data-toggle="modal" data-target="#modal-progress">
             </div>
         </form>
         <select class="form-control" id="select_id" size="10">
@@ -38,8 +39,8 @@
     </div>
     <form method="POST">
         <div class="col-md-6">
-            <input type="button" value="追加" class="btn btn-primary" id="btn_insert" style="margin-top:10px;margin-bottom:10px;">
-            <input type="button" value="訂正" class="btn btn-primary" id="btn_upload" style="margin-top:10px;margin-bottom:10px;">
+            <input type="button" value="追加" class="btn btn-primary" id="btn_insert" style="margin-top:10px;margin-bottom:10px;" data-toggle="modal" data-target="#modal-progress">
+            <input type="button" value="訂正" class="btn btn-primary" id="btn_upload" style="margin-top:10px;margin-bottom:10px;" data-toggle="modal" data-target="#modal-progress">
             <label for="t_id">t_id:<input type="text" id="t_id" value="{{ t_id }}"></label>
             <label for="u_id">u_id:<input type="text" id="u_id" value="{{ u_id }}"></label>
             <table id="answer_table">

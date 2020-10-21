@@ -31,34 +31,6 @@ $(function(){
         return csrftoken;
     }
 
-    //問題を取得するajax
-    function ajax_getresult(child_class, query ){
-
-        console.log( getJsonStr(query) );
-
-        $.ajaxSetup({
-            beforeSend : function(xhr,settings ){
-                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
-            }
-        });
-        $.ajax({
-            type:"POST",
-            url:"/exam/ajax_answerupload/",
-            dataType:'json',
-            contentType: 'charset=utf-8',
-            data: getJsonStr( query ),
-        }).done( (data) => {
-
-            $(child_class).children().remove();
-            $('#modal-progress').modal('hide');
-            alert( data['message'] );
-
-        }).fail( (data)=>{
-            alert( data );
-        }).always( (data) => {
-        });
-    }
-
     //更新ボタン
     $("#btn_upload").on('click',function(){
         //ユーザのidを送信する
@@ -80,10 +52,75 @@ $(function(){
             });
             items.push( item );
         });
+        var id = $('#select_id').val();
+        var old_t_id = id.split('_')[0];
+        var old_u_id = id.split('_')[1];
 
-        var json = {'t_id':$('#t_id').val(),'u_id':$("#u_id").val() , 'answerlist':items };
+        var json = {'old_t_id':old_t_id,'old_u_id':old_u_id,'new_t_id':$('#t_id').val(),'new_u_id':$("#u_id").val() , 'answerlist':items };
 
-        ajax_getresult( '#answer_table' , json );
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"/exam/ajax_answerupload/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( json ),
+        }).done( (data) => {
+
+            $('#answer_table').children().remove();
+            $('#modal-progress').modal('hide');
+            alert( '更新完了' );
+
+        }).fail( (data)=>{
+            alert( data );
+        }).always( (data) => {
+        });
+    });
+    //追加ボタン
+    $("#btn_all_insert").on('click',function(){
+
+        var list = [];
+        $('#select_id option').each( function(i){
+
+            var t_id = $(this).text().split("_")[0];
+            var u_id = $(this).text().split("_")[1];
+
+            dict = {'t_id':t_id,'u_id':u_id};
+            list.push( dict );
+
+        });
+
+
+        var json = { 'list' : list };
+
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"/exam/ajax_answerallinsert/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( json ),
+        }).done( (data) => {
+
+            $("#select_id").children().remove();
+
+            for( var i = 0 ; i < data['list'].length ; i++ ){
+                $('#select_id').append( $('<option>').val(data['list'][i]['t_id'] + "_" + data['list'][i]['u_id'] + "_済").text(data['list'][i]['t_id'] + "_" + data['list'][i]['u_id'] + "_済") );
+
+            }
+            $('#modal-progress').modal('hide');
+        }).fail( (data)=>{
+            alert( data );
+        }).always( (data) => {
+        });
 
     });
 
@@ -153,8 +190,10 @@ $(function(){
 
         if( id.split("_")[2] == '未'){
             $('#btn_upload').prop('disabled',true);
+            $('#btn_insert').prop('disabled',false);
         }else{
             $('#btn_upload').prop('disabled',false);
+            $('#btn_insert').prop('disabled',true);
         }
 
         $.ajaxSetup({

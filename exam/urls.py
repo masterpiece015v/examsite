@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^answerupload/$',views.AnswerUpload.answerupload,name='answerupload'),
     url(r'^ajax_answerupload/$',views.AnswerUpload.ajax_answerupload,name='ajax_answerupload'),
     url(r'^ajax_answerinsert/$',views.AnswerUpload.ajax_answerinsert,name='ajax_answerinsert'),
+    url(r'^ajax_answerallinsert/$',views.AnswerUpload.ajax_answerallinsert,name='ajax_answerallinsert'),
     url(r'^ajax_getanswerlist/$', views.AnswerUpload.ajax_getanswerlist, name='ajax_getanswerlist'),
     # AnswerSheetPrint 解答用紙印刷
     url(r'^answersheetprint/$', views.AnswerSheetPrint.answersheetprint, name='answersheetprint'),
