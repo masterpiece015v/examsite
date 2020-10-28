@@ -1,0 +1,30 @@
+{% extends 'jgbase.html' %}
+
+{% block title %}CBT_PM_result{% endblock %}
+{% block css %}
+{% endblock %}
+{% load static %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-6">
+        <p>試験ID:{{ a_dict.r_id }} 試験名:{{ a_dict.q_test }} 得点:{{ a_dict.g_total }}</p>
+        <table class="table table-condensed">
+            {% for l in a_dict.list %}
+            <tr style="background-color:yellow">
+                <td colspan="6">
+                    <a href="{% static 'jg/pdf/question_pm/' %}{{ l.pdf }}" target="_blank">問{{ l.q_q }}</a> 正解数:{{ l.total }} 問題数:{{ l.count }} 得点:{{ l.score }}</td>
+            {% for l2 in l.list %}
+            <tr><td>設問{{ l2.q_question }}</td><td>{{ l2.q_symbol }}</td><td>{{ l2.u_answer }}</td><td>{{ l2.q_answer }}</td><td>{{ l2.correct }}</td><td>{{ l2.q_allocation }}</td></tr>
+            {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'jg/js/cbtpmmain.js' %}" charset="utf-8"></script>
+{% endblock %}

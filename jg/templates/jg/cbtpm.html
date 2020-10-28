@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>CBT_PM</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+<script>
+$(function($){
+    var res_list = ["","ア","イ","ウ","エ","オ","カ","キ","ク","ケ","コ","サ","シ","ス","セ"];
+    var a_dict = {
+        'r_id':'{{ r_id }}','q_test':'{{ dict.q_test }}','q_period':'{{ dict.q_period }}',
+        'list':[{% for q in dict.list %}{'q_q':'{{ q.q_num }}','list':[
+        {% for q2 in q.list %}
+        {'q_question':'{{ q2.q_question }}','q_symbol':'{{ q2.q_symbol }}','u_answer':''},
+        {% endfor %}
+        ]},{% endfor %}]
+    };
+    var dict = {
+            'q_test' : '{{ dict.q_test }}','q_period' : '{{ dict.q_period }}',
+            'list' : [
+                {% for q in dict.list %}
+                {'q_q':'{{ q.q_num }}','pdf':'{{ q.pdf }}','list':[
+                {% for q2 in q.list %}
+                { 'q_question':'{{ q2.q_question }}','q_symbol':'{{ q2.q_symbol }}','q_lastanswer':'{{ q2.q_lastanswer }}','u_answer':''},
+                {% endfor %}
+                ]},
+                {% endfor %}
+            ]
+    };
+
+    //JSONオブジェクトを文字列に変える
+    function getJsonStr(json){
+        return JSON.stringify(json);
+    }
+
+    //CSRF Tokenを取得する
+    function getCSRFToken(){
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        return csrftoken;
+    }
+    //解答を変更
+    $(document).on("change", "select.answer", function(){
+        var u_answer = $(this).val();
+        var q_question = $(this).attr('id').split('_')[0];
+        var q_symbol = $(this).attr('id').split('_')[1];
+        var q_q = $('#q_q').text();
+
+        for( var i = 0 ; i < a_dict['list'].length ; i++ ){
+            if(a_dict['list'][i]['q_q'] == q_q ){
+                var item = a_dict['list'][i];
+
+                for( var j = 0 ; j < item['list'].length ; j++ ){
+                    if( item['list'][j]['q_question'] == q_question && item['list'][j]['q_symbol'] == q_symbol ){
+                        item['list'][j]['u_answer'] = u_answer;
+                        console.log(a_dict['list'][i]['q_q']);
+                        console.log(item['list'][j]['q_question']);
+                        console.log(item['list'][j]['q_symbol']);
+                        console.log(item['list'][j]['u_answer']);
+
+                    }
+                }
+
+            }
+        }
+    });
+
+    //終了ボタン
+    $('#endbtn').on('click',function(){
+        $('#a_dict').val( getJsonStr( a_dict ));
+
+        $('#form1').submit();
+
+    });
+
+    //テストをクリック
+    $('.q_q').on('click',function(){
+
+        var q_q = $(this).val();
+        //解答を取得する
+        var a_list;
+        for( var i = 0 ; i < a_dict['list'].length ; i++ ){
+            if( a_dict['list'][i]['q_q'] == q_q ){
+                a_list = a_dict['list'][i]['list'];
+            }
+        }
+
+        console.log( getJsonStr( a_list ) );
+
+        $("#res").children().remove();
+        $("#res").append( $('<p>').attr('id','q_q').text(q_q));
+        for( var i = 0 ; i < dict['list'].length ; i++ ){
+            var item = dict['list'][i];
+            if( item['q_q'] == q_q ){
+                var pdf = item['pdf'];
+                $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf );
+
+                $old_question = item['list'][0]['q_question'];
+
+                for( var j = 0 ; j < item['list'].length ; j++ ){
+                    var q_question = item['list'][j]['q_question'];
+                    var q_symbol = item['list'][j]['q_symbol'];
+                    var q_lastanswer = item['list'][j]['q_lastanswer'];
+                    $p = $('<p>').attr('id',q_question);
+                    $label = $('<label>').text( q_symbol + ":" ).attr('for',q_question+"_"+q_symbol);
+                    $select = $('<select>').attr('id',q_question+"_"+q_symbol).attr('class','form-control answer').attr('style','width:100px');
+
+                    for( var k = 0 ; res_list[k] != q_lastanswer ; k++ ){
+                        $select.append( $('<option>').val(res_list[k]).text(res_list[k]));
+                    }
+                    $select.append( $('<option>').val(q_lastanswer).text(q_lastanswer) );
+
+                    //前の解答を入れる
+                    for( var l = 0 ; l < a_list.length ; l++ ){
+                        //console.log( a_list[l]['q_question'] + a_list[l]['u_answer'] );
+                        if( a_list[l]['q_question'] == q_question && a_list[l]['q_symbol']==q_symbol){
+                            $select.val( a_list[l]['u_answer'] );
+                        }
+                    }
+
+                    $p.append( $label , $select );
+
+                    if( i == 0 || $old_question != q_question ){
+                        $("#res").append( $('<p>').text("設問"+q_question));
+                    }
+
+                    $("#res").append( $p );
+                    $old_question = q_question;
+                }
+
+            }
+            //console.log( item['q_q'] );
+        }
+
+        /*
+        ***********************************************************************************************
+        var json = {'q_test':$('#q_test').text() , 'q_period':$("#q_period").text(), 'q_q':q_q };
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings){
+                xhr.setRequestHeader( 'X-CSRFToken',getCSRFToken());
+            }
+        });
+        $.ajax({
+            type:"POST",
+            url:"/jg/ajax_cbtpm_get_q/",
+            dataType:'json',
+            contentType:'charset=utf-8',
+            data:getJsonStr( json ),
+        }).done( (data) => {
+            var pdf = data['pdf'];
+            $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf );
+
+            $old_question = data['list'][0]['q_question'];
+
+            for( i = 0 ; i < data['list'].length ; i++){
+                var q_question = data['list'][i]['q_question'];
+                var q_symbol = data['list'][i]['q_symbol'];
+                var q_lastanswer = data['list'][i]['q_lastanswer'];
+                $p = $('<p>').attr('id',q_question);
+                $label = $('<label>').text( q_symbol + ":" ).attr('for',q_question+q_symbol);
+                $select = $('<select>').attr('id',q_question+q_symbol).attr('class','form-control').attr('style','width:100px');
+
+                for( j = 0 ; res_list[j] != q_lastanswer ; j++ ){
+                    $select.append( $('<option>').val(res_list[j]).text(res_list[j]));
+                }
+                $select.append( $('<option>').val(q_lastanswer).text(q_lastanswer) );
+                $p.append( $label , $select );
+
+                if( i == 0 || $old_question != q_question ){
+                    $("#res").append( $('<p>').text("設問"+q_question));
+                }
+
+                $("#res").append( $p );
+                $old_question = q_question;
+            }
+        }).fail((data)=>{
+
+        }).always((data)=>{
+
+        });
+        **********************************************************************************************************************
+        */
+
+    });
+
+});
+</script>
+</head>
+<body>
+{% csrf_token %}
+<div class="container-fluid">
+    <div class="row" style="margin-top:20px;margin-left:20px">
+        <div class="col-md-12">
+            <p>試験区分:<strong id="q_test">{{ dict.q_test }}</strong> 年度期:<strong id="q_period">{{ dict.q_period }}</strong> 受験ID:<strong id="{{ r_id }}">{{ r_id }}</strong></p>
+
+            <p>
+                {% for q in dict.list %}<spam> 問<input type="button" value="{{ q.q_num }}" class="q_q" class="btn"></spam>{% endfor %}
+                <spam><input type="button" value="終了" id="endbtn"></spam>
+            </p>
+
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;margin-left:20px">
+        <div class="col-md-8">
+            <iframe src="" width="100%" height="800px" id="iframe">
+                <p><b>表示されない時の表示</b>: <a href="pdf.pdf">PDF をダウンロード</a>.</p>
+            </iframe>
+        </div>
+        <div class="col-md-4" id="res">
+
+        </div>
+    </div>
+</div>
+
+<form id="form1" action="{% url 'jg:cbtpmresult' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="a_dict" id="a_dict" value="">
+</form>
+<!--
+<script type="text/javascript" src="{% static 'jg/js/cbtpm.js' %}" charset="utf-8"></script>
+-->
+
+</body>
+</html>

@@ -157,3 +157,21 @@ class QuestionCbtPm( models.Model ):
     q_lastanswer = models.CharField(max_length=1,blank=True)
     q_remarks = models.CharField(max_length=1,blank=True)
     q_allocation = models.IntegerField(default=0)
+
+class QuestionCbtPmResult( models.Model ):
+    r_id = models.CharField( max_length=10,primary_key=True)
+    q_test = models.CharField( max_length=2 )
+    q_period = models.CharField( max_length=5 )
+    o_id = models.CharField( max_length=4 )
+    u_id = models.CharField( max_length=20 )
+    a_datetime = models.DateTimeField(default=timezone.now )
+
+class QuestionCbtPmResultDetail( models.Model ):
+    r_id = models.CharField( max_length=10)
+    q_test = models.CharField( max_length=2 )
+    q_period = models.CharField( max_length=5 )
+    q_q = models.CharField(max_length=2)
+    q_question = models.CharField(max_length=2)
+    q_symbol = models.CharField(max_length=1)
+    u_answer = models.CharField(max_length=1)
+    correct = models.IntegerField( default=0 )

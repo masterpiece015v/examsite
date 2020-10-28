@@ -1,0 +1,117 @@
+{% extends 'jgbase.html' %}
+{% load static %}
+{% block title %}分析{% endblock %}
+{% block css %}
+.modal{
+    display: none;
+    height: 100vh%;
+    position: fixed;
+    top: 0%;
+    width: 100%;
+
+}
+.modal__bg{
+    background: rgba(0,0,0,0.8);
+    height: 100vh;
+    position: absolute;
+    width: 100%;
+}
+.modal__content{
+    background: #fff;
+    left: 50%;
+    padding: 40px;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 80%;
+    height : 90%;
+    overflow-y:scroll;
+}
+.r_answer{
+    background-color : black;
+    color : black;
+    padding-left : 10px;
+    padding-right : 10px;
+}
+.q_answer{
+    background-color : black;
+    color : black;
+    padding-left:10px;
+    padding-right : 10px;
+}
+.r_answer:hover{
+    background-color : white;
+}
+.q_answer:hover{
+    background-color : white;
+}
+{% endblock%}
+{% block bland %}分析{% endblock %}
+{% block a2 %}active{% endblock %}
+{% block main %}
+
+{% if u_admin == 1 %}
+<div class="row" style="margin-top:20px">
+    <div class="col-md-2">
+        <div class="form-group">
+            <label for="lst_user" style="font-size:9pt;">ユーザ</label>
+            <select id="lst_user" size="5" style="width:150px;height:200px;font-size:9pt" class="form-control">
+            {% for user in user_list %}
+            <option value="{{ user.u_id }}">{{ user.u_id }},{{user.u_name}}</option>
+            {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <table class="table-striped" style="font-size:11pt">
+            <thead>
+            <th>大分類名</th>
+            <th>中分類名</th>
+            <th>小分類名</th>
+            <th>正解数</th>
+            <th>問題数</th>
+            </thead>
+            <tbody id="resultdata"></tbody>
+        </table>
+    </div>
+    <div id="modal">
+
+    </div>
+</div>
+{% else %}
+<div class="row" style="margin-top:20px">
+    <div class="col-md-2">
+        <div class="form-group">
+            <label id="u_id">{{ u_id }}</label>
+            <input type="button" value="表示" id="showdata">
+        </div>
+    </div>
+    <div class="col-md-9">
+        <table class="table-striped" style="font-size:11pt">
+            <thead>
+            <th>大分類名</th>
+            <th>中分類名</th>
+            <th>小分類名</th>
+            <th>正解数</th>
+            <th>問題数</th>
+            </thead>
+            <tbody id="resultdata"></tbody>
+        </table>
+    </div>
+    <div id="modal">
+
+    </div>
+</div>
+<script type="text/javascript">
+    load_ajax('00024001');
+</script>
+{% endif %}
+
+{% csrf_token %}
+
+{% endblock %}
+
+{% block addhead %}
+<script type="text/javascript" src="{% static 'jg/js/a_bunya.js' %}" charset="utf-8"></script>
+{% endblock %}

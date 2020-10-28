@@ -1,0 +1,53 @@
+{% extends 'jgbase.html' %}
+
+{% block title %}CBT_PM{% endblock %}
+{% block css %}
+{% endblock %}
+{% load static %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-6">
+        <div class="form-group">
+            <form class="form-inline">
+                <label for="test" style="font-size:12pt;">試験科目：</label>
+                <select id="test" style="width:180px;font-size:9pt" class="form-control">
+                    {% for t in test %}
+                    <option value="{{ t.test }}">{{t.test}}({{ t.name }})</option>
+                    {% endfor %}
+                </select>
+
+                <label for="classify" style="font-size:12pt;margin-left:10px;">出題範囲：</label>
+                <select id="classify" style="width:180px;font-size:9pt" class="form-control">
+                    {% for c in classify %}
+                    <option value="{{ c.classify }}">{{ c.classify }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10">
+        <table class="table" >
+            <thead><th>問題</th><th>解答</th></thead>
+            <tbody id="questionpm">
+            {% for q in question %}
+            <tr><td><a href="/static/jg/pdf/question_pm/{{ q.qfn }}">{{ q.qfn }}</a></td>
+                {% if q.afn == "ファイルなし" %}
+                <td>{{ q.afn }}</td>
+                {% else %}
+                <td><a href="/static/jg/pdf/question_pm/{{ q.afn }}" target="_blank">{{ q.afn }}</a></td></tr>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'jg/js/questionpm.js' %}" charset="utf-8"></script>
+{% endblock %}

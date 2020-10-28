@@ -32,6 +32,9 @@ ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'exam.apps.ExamConfig',
+    'bk.apps.BkConfig',
+    'jg.apps.JgConfig',
+    'jk.apps.JkConfig',
     'manager.apps.ManagerConfig',
     'django.contrib.admin',
     'django.contrib.auth',

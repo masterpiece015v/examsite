@@ -1,0 +1,46 @@
+{% extends 'jkbase.html' %}
+
+{% block title %}午後問題{% endblock %}
+{% block css %}
+{% endblock %}
+{% load static %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-9">
+        <div class="form-group">
+            <form class="form-inline">
+                <label for="subject" style="font-size:12pt;">試験区分：</label>
+                <select id="subject" style="width:100px;font-size:9pt" class="form-control">
+                    {% for s in subjects %}
+                    <option value="{{ s.key }}">{{ s.name }}({{s.key}})</option>
+                    {% endfor %}
+                </select>
+                <label for="title" style="font-size:12pt;margin-left:10px;">分野：</label>
+                <select id="title" style="width:180px;font-size:9pt" class="form-control">
+                    {% for t in titles %}
+                    <option value="{{ t.q_num }}">{{ t.q_title }}({{ t.q_num }})</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-10">
+        <table class="table" >
+            <thead><th>問題</th><th>解答</th></thead>
+            <tbody id="questionjs">
+                {% for c in contents %}
+                <tr><td><a href="/static/jk/pdf/question_js/{{ c.filename }}" target="_blank">{{ c.q_id }}</a></td><td>{{ c.q_content }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'jk/js/questionjs.js' %}" charset="utf-8"></script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'jgbase.html' %}
+{% load static %}
+{% block title %}分析{% endblock %}
+{% block bland %}分析{% endblock %}
+{% block a2 %}active{% endblock %}
+
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+
+    <div class="col-md-2">
+        <div class="form-group">
+            <label for="lst_make_test" style="font-size:9pt;">ユーザID</label>
+            <select id="lst_make_test" size="1" style="width:180px;font-size:9pt" class="form-control">
+            {% for make_test_uid in make_test_uid_list %}
+            <option value="{{ make_test_uid.u_id }}">{{ make_test_uid.u_id }}</option>
+            {% endfor %}
+            </select>
+
+            <label for="lst_test" style="font-size:9pt;">テストID</label>
+            <select id="lst_test" size="5" style="width:180px;height:150px;font-size:9pt" class="form-control" data-toggle="modal" data-target="#modal-progress">
+
+            </select>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <table style="font-size:11pt;" class="table table-condensed">
+            <thead>
+            <tr><th>u_id</th><th>u_name</th><th>positive</th></th></tr>
+
+            </thead>
+            <tbody id="resultdata">
+            {% for result in result_list %}
+            <tr><td>{{result.u_id}}</td><td>{{result.u_name}}</td><td>{{result.positive}}</td></tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% csrf_token %}
+<div class="modal" id="modal-progress" tabindex="-1" style="position:fixed;top:10px;left:10px;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-body">作成中です。しばらくお待ちください</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script type="text/javascript" src="{% static 'jg/js/a_all.js' %}" charset="utf-8"></script>
+{% endblock %}

@@ -12,6 +12,21 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='QuestionCbtPm',
+            fields=[
+                ('q_id', models.CharField(max_length=12, primary_key=True, serialize=False)),
+                ('q_test', models.CharField(max_length=2)),
+                ('q_period', models.CharField(max_length=5)),
+                ('q_q', models.CharField(max_length=2)),
+                ('q_question', models.CharField(max_length=2)),
+                ('q_symbol', models.CharField(max_length=1)),
+                ('q_answer', models.CharField(max_length=1)),
+                ('q_lastanswer', models.CharField(blank=True, max_length=1)),
+                ('q_remarks', models.CharField(blank=True, max_length=1)),
+                ('q_allocation', models.IntegerField(default=0)),
+            ],
+        ),
+        migrations.CreateModel(
             name='ResultTestTemp',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
