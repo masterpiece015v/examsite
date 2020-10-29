@@ -1314,8 +1314,12 @@ class Question_Pm():
 
 class CbtPmMain():
     def cbtpmmain(request):
+        u_id = request.session['u_id']
+        o_id = request.session['o_id']
         questioncbtpm = QuestionCbtPm.objects.values('q_test','q_period').distinct()
-        return render( request,'jg/cbtpmmain.html',{'u_admin':request.session['u_admin'] , 'questioncbtpm':questioncbtpm})
+        questioncbtpmresult = QuestionCbtPmResult.objects.filter(u_id=u_id,o_id=o_id).values('r_id','q_test','q_period','a_datetime').order_by('-a_datetime')
+        print( questioncbtpmresult )
+        return render( request,'jg/cbtpmmain.html',{'u_admin':request.session['u_admin'] , 'questioncbtpm':questioncbtpm , 'questioncbtpmresult':questioncbtpmresult})
 
 # cbtpm
 class CbtPm():
@@ -1325,6 +1329,15 @@ class CbtPm():
         q_period = q_id[2:7]
         o_id = request.session['o_id']
         u_id = request.session['u_id']
+        #idを作る
+        r_id = random_id(10)
+        qcpr = QuestionCbtPmResult.objects.filter(r_id=r_id)
+        while len(qcpr)>=1:
+            r_id = random_id(10)
+            qcpr = QuestionCbtPmResult.objects.get(r_id=r_id)
+        qcpr = QuestionCbtPmResult(r_id=r_id,q_test=q_test,q_period=q_period,o_id=o_id,u_id=u_id)
+        qcpr.save()
+
         qpm = QuestionPm.objects.values('q_test', 'q_period','q_num','q_classify', 'q_title').filter(q_test=q_test,q_period=q_period)
         question = QuestionCbtPm.objects.values('q_q','q_question','q_symbol','q_lastanswer').filter(q_test=q_test,q_period=q_period)
 
@@ -1346,42 +1359,36 @@ class CbtPm():
                 dic['q_symbol'] = q2['q_symbol']
                 dic['q_lastanswer'] = q2['q_lastanswer']
                 dict2['list'].append( dic )
+                #解答を保存するレコードを追加する
+                qcprd = QuestionCbtPmResultDetail(
+                    r_id=r_id, q_test=q_test, q_period=q_period, q_q=q_num,
+                    q_question=q2['q_question'], q_symbol=q2['q_symbol'] )
+                qcprd.save()
+
             dict['list'].append( dict2 )
 
-        #idを作る
-        r_id = random_id(10)
-        qcpr = QuestionCbtPmResult.objects.filter(r_id=r_id)
-        while len(qcpr)>=1:
-            r_id = random_id(10)
-            qcpr = QuestionCbtPmResult.objects.get(r_id=r_id)
-        qcpr = QuestionCbtPmResult(r_id=r_id,q_test=q_test,q_period=q_period,o_id=o_id,u_id=u_id)
-        qcpr.save()
+
 
         #print( dict )
         return render( request,'jg/cbtpm.html',{'u_admin':request.session['u_admin'] ,
                                                   'dict':dict ,
                                                   'r_id':r_id})
 
-    def ajax_cbtpm_get_q(request):
+    def ajax_cbtpm_update(request):
         c_dic = byteToDic( request.body )
         #print( c_dic )
-        q_test = c_dic['q_test']
-        q_period = c_dic['q_period']
+        r_id = c_dic['r_id']
         q_q = c_dic['q_q']
-        qpm = QuestionPm.objects.values('q_test','q_period','q_classify','q_title').filter(q_test=q_test,q_period=q_period,q_num=int(q_q)).first()
-        q_classify = qpm['q_classify']
-        q_title = qpm['q_title']
-        print( qpm['q_title'])
-        question = QuestionCbtPm.objects.values('q_question','q_symbol','q_lastanswer').filter(q_test=q_test,q_period=q_period,q_q=q_q)
-        list = []
-        for q in question:
-            dict = {}
-            dict['q_question'] = q['q_question']
-            dict['q_symbol'] = q['q_symbol']
-            dict['q_lastanswer'] = q['q_lastanswer']
-            list.append( dict )
-
-        return HttpResponseJson( {'pdf':"%s_%s_%s_%s.pdf"%(q_test,q_period,q_classify,q_title),'list':list} )
+        list = c_dic['list']
+        for l in list:
+            q_question = l['q_question']
+            q_symbol = l['q_symbol']
+            u_answer = l['u_answer']
+            print( len(u_answer) )
+            if( len( u_answer) >= 1 ):
+                qcprd = QuestionCbtPmResultDetail.objects.filter(r_id=r_id,q_q=q_q,q_question=q_question,q_symbol=q_symbol).update(u_answer=u_answer)
+                print( "%s,%s,%s"%(q_question,q_symbol,u_answer) )
+        return HttpResponseJson( {'msg':'ok'} )
 
 class CbtPmResult():
     def cbtpmresult( request ):
@@ -1412,7 +1419,9 @@ class CbtPmResult():
             q_q = l['q_q']
             qpm = QuestionPm.objects.filter(q_test=q_test,q_period=q_period,q_num=int(q_q)).values('q_classify','q_title').first()
             pdf = "%s_%s_%s_%s.pdf"%(q_test,q_period,qpm['q_classify'],qpm['q_title'])
+            ans_pdf = "%s_%s_%s_ans.pdf"%(q_test,q_period,qpm['q_classify'])
             l['pdf'] = pdf
+            l['ans_pdf'] = ans_pdf
             #print("%s"%q_q)
             list2 = l['list']
             count = 0
@@ -1448,10 +1457,8 @@ class CbtPmResult():
                     else:
                         correct = 0
                 l2['correct'] = correct
-                qcprd = QuestionCbtPmResultDetail(
-                    r_id=r_id,q_test=q_test,q_period=q_period,q_q=q_q,
-                    q_question=q_question,q_symbol=q_symbol,u_answer=u_answer,correct=l2['correct'])
-                qcprd.save()
+                #更新
+                QuestionCbtPmResultDetail.objects.filter(r_id=r_id,q_q=q_q,q_question=q_question,q_symbol=q_symbol).update(u_answer=u_answer,correct=l2['correct'])
                 count=count+1
                 total=total+correct
                 #print("%s,%s,%s,%s,%s"%(q_question , q_symbol , u_answer,q_answer,q_remarks ) )
@@ -1462,6 +1469,66 @@ class CbtPmResult():
 
         a_dict['g_total'] = g_total
         return render( request,'jg/cbtpmresult.html',{'u_admin':request.session['u_admin'],'a_dict':a_dict })
+
+class CbtPmResultShow():
+    def cbtpmresultshow( request ):
+        u_id = request.session['u_id']
+        r_id = request.GET['r_id']
+        print( r_id )
+        a_dict = {}
+
+        qr = QuestionCbtPmResult.objects.filter(r_id=r_id).values().first()
+        q_test = qr['q_test']
+        q_period = qr['q_period']
+
+        qpm = QuestionPm.objects.filter(q_test=q_test,q_period=q_period).values()
+
+        q_test = qpm[0]['q_test']
+        q_period = qpm[0]['q_period']
+        a_dict['r_id'] = r_id
+        a_dict['q_test'] = q_test
+        a_dict['q_period'] = q_period
+        a_dict['list'] = []
+        g_total = 0
+        for q1 in qpm:
+            if q1['q_num'] < 10:
+                q_num = "0%s" % (q1['q_num'])
+            else:
+                q_num = str(q1['q_num'])
+
+            dict2 = {'q_q': q_num, 'pdf': "%s_%s_%s_%s.pdf" % (q_test, q_period, q1['q_classify'], q1['q_title']),'list': []}
+
+            qcprd = QuestionCbtPmResultDetail.objects.filter(r_id=r_id,q_q=q_num).values()
+            count = 0
+            total = 0
+            score = 0
+            for q2 in qcprd:
+                dic = {}
+                q_question=q2['q_question']
+                q_symbol=q2['q_symbol']
+                correct = q2['correct']
+                dic['q_question'] = q_question
+                dic['q_symbol'] = q_symbol
+                dic['u_answer'] = q2['u_answer']
+                dic['correct'] = correct
+                qcp = QuestionCbtPm.objects.filter(q_test=q_test,q_period=q_period,q_q=q_num,q_question=q_question,q_symbol=q_symbol).values().first()
+                q_allocation = qcp['q_allocation']
+                q_answer = qcp['q_answer']
+                dic['q_answer'] = q_answer
+                dic['q_allocation'] = q_allocation
+                dict2['list'].append(dic)
+                count = count + 1
+                total = total + q2['correct']
+                score = score + correct * q_allocation
+            g_total = g_total + score
+            dict2['count'] = count
+            dict2['total'] = total
+            dict2['score'] = score
+
+            a_dict['list'].append(dict2)
+            a_dict['g_total'] = g_total
+        print(a_dict)
+        return render( request,'jg/cbtpmresultshow.html',{'u_admin':request.session['u_admin'],'a_dict':a_dict })
 
 # cbtam
 class CbtAmMain():

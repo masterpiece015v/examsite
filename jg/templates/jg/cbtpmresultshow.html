@@ -7,8 +7,8 @@
 {% block main %}
 
 <div class="row" style="margin-top:20px">
-    <div class="col-md-6">
-        <p>試験ID:{{ a_dict.r_id }} 試験名:{{ a_dict.q_test }} 得点:{{ a_dict.g_total }}</p>
+<div class="col-md-6">
+        <p>試験ID:{{ a_dict.r_id }} 試験名:{{ a_dict.q_test }} 年度期:{{ a_dict.q_period }} 得点:{{ a_dict.g_total }}</p>
         <p>※は順不同</p>
         <table class="table table-condensed">
             {% for l in a_dict.list %}
@@ -45,11 +45,6 @@
             </tr>
             {% endfor %}
         </table>
-    </div>
 </div>
 {% csrf_token %}
-{% endblock %}
-
-{% block script %}
-<script type="text/javascript" src="{% static 'jg/js/cbtpmmain.js' %}" charset="utf-8"></script>
 {% endblock %}

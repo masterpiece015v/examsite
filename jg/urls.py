@@ -77,7 +77,8 @@ urlpatterns = [
     url(r'^cbtpmmain/$', views.CbtPmMain.cbtpmmain, name='cbtpmmain'),
     url(r'^cbtpm/$', views.CbtPm.cbtpm, name='cbtpm'),
     url(r'^cbtpmresult/$', views.CbtPmResult.cbtpmresult, name='cbtpmresult'),
-    url(r'^ajax_cbtpm_get_q/$', views.CbtPm.ajax_cbtpm_get_q, name='ajax_cbtpm_get_q'),
+    url(r'^cbtpmresultshow/$', views.CbtPmResultShow.cbtpmresultshow, name='cbtpmresultshow'),
+    url(r'^ajax_cbtpm_update/$', views.CbtPm.ajax_cbtpm_update, name='ajax_cbtpm_update'),
 ]
 
 from django.conf import settings

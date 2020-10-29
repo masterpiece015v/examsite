@@ -79,8 +79,10 @@ $(function($){
 
     //テストをクリック
     $('.q_q').on('click',function(){
-
+        var temp_q_q = $('#q_q').text();
+        console.log( "temp_q_q" + temp_q_q.length );
         var q_q = $(this).val();
+
         //解答を取得する
         var a_list;
         for( var i = 0 ; i < a_dict['list'].length ; i++ ){
@@ -89,7 +91,7 @@ $(function($){
             }
         }
 
-        console.log( getJsonStr( a_list ) );
+        //console.log( getJsonStr( a_list ) );
 
         $("#res").children().remove();
         $("#res").append( $('<p>').attr('id','q_q').text(q_q));
@@ -97,7 +99,7 @@ $(function($){
             var item = dict['list'][i];
             if( item['q_q'] == q_q ){
                 var pdf = item['pdf'];
-                $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf );
+                $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#zoom=120');
 
                 $old_question = item['list'][0]['q_question'];
 
@@ -136,57 +138,57 @@ $(function($){
             //console.log( item['q_q'] );
         }
 
-        /*
-        ***********************************************************************************************
-        var json = {'q_test':$('#q_test').text() , 'q_period':$("#q_period").text(), 'q_q':q_q };
-        $.ajaxSetup({
-            beforeSend : function(xhr,settings){
-                xhr.setRequestHeader( 'X-CSRFToken',getCSRFToken());
-            }
-        });
-        $.ajax({
-            type:"POST",
-            url:"/jg/ajax_cbtpm_get_q/",
-            dataType:'json',
-            contentType:'charset=utf-8',
-            data:getJsonStr( json ),
-        }).done( (data) => {
-            var pdf = data['pdf'];
-            $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf );
+        //初回は実行しない
+        if( temp_q_q.length >= 1 ){
+            var new_a_dict = {}
+            new_a_dict['r_id'] = a_dict['r_id'];
+            new_a_dict['q_q'] = temp_q_q;
+            new_a_dict['list'] = [];
 
-            $old_question = data['list'][0]['q_question'];
+            //console.log( getJsonStr( a_dict ) );
 
-            for( i = 0 ; i < data['list'].length ; i++){
-                var q_question = data['list'][i]['q_question'];
-                var q_symbol = data['list'][i]['q_symbol'];
-                var q_lastanswer = data['list'][i]['q_lastanswer'];
-                $p = $('<p>').attr('id',q_question);
-                $label = $('<label>').text( q_symbol + ":" ).attr('for',q_question+q_symbol);
-                $select = $('<select>').attr('id',q_question+q_symbol).attr('class','form-control').attr('style','width:100px');
+            for(var i = 0 ; i < a_dict['list'].length ; i++ ){
+                if( a_dict['list'][i]['q_q'] == temp_q_q ){
+                    var temp_list = a_dict['list'][i]['list'];
 
-                for( j = 0 ; res_list[j] != q_lastanswer ; j++ ){
-                    $select.append( $('<option>').val(res_list[j]).text(res_list[j]));
+                    for(var j = 0 ; j < temp_list.length ; j++ ){
+                        var temp = {};
+                        temp['q_question'] = temp_list[j]['q_question'];
+                        temp['q_symbol'] = temp_list[j]['q_symbol'];
+                        temp['u_answer'] = temp_list[j]['u_answer'];
+
+                        console.log( getJsonStr( temp ));
+
+                        new_a_dict['list'].push( temp );
+                    }
                 }
-                $select.append( $('<option>').val(q_lastanswer).text(q_lastanswer) );
-                $p.append( $label , $select );
-
-                if( i == 0 || $old_question != q_question ){
-                    $("#res").append( $('<p>').text("設問"+q_question));
-                }
-
-                $("#res").append( $p );
-                $old_question = q_question;
             }
-        }).fail((data)=>{
 
-        }).always((data)=>{
+            console.log( getJsonStr( new_a_dict ) );
 
-        });
-        **********************************************************************************************************************
-        */
+            $.ajaxSetup({
+                beforeSend : function(xhr,settings){
+                    xhr.setRequestHeader( 'X-CSRFToken',getCSRFToken());
+                }
+            });
+            $.ajax({
+                type:"POST",
+                url:"/jg/ajax_cbtpm_update/",
+                dataType:'json',
+                contentType:'charset=utf-8',
+                data:getJsonStr( new_a_dict ),
+            }).done( (data) => {
 
+                console.log( getJsonStr( data ) );
+
+            }).fail((data)=>{
+
+            }).always((data)=>{
+
+            });
+
+        }
     });
-
 });
 </script>
 </head>

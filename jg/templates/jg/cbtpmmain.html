@@ -7,14 +7,28 @@
 {% block main %}
 
 <div class="row" style="margin-top:20px">
-    <div class="col-md-6">
+    <div class="col-md-5">
         <table class="table table-condensed">
             <th>試験区分</th><th>年度期</th><th></th>
             {% for q in questioncbtpm %}
             <tr>
                 <td>{{ q.q_test }}</td>
                 <td>{{ q.q_period }}</td>
-                <td><a href="{% url 'jg:cbtpm' %}?q_id={{ q.q_test }}{{ q.q_period }}">スタート</a></td>
+                <td><a href="{% url 'jg:cbtpm' %}?q_id={{ q.q_test }}{{ q.q_period }}"><button class="btn-primary">スタート</button></a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <table class="table table-condensed">
+            <th>試験日時</th><th>試験区分</th><th>年度期</th><th>試験ID</th>
+            {% for q in questioncbtpmresult %}
+            <tr>
+                <td>{{ q.a_datetime| date:"Y.n.j H:i" }}</td>
+                <td>{{ q.q_test }}</td>
+                <td>{{ q.q_period }}</td>
+                <td><a href="{% url 'jg:cbtpmresultshow' %}?r_id={{ q.r_id }}"><button class="btn-primary">{{ q.r_id }}</button></a></td>
             </tr>
             {% endfor %}
         </table>
