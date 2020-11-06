@@ -39,6 +39,27 @@ def byteToDic( data ):
 def HttpResponseJson( jsonobj ):
     jsonStr = json.dumps( jsonobj , ensure_ascii=False, indent=2)
     return HttpResponse(jsonStr, content_type='application/json', charset='utf-8')
+#000Xのコードを作成する
+def code4( c ):
+    if type( c ) is int:
+        if c < 10:
+            return '000' + str( c )
+        elif c < 100:
+            return '00' + str( c )
+        elif c < 1000:
+            return '0' + str( c )
+        else:
+            return str( c )
+    else:
+        if len(c) == 1:
+            return '000' + c
+        elif len(c) == 2:
+            return '00' + c
+        elif len(c) == 3:
+            return '0' + c
+        else:
+            return c
+
 #セッションにu_idを含むかをチェックする
 def securecheck( request ):
     if 'u_id' not in request.session:
@@ -1466,6 +1487,8 @@ class CbtPmResult():
             l['total'] = total
             l['score'] = score
             g_total = g_total + score
+
+        QuestionCbtPmResult.objects.filter(r_id=r_id).update(b_datetime=datetime.datetime.now())
 
         a_dict['g_total'] = g_total
         return render( request,'jg/cbtpmresult.html',{'u_admin':request.session['u_admin'],'a_dict':a_dict })

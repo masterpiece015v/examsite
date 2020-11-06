@@ -14,6 +14,9 @@ from django.conf import settings
 from .logger import log_write
 
 #関数
+#ajaxのPOSTデータをDictionaryに変換する
+def byteToDic( data ):
+    return ast.literal_eval( data.decode() )
 #アクセスログに追加する
 def addAccessLog(request,a_page,a_state):
     u_id = request.POST["u_id"]

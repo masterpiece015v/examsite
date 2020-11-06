@@ -165,6 +165,7 @@ class QuestionCbtPmResult( models.Model ):
     o_id = models.CharField( max_length=4 )
     u_id = models.CharField( max_length=20 )
     a_datetime = models.DateTimeField(default=timezone.now )
+    b_datetime = models.DateTimeField(default=timezone.now )
 
 class QuestionCbtPmResultDetail( models.Model ):
     r_id = models.CharField( max_length=10)
@@ -175,3 +176,13 @@ class QuestionCbtPmResultDetail( models.Model ):
     q_symbol = models.CharField(max_length=1)
     u_answer = models.CharField(max_length=1)
     correct = models.IntegerField( default=0 )
+
+class QuestionBoki( models.Model ):
+    b_id = models.CharField( max_length=11,primary_key=True)
+    b_org = models.CharField( max_length=1)     #主催
+    b_times = models.CharField( max_length=3)   #回
+    b_class = models.CharField( max_length=1)   #級
+    b_que1 = models.CharField( max_length=1)    #問
+    b_que2 = models.CharField( max_length=1)    #設問
+    b_ocr = models.CharField( max_length=255,blank=True,null=True) #OCRで読み込んだ内容
+    b_field = models.CharField( max_length=40,blank=True,null=True) #分野

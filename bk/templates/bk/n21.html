@@ -1,0 +1,61 @@
+{% extends 'bkbase.html' %}
+{% load static %}
+
+{% block addhead %}
+<link rel="stylesheet" href="{% static 'exam/css/mtcss.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col">
+            <form class="form-inline">
+                <div class="form-group">
+                    <select class="form-control d-print-none" id="s_test" style="width:300px;">
+                        <option></option>
+                        {% for field in field_list %}
+                            <option value="{{ field }}">{{ field }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group" style="margin-left:10px;">
+                    <label for="formControlRange" class="d-print-none">サイズ</label>
+                    <input type="range" class="form-control-range d-print-none" id="formControlRange">
+                </div>
+                <div class="form-group" style="margin-left:10px;">
+                    <label for="txtSize" class="d-print-none">サイズ</label>
+                    <input type="text" class="form-control d-print-none" id="txtSize" value="800">
+                </div>
+                <div class="form-group" style="margin-left:10px;">
+                    <input type="button" class="form-control d-print-none" id="btnKaitou" value="解答用紙印刷">
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col">
+            <p id="t_id"></p>
+        </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col">   
+            <table id="qtable" class="table table-condensed">
+                
+            </table>
+            
+        </div>
+    </div>
+
+    <div style="page-break-after: always;"></div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col">
+            <table id="qanswer" class="table table-condensed" style="width:80px;">
+            </table>
+        </div>
+    </div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'bk/js/n21.js' %}"></script>
+{% endblock %}

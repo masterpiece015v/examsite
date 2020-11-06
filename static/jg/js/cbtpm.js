@@ -35,7 +35,7 @@ $(function(){
             data:getJsonStr( json ),
         }).done( (data) => {
             var pdf = data['pdf'];
-            $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf );
+            $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#view=Fit');
 
             $old_question = data['list'][0]['q_question'];
 

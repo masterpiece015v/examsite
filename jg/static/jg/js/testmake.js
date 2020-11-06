@@ -342,7 +342,7 @@ $(function(){
 
         $.ajax({
             type:"POST",
-            url:"/exam/ajax_testupdate/",
+            url:"/jg/ajax_testupdate/",
             dataType:'json',
             data: getJsonStr( q_json ),
             contentType: 'charset=utf-8'

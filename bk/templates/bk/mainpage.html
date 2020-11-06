@@ -1,0 +1,96 @@
+{% extends 'bkbase.html' %}
+
+{% block title %}メッセージページ{% endblock %}
+{% block css %}
+span.answer{background-color : black;
+color : black;
+padding-left:50px;
+padding-right:50px;}
+span.answer:hover{background-color : white;}
+p.question { margin-top : 30px; }
+h2 {font-size : 15pt;}
+h3 {font-size :12pt;}
+{% endblock %}
+{% load static %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-8">
+        <!-- アコーディオンレベル１ -->
+        <div class="accordion" id="accordion-1">
+            <div class="card">
+                <!-- アコーディオンレベル２ -->
+                <div class="card-header" id="header-1">
+                   <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#card-1" aria-expanded="true" aria-controls="card-1">日商簿記検定</button>
+                </div>
+                <div id="card-1" class="collapse" aria-labelledby="header-1" data-parent="#header-1">
+                    <div class="card-body">
+                        <!-- アコーディオンレベル３ -->
+                        <div class="card-header" id="header-1-1">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#card-1-1" aria-expanded="true" aria-controls="card-1-1">２級</button>
+                        </div>
+                        <div id="card-1-1" class="collapse" aria-labelledby="header-1-1" data-parent="#header-1-1">
+                            <div class="card-body"><a href="{% url 'bk:n21' %}">問１</a></div>
+                            <div class="card-body">問２</div>
+                            <div class="card-body">問３</div>
+                            <div class="card-body">問４</div>
+                            <div class="card-body">問５</div>
+                        </div>
+                        <!-- アコーディオンレベル３ -->
+                        <div class="card-header" id="header-1-2">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#card-1-2" aria-expanded="true" aria-controls="card-1-2">３級</button>
+                        </div>
+                        <div id="card-1-2" class="collapse" aria-labelledby="header-1-2" data-parent="#header-1-2">
+                            <div class="card-body">問１</div>
+                            <div class="card-body">問２</div>
+                            <div class="card-body">問３</div>
+                            <div class="card-body">問４</div>
+                            <div class="card-body">問５</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- アコーディオンレベル２ -->
+                <div class="card-header" id="header-2">
+                   <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#card-2" aria-expanded="true" aria-controls="card-2">全経簿記検定</button>
+                </div>
+                <div id="card-2" class="collapse" aria-labelledby="header-2" data-parent="#header-2">
+                    <div class="card-body">
+                        <!-- アコーディオンレベル３ -->
+                        <div class="card-header" id="header-2-1">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#card-2-1" aria-expanded="true" aria-controls="card-2-1">２級</button>
+                        </div>
+                        <div id="card-2-1" class="collapse" aria-labelledby="header-2-1" data-parent="#header-2-1">
+                            <div class="card-body">問１</div>
+                            <div class="card-body">問２</div>
+                            <div class="card-body">問３</div>
+                            <div class="card-body">問４</div>
+                            <div class="card-body">問５</div>
+                        </div>
+                        <!-- アコーディオンレベル３ -->
+                        <div class="card-header" id="header-2-2">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#card-2-2" aria-expanded="true" aria-controls="card-2-2">３級</button>
+                        </div>
+                        <div id="card-2-2" class="collapse" aria-labelledby="header-2-2" data-parent="#header-2-2">
+                            <div class="card-body">問１</div>
+                            <div class="card-body">問２</div>
+                            <div class="card-body">問３</div>
+                            <div class="card-body">問４</div>
+                            <div class="card-body">問５</div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+
+    </div>
+    <div class="col-md-5">
+
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'bk/js/mainpage.js' %}" charset="utf-8"></script>
+{% endblock %}
