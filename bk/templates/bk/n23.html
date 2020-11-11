@@ -1,0 +1,77 @@
+{% extends 'bkbase.html' %}
+{% load static %}
+
+{% block addhead %}
+<style type="text/css">
+@media print{
+    #header { display:none; }
+}
+</style>
+{% endblock %}
+
+{% block main %}
+    <div id="header">
+        <h1>日商簿記２級</h1>
+        <div class="container-fluid">
+            <div class="row" style="margin-top:20px;margin-bottom:20px">
+                <div class="col-1"><a href="{% url 'bk:n21' %}" class="btn btn-primary" role="button">問１</a></div>
+
+                <div class="col-1"><a href="{% url 'bk:n22' %}" class="btn btn-primary" role="button">問２</a></div>
+                <div class="col-1"><a href="#" class="btn btn-success" role="button">問３</a></div>
+                <div class="col-1"><a href="{% url 'bk:n24' %}" class="btn btn-primary" role="button">問４</a></div>
+                <div class="col-1"><a href="{% url 'bk:n25' %}" class="btn btn-primary" role="button">問５</a></div>
+        </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <form class="form-inline">
+                    <div class="form-group">
+                        分野選択：
+                        <select class="form-control d-print-none" id="s_test" style="width:150px;">
+                            <option></option>
+                            {% for field in field_list %}
+                                <option value="{{ field }}">{{ field }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="button" class="form-contral" value="印刷表示" id="print" style="margin-left:10px;">
+                    </div>
+                    <div class="form-group" style="margin-left:50px;">
+                        <label for="formControlRange" class="d-print-none">サイズ</label>
+                        <input type="range" class="form-control-range d-print-none" id="formControlRange">
+                    </div>
+                    <div class="form-group" style="margin-left:10px;">
+                        <label for="txtSize" class="d-print-none">サイズ</label>
+                        <input type="text" class="form-control d-print-none" id="txtSize" value="800">
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+        <!-- 印刷リスト -->
+        <div class="row" style="margin-top:10px;">
+            <table id="printlist" class="table table-border">
+
+            </table>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+        <div class="col">
+            <p id="t_id"></p>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+        <div id="qtable">
+
+        </div>
+    </div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'bk/js/n23.js' %}"></script>
+{% endblock %}
