@@ -519,27 +519,11 @@ class AnswerUpload():
 
                 # すでにテストID＋ユーザIDが存在する場合
                 if len( check_answer ) >= 1:
-                    # リストの再取得
-                    #answerimage = AnswerImage.objects.all()
-                    #filelist = []
-                    #for file in answerimage:
-                    #    filelist.append(file)
-                    #msg = msg + uf.name
-                    #return render(request, 'exam/answerupload.html', { "message" : "そのデータはすでに存在します。", "t_id" : test_id , "u_id" : user_id , "answerlist" : answerlist ,'u_admin':u_admin})
                     dict = {'t_id':test_id,'u_id':user_id,'exists':1}
                     list.append( dict )
                 else:
-                    # 画像をデータベースに登録する
-                    #add_answerimage = AnswerImage( image=filename , o_id=org_id , t_id=test_id , u_id=user_id )
-                    #add_answerimage.save()
-
-                    # 解答をResultTestに登録する
+                    # 解答をResultTestTempに登録する
                     date = datetime.datetime.now()
-
-                    #テスト数を取得
-                    #num = LittleTest.objects.filter( o_id=org_id,t_id=test_id ).count()
-                    #num = record.count()
-
                     cnt = 0
                     for answer in answerlist:
                         if cnt < 80:
@@ -549,12 +533,6 @@ class AnswerUpload():
                                 add_rt = ResultTestTemp(t_id=test_id,t_num=code4(answer[0]),r_answer=answer[1],r_date=date,u_id=user_id)
                             add_rt.save()
                         cnt = cnt + 1
-                    #ファイルを削除する
-                    #filelist = glob.glob( media_path + '/*')
-
-                    #for file in filelist:
-                        #print( os.path.join(media_path,file))
-                        #os.remove( os.path.join(media_path, file ) )
                     dict = {'t_id':test_id,'u_id':user_id,'exists':0}
                     list.append( dict )
             return render(request, 'jg/answerupload.html' , { 'list':list ,'u_admin':u_admin})
@@ -631,42 +609,36 @@ class AnswerUpload():
         dict = {'list':[]}
 
         for l in list:
-
             # 登録チェック
             t_id = l['t_id']
             u_id = l['u_id']
-
-            check_answer = ResultTest.objects.filter(t_id=t_id, u_id=u_id)
+            check_answer = ResultTest.objects.filter(t_id=t_id, u_id=u_id).distinct()
 
             # すでにテストID＋ユーザIDが存在する場合
             if len(check_answer) >= 1:
-                print( t_id )
                 dic = {'t_id':t_id , 'u_id':u_id}
                 dict['list'].append( dic )
 
             else:
                 # 解答をResultTestに登録する
-                date = datetime.datetime.now()
+                # date = datetime.datetime.now()
                 # テスト数を取得
                 num = LittleTest.objects.filter(o_id=o_id, t_id=t_id).count()
 
                 cnt = 0
                 resulttesttemp = ResultTestTemp.objects.filter(t_id=t_id,u_id=u_id).valuse()
-
+                #answer = []
                 for r in resulttesttemp:
                     if cnt < num:
-                        if answer[1] == "未回答" or answer[1] == "複数回答":
-                            add_rt = ResultTest(t_id=r['t_id'], t_num=r['t_id'], r_answer='', r_date=date,u_id=r['u_id'])
-                        else:
-                            add_rt = ResultTest(t_id=r['t_id'], t_num=r['t_id'], r_answer=answer[1], r_date=date,u_id=r['u_id'])
+                        add_rt = ResultTest(t_id=r['t_id'], t_num=r['t_id'], r_answer=r['r_answer'], r_date=r['r_date'],u_id=r['u_id'])
                         add_rt.save()
                     cnt = cnt + 1
 
-                    # ResultTestTempのデータを削除する
-                    ResultTestTemp.objects.filter(t_id=old_t_id, u_id=old_u_id).delete()
+                #ResultTestTempのデータを削除する
+                ResultTestTemp.objects.filter(t_id=t_id, u_id=u_id).delete()
                 dic = {'t_id': t_id, 'u_id': u_id}
                 dict['list'].append(dic)
-        print( dict )
+
         return HttpResponseJson( dict )
 
     # upload
@@ -1360,7 +1332,6 @@ class CbtPm():
         qcpr.save()
 
         qpm = QuestionPm.objects.values('q_test', 'q_period','q_num','q_classify', 'q_title').filter(q_test=q_test,q_period=q_period)
-        question = QuestionCbtPm.objects.values('q_q','q_question','q_symbol','q_lastanswer').filter(q_test=q_test,q_period=q_period)
 
         dict = {}
         dict['q_test'] = q_test
@@ -1373,6 +1344,9 @@ class CbtPm():
                 q_num = str(q1['q_num'])
 
             dict2 = { 'q_num' : q_num , 'pdf' :"%s_%s_%s_%s.pdf"%(q_test,q_period,q1['q_classify'],q1['q_title']),'list':[]}
+
+            print( dict2 )
+
             qcp = QuestionCbtPm.objects.values('q_q','q_question','q_symbol','q_lastanswer').filter(q_test=q_test,q_period=q_period,q_q=q_num)
             for q2 in qcp:
                 dic = {}
@@ -1387,8 +1361,6 @@ class CbtPm():
                 qcprd.save()
 
             dict['list'].append( dict2 )
-
-
 
         #print( dict )
         return render( request,'jg/cbtpm.html',{'u_admin':request.session['u_admin'] ,
@@ -1434,7 +1406,7 @@ class CbtPmResult():
                 a = ""
             r_answer_dict[id] = a + q['q_answer']
 
-        print( r_answer_dict )
+        #print( r_answer_dict )
         g_total = 0
         for l in list:
             q_q = l['q_q']
@@ -1443,6 +1415,8 @@ class CbtPmResult():
             ans_pdf = "%s_%s_%s_ans.pdf"%(q_test,q_period,qpm['q_classify'])
             l['pdf'] = pdf
             l['ans_pdf'] = ans_pdf
+            print( pdf )
+            print( ans_pdf )
             #print("%s"%q_q)
             list2 = l['list']
             count = 0
@@ -1519,7 +1493,7 @@ class CbtPmResultShow():
             else:
                 q_num = str(q1['q_num'])
 
-            dict2 = {'q_q': q_num, 'pdf': "%s_%s_%s_%s.pdf" % (q_test, q_period, q1['q_classify'], q1['q_title']),'list': []}
+            dict2 = {'q_q': q_num, 'pdf': "%s_%s_%s_%s.pdf" % (q_test, q_period, q1['q_classify'],q1['q_title']), 'ans_pdf':"%s_%s_%s_ans.pdf"%(q_test,q_period,q1['q_classify']),'list': []}
 
             qcprd = QuestionCbtPmResultDetail.objects.filter(r_id=r_id,q_q=q_num).values()
             count = 0
@@ -1550,10 +1524,72 @@ class CbtPmResultShow():
 
             a_dict['list'].append(dict2)
             a_dict['g_total'] = g_total
-        print(a_dict)
+        #print(a_dict)
         return render( request,'jg/cbtpmresultshow.html',{'u_admin':request.session['u_admin'],'a_dict':a_dict })
 
 # cbtam
 class CbtAmMain():
     def cbtammain(request):
-        return render( request,'jg/cbtammain.html', {'u_admin':request.session['u_admin']})
+        question = Question.objects.filter(q_test='fe').values('q_test','q_period').distinct().order_by('q_test','-q_period')
+        q_list = []
+        for q in question:
+            dic = {}
+            dic['q_test'] = q['q_test']
+            dic['q_period'] = q['q_period']
+            dic['year'] = q['q_period'][0:3]
+
+            if q['q_period'][4] == '1':
+                dic['season'] = "春"
+            else:
+                dic['season'] = "秋"
+            q_list.append( dic )
+
+        return render( request,'jg/cbtammain.html', {'u_admin':request.session['u_admin'],'q_list':q_list})
+
+class CbtAm():
+    def cbtam(request):
+        q_test = request.GET.get('q_test')
+        q_period = request.GET.get('q_period')
+        r_id = random_id(10)
+        q = Question.objects.filter(q_test=q_test,q_period=q_period).values('q_id','q_num').order_by('q_num')
+        question = {'q_test':q_test,'q_period':q_period,'r_id':r_id,'q':q}
+
+        for item in q:
+            qcar = QuestionCbtAmResult(
+                r_id=r_id,
+                q_id=item['q_id'],
+                u_id=request.session['u_id'],
+                o_id=request.session['o_id'])
+            qcar.save()
+
+        return render( request,'jg/cbtam.html',{'u_adimn':request.session['u_admin'],'question':question})
+
+class CbtAmResult():
+    def cbtamresult( request ):
+        dict = request.POST['a_dict']
+        a_dict = json.loads( dict )
+        u_id = request.session['u_id']
+        o_id = request.session['o_id']
+        r_id = a_dict['r_id']
+        r_dict = {'r_id':r_id,'list':[]}
+        for item in a_dict['list']:
+
+            q_id = item['q_id']
+            u_answer = item['u_answer']
+            #更新
+            QuestionCbtAmResult.objects.filter(r_id=r_id,q_id=q_id).update(u_answer=u_answer)
+            #答えの取得
+            question = Question.objects.filter(q_id=q_id).values('q_answer').first()
+            q_answer = question['q_answer']
+
+            if u_answer == q_answer:
+                result = 1
+            else:
+                result = 0
+
+            dict = {'q_id':q_id,'u_answer':u_answer,'q_answer':q_answer,'result':result}
+            r_dict['list'].append( dict )
+
+        #qcpr = QuestionCbtAmResult.objects.filter(r_id).values()
+
+        return render( request,'jg/cbtamresult.html',{'u_admin':request.session['u_admin'],'r_dict':r_dict})

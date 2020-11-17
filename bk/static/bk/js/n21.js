@@ -9,14 +9,15 @@ $(function(){
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
         return csrftoken;
     }
+
     $("#formControlRange").val( 800 / 1400 * 100 );
     //スライダーのイベント
     $("#formControlRange").on('change',function(){
-        
         var q_size = ($(this).val() * 1400 / 100) ;
         $(".q_img").attr("style","width:" + q_size + "px;" );
         $("#txtSize").val( q_size );
     });
+
     //サイズのイベント
     $("#txtSize").on('change',function(){
         var q_size = $(this).val();
@@ -25,12 +26,82 @@ $(function(){
 
     });
 
+    //分野の選択
     $("#s_test").on('change',function(){
 
-        query = {'b_field':$(this).val() };
+        var query = {'b_field':$(this).val() };
 
         $("#t_id").text( "テストID:" + query['b_field'] );
 
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+
+        $.ajax({
+            type:"POST",
+            url:"/bk/ajax_n21_gettimes/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( query ),
+        }).done( (data) => {
+            //$('#b_times').children().remove();
+            //$('#b_times').append( $('<option>') );
+            //for( var i = 0 ;  i < data.qlist.length ; i++){
+            //    console.log( i );
+            //    $option = $('<option>').val(data.qlist[i]['b_times']).text(data.qlist[i]['b_times']);
+            //    $('#b_times').append( $option );
+            //}
+            $('#printlist').children().remove();
+            $('#qtable').children().remove();
+            $('#allow_field').children().remove();
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                $tr = $('<tr>');
+                $td1 = $("<td width='50px'>").text( data.qlist[i]['b_times'] );
+                $td4 = $("<td width='50px'>").text( '(' + data.qlist[i]['b_que2'] + ')' );
+                $td3 = $("<td>").text( data.qlist[i]['b_ocr']);
+                $td2 = $("<td width='30px'>").append( $('<input>').attr('type','checkbox').attr('name','chktimes').val(data.qlist[i]['b_times'] + '_1_' + data.qlist[i]['b_que2']) );
+                $tr.append( $td1 );
+                $tr.append( $td4 );
+                $tr.append( $td2 );
+                $tr.append( $td3 );
+                $('#printlist').append( $tr );
+            }
+
+        }).fail( (data)=>{
+            alert('fail');
+        }).always( (data) => {
+
+        });
+
+    });
+    //すべてのチェックを入れる
+    $('#chkon').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',true);
+        });
+    });
+    //すべてのチェックを入れる
+    $('#chkoff').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',false);
+        });
+    });
+    //回の選択
+    $("#print").on('click',function(){
+        var array = [];
+        $('input[type=checkbox]').each( function(index){
+            if( $(this).prop('checked') ){
+                array.push( $(this).val() );
+            }else{
+
+            }
+        });
+        var query={};
+        query['b_times'] = array;
+        console.log( getJsonStr( query ) );
+        query['b_field'] = $('#s_test').val()
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
                 xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
@@ -44,72 +115,87 @@ $(function(){
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
         }).done( (data) => {
-            $('#aftable').children().remove();
             $('#qtable').children().remove();
-            $('#qas').children().remove();
-            $('#qans').children().remove();
-            $('#qcom').children().remove();
+            $('#allow_field').children().remove();
+            console.log( data.qlist );
+            //許容勘定科目の表示
 
-            for( var i = 0 ; i < data.aflist.length ; i++ ){
-                if( i == 0 || i == 4 || i == 9 ){
-                    $tr = $("<tr>");
-                    $td = $("<td>").text( data.aflist[i] );
-                    $tr.append( $td );
-                    $('#aftable').append( $tr );
+            $tr = $('<tr>');
+            $td = $('<td>').text(data.b_allow_field[0]);
+            $tr.append( $td);
+            for( var i = 1 ; i < data.b_allow_field.length ;i++){
+                if( i % 5 == 0 ){
+                    $("#allow_field").append( $tr );
+                    $tr = $('<tr>');
+                    $td = $('<td>').text(data.b_allow_field[i]);
+                    $tr.append( $td);
                 }else{
-                    $td = $("<td>").text( data.aflist[i] );
-                    $tr.append( $td );
+                    $td = $('<td>').text(data.b_allow_field[i]);
+                    $tr.append( $td);
                 }
 
             }
+            //問題の表示
             for( var i = 0 ;  i < data.qlist.length ; i++){
+                $p = $('<p>').text("第" + data.qlist[i]['b_times'] + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')');
+                $p.attr("style","font-size:14pt;");
 
-                $td1 = $('<td>').text("第" + data.qlist[i]['b_times'] + "回 問" + data.qlist[i]['b_que1'] + " (" + data.qlist[i]['b_que2'] + ")");
-                $td1.attr("style","font-size:14pt;");
-                $tr1 = $("<tr>").append( $td1 );
-                $img = $("<img src='/static/bk/question/" + data.qlist[i]['b_id'] + ".png'>");
-                $img.attr("style","width:800px;");
+                $img = $("<img src='/static/bk/question/" + data.qlist[i].b_id + ".png'>");
+                $img.attr("style","width:900px;");
                 $img.attr("class","q_img");
-                $td2 = $('<td>').append($img);
-                $tr2 = $('<tr>').append($td2);
+                $figure = $('<figure>').append($img);
 
-                $('#qtable').append( $tr1 );
-                $('#qtable').append( $tr2 );
+                $('#qtable').append( $p );
+                $('#qtable').append( $figure );
+            }
+            $('#qtable').append( $("<div>").attr("style","page-break-after: always"));
 
-                $td3 = $("<td colspan='4'>").text("第" + data.qlist[i]['b_times'] + "回 問" + data.qlist[i]['b_que1'] + " (" + data.qlist[i]['b_que2'] + ")");
-                $atr = $("<tr>").append( $td3 ).attr("style","border:1px solid black");
-                $('#qas').append( $atr );
-                $btr = $("<tr>").append($("<td style='width:200px;height:100px;border:1px solid black'>"));
-                $btr.append($("<td style='width:200px;height:100px;border:1px solid black'>"));
-                $btr.append($("<td style='width:200px;height:100px;border:1px solid black'>"));
-                $btr.append($("<td style='width:200px;height:100px;border:1px solid black'>"));
-                $('#qas').append( $btr );
+            //解答用紙
+            $tableas = $("<table>");
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                $tr1 = $("<tr>");
+                $th = $("<th colspan=4>").text( "第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解答用紙】" );
+                $tr1.append( $th );
 
-                $td4 = $('<td>').text("第" + data.qlist[i]['b_times'] + "回 問" + data.qlist[i]['b_que1'] + " (" + data.qlist[i]['b_que2'] + ")【解答】");
-                $td4.attr("style","font-size:14pt;");
-                $tr3 = $("<tr>").append( $td4 );
-                $img = $("<img src='/static/bk/question/" + data.qlist[i]['b_id'] + "_ans.png'>");
-                $img.attr("style","width:800px;");
+                $tr2 = $("<tr>");
+                $td1 = $("<td>").attr('style','border:1px solid black;width:250px;height:150px;');
+                $td2 = $("<td>").attr('style','border:1px solid black;width:250px;height:150px;');
+                $td3 = $("<td>").attr('style','border:1px solid black;width:250px;height:150px;');
+                $td4 = $("<td>").attr('style','border:1px solid black;width:250px;height:150px;');
+                $tr2.append( $td1,$td2,$td3,$td4 );
+
+                $tableas.append( $tr1,$tr2 );
+            }
+            $('#qtable').append( $tableas );
+            $('#qtable').append( $("<div>").attr("style","page-break-after: always"));
+            //解答
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                filename = "n_" + data.qlist[i].b_times + "_2_1_";
+                $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解答】");
+                $p.attr("style","font-size:14pt");
+                $('#qtable').append( $p );
+                $img = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_ans.png'>" );
+                $img.attr("style","width:900px;");
                 $img.attr("class","q_img");
-                $td4 = $('<td>').append($img);
-                $tr4 = $('<tr>').append($td4);
-
-                $('#qans').append( $tr3 );
-                $('#qans').append( $tr4 );
-
-                $td5 = $('<td>').text("第" + data.qlist[i]['b_times'] + "回 問" + data.qlist[i]['b_que1'] + " (" + data.qlist[i]['b_que2'] + ")【解説】");
-                $td5.attr("style","font-size:14pt;");
-                $tr5 = $("<tr>").append( $td5 );
-                $img = $("<img src='/static/bk/question/" + data.qlist[i]['b_id'] + "_com.png'>");
-                $img.attr("style","width:800px;");
-                $img.attr("class","q_img");
-                $td6 = $('<td>').append($img);
-                $tr6 = $('<tr>').append($td6);
-
-                $('#qans').append( $tr5 );
-                $('#qans').append( $tr6 );
+                $figure = $('<figure>').append($img);
+                $('#qtable').append( $p );
+                $('#qtable').append( $figure );
             }
 
+            $('#qtable').append( $("<div>").attr("style","page-break-after: always"));
+            //解説
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                filename = "n_" + data.qlist[i].b_times + "_2_1_";
+                $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解説】");
+                $p.attr("style","font-size:14pt");
+                $('#qtable').append( $p );
+                $img = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_com.png'>" );
+                $img.attr("style","width:900px;");
+                $img.attr("class","q_img");
+                $figure = $('<figure>').append($img);
+                $('#qtable').append( $p );
+                $('#qtable').append( $figure );
+            }
         }).fail( (data)=>{
             alert('fail');
         }).always( (data) => {

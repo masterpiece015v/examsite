@@ -1,0 +1,26 @@
+{% extends 'jgbase.html' %}
+
+{% block title %}CBT_AM_result{% endblock %}
+{% block css %}
+{% endblock %}
+{% load static %}
+{% block main %}
+
+<div class="row" style="margin-top:20px">
+    <div class="col-md-6">
+        <p>※は順不同</p>
+        <table class="table table-condensed">
+        {% for r in r_dict.list %}
+        <tr>
+            <td>{{ r.q_id }}</td><td>{{ r.u_answer }}</td><td>{{ r.q_answer }}</td><td>{{ r.result }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+    </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% static 'jg/js/cbtamresult.js' %}" charset="utf-8"></script>
+{% endblock %}

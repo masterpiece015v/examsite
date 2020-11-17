@@ -177,6 +177,14 @@ class QuestionCbtPmResultDetail( models.Model ):
     u_answer = models.CharField(max_length=1)
     correct = models.IntegerField( default=0 )
 
+class QuestionCbtAmResult( models.Model ):
+    r_id = models.CharField( max_length=10 )
+    q_id = models.CharField( max_length=9)
+    u_id = models.CharField( max_length=20 )
+    o_id = models.CharField(max_length=4)
+    u_answer = models.CharField(max_length=1,blank=True,null=True)
+
+
 class QuestionBoki( models.Model ):
     b_id = models.CharField( max_length=11,primary_key=True)
     b_org = models.CharField( max_length=1)     #主催

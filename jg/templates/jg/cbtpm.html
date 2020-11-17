@@ -33,6 +33,9 @@ $(function($){
             ]
     };
 
+    var page = 1;
+    var pdf = '';
+
     //JSONオブジェクトを文字列に変える
     function getJsonStr(json){
         return JSON.stringify(json);
@@ -80,7 +83,7 @@ $(function($){
     //テストをクリック
     $('.q_q').on('click',function(){
         var temp_q_q = $('#q_q').text();
-        console.log( "temp_q_q" + temp_q_q.length );
+
         var q_q = $(this).val();
 
         //解答を取得する
@@ -91,15 +94,18 @@ $(function($){
             }
         }
 
-        //console.log( getJsonStr( a_list ) );
-
         $("#res").children().remove();
         $("#res").append( $('<p>').attr('id','q_q').text(q_q));
         for( var i = 0 ; i < dict['list'].length ; i++ ){
             var item = dict['list'][i];
             if( item['q_q'] == q_q ){
-                var pdf = item['pdf'];
-                $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#zoom=120');
+                pdf = item['pdf'];
+
+                page = 1;
+                $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#zoom=100&page=1');
+                //$('#iframe')[0].contentDocument.location.reload(true)
+                //$("#pdf").attr('data','/static/jg/pdf/question_pm/' + pdf + '#page=1');
+                //console.log( $('#iframe').attr('src') );
 
                 $old_question = item['list'][0]['q_question'];
 
@@ -189,6 +195,31 @@ $(function($){
 
         }
     });
+
+    $('#review').on('click',function(){
+        if( page > 1 ){
+            page = page - 1;
+        }
+
+        //$("#iframe").attr('src','');
+        //$("#iframe").attr('src','');
+        $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#zoom=100&page=' + page);
+        $('#iframe')[0].contentDocument.location.reload(true)
+        //$("#pdf").attr('data','');
+        //$("#pdf").attr('data','/static/jg/pdf/question_pm/' + pdf + '#page=' + page);
+        console.log( '/static/jg/pdf/question_pm/' + pdf + '#page=' + page );
+    });
+    $('#nextview').on('click',function(){
+        page = page + 1;
+        //$("#iframe").attr('src','');
+        //$("#iframe").attr('src','');
+        $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#zoom=100&page=' + page);
+        $('#iframe')[0].contentDocument.location.reload(true)
+        //$("#pdf").attr('data','');
+        //$("#pdf").attr('data','/static/jg/pdf/question_pm/' + pdf + '#page=' + page);
+        console.log( '/static/jg/pdf/question_pm/' + pdf + '#page=' + page );
+    });
+
 });
 </script>
 </head>
@@ -197,23 +228,33 @@ $(function($){
 <div class="container-fluid">
     <div class="row" style="margin-top:20px;margin-left:20px">
         <div class="col-md-12">
-            <p>試験区分:<strong id="q_test">{{ dict.q_test }}</strong> 年度期:<strong id="q_period">{{ dict.q_period }}</strong> 受験ID:<strong id="{{ r_id }}">{{ r_id }}</strong></p>
+            <p>試験区分:<strong id="q_test">{{ dict.q_test }}</strong>
+                年度期:<strong id="q_period">{{ dict.q_period }}</strong>
+                受験ID:<strong id="{{ r_id }}">{{ r_id }}</strong>
 
-            <p>
-                {% for q in dict.list %}<spam> 問<input type="button" value="{{ q.q_num }}" class="q_q" class="btn"></spam>{% endfor %}
-                <spam><input type="button" value="終了" id="endbtn"></spam>
-            </p>
+                <span><input type="button" value="戻る" id="review"></span>
+                <span><input type="button" value="次へ" id="nextview"></span>
 
+                <spam><input type="button" value="終了" id="endbtn"></spam></p>
         </div>
     </div>
 
-    <div class="row" style="margin-top:20px;margin-left:20px">
+    <div class="row" style="margin-top:5px;margin-left:5px">
+        <div class="col_md-1">
+            {% for q in dict.list %}<p><input type="button" value="{{ q.q_num }}" class="q_q" class="btn"></p>{% endfor %}
+        </div>
         <div class="col-md-8">
+
             <iframe src="" width="100%" height="800px" id="iframe">
                 <p><b>表示されない時の表示</b>: <a href="pdf.pdf">PDF をダウンロード</a>.</p>
             </iframe>
+
+            <!--
+            <object type="application/pdf" data="" width="100%" height="800px" id="pdf"></object>
+            -->
         </div>
-        <div class="col-md-4" id="res">
+
+        <div class="col-md-3" id="res">
 
         </div>
     </div>

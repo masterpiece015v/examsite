@@ -54,6 +54,7 @@ $(function(){
             //    $('#b_times').append( $option );
             //}
             $('#printlist').children().remove();
+            $('#qtable').children().remove();
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 $tr = $('<tr>');
                 $td1 = $("<td width='50px'>").text( data.qlist[i]['b_times'] );
@@ -74,7 +75,18 @@ $(function(){
         });
 
     });
-
+    //すべてのチェックを入れる
+    $('#chkon').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',true);
+        });
+    });
+    //すべてのチェックを入れる
+    $('#chkoff').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',false);
+        });
+    });
     //回の選択
     $("#print").on('click',function(){
         var array = [];

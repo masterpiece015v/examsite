@@ -33,25 +33,52 @@ class N21():
 
         return render( request,'bk/n21.html',{'field_list':field_list,'u_admin':request.session['u_admin']})
 
+    #回を取得する
+    def ajax_n21_gettimes(request):
+        body = byteToDic( request.body )
+        o_id = request.session['o_id']
+        b_field = body['b_field']
+        print(b_field)
+        qb = QuestionBoki.objects.filter(b_field=b_field,b_que1='1').values('b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
+        #print( qb )
+        data = {'qlist':[]}
+        for q in qb:
+            dic = {}
+            dic['b_times'] = q['b_times']
+            dic['b_que2'] = q['b_que2']
+            dic['b_ocr'] = q['b_ocr'][0:100]
+            data['qlist'].append( dic )
+
+        #print( data )
+        return HttpResponseJson( data )
+
     #テストの印刷用データをajaxで取得する
     def ajax_n21_getquestion( request ):
         body = byteToDic( request.body )
         o_id = request.session['o_id']
+        b_times = body['b_times']
         b_field = body['b_field']
-        qb = QuestionBoki.objects.filter(b_field=b_field).values()
-        data = {'qlist':[],'aflist':[]}
-        for q in qb:
-            dic = {}
-            dic['b_id'] = q['b_id']
-            dic['b_times'] = q['b_times']
-            dic['b_que1'] = q['b_que1']
-            dic['b_que2'] = q['b_que2']
-            data['qlist'].append( dic )
+        data = {'qlist':[]}
+        for b in b_times:
+            bt = b.split("_")[0]
+            bq2 = b.split("_")[2]
 
+            q = QuestionBoki.objects.filter(b_times=bt,b_que1='1',b_que2=bq2).values().first()
+            dic2 = {}
+            dic2['b_id'] = q['b_id']
+            dic2['b_times'] = q['b_times']
+            dic2['b_que1'] = q['b_que1']
+            dic2['b_que2'] = q['b_que2']
+
+            data['qlist'].append( dic2 )
         qbaf = QuestionBokiQ1AllowField.objects.filter(b_field=b_field).values().first()
-        if qbaf['b_allow_field'] is not None:
-            data['aflist'] = qbaf['b_allow_field'].split(",")
+        q1allow = qbaf['b_allow_field']
+        if q1allow is not None:
+            data['b_allow_field'] = q1allow.split(',')
+        else:
+            data['b_allow_field'] = ''
 
+        print( data )
         return HttpResponseJson( data )
 
 #テスト印刷画面
@@ -257,7 +284,7 @@ class N25():
         b_times = body['b_times']
         data = {'qlist':[]}
         for b in b_times:
-            qb = QuestionBoki.objects.filter(b_times=b,b_que1='4').values()
+            qb = QuestionBoki.objects.filter(b_times=b,b_que1='5').values()
             dic1 = {'b_times':b,'list':[]}
             for q in qb:
                 dic2 = {}

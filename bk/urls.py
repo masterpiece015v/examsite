@@ -8,6 +8,7 @@ urlpatterns = [
     #url(r'^$',views.Index.index , name="index" ),
     url(r'^$',views.Mainpage.mainpage,name="mainpage"),
     url(r'^n21/$',views.N21.n21 , name="n21" ),
+    url(r'^ajax_n21_gettimes/$', views.N21.ajax_n21_gettimes, name="ajax_n21_gettimes"),
     url(r'^ajax_n21_getquestion/$',views.N21.ajax_n21_getquestion,name="ajax_n21_getquestion"),
 
     url(r'^n22/$', views.N22.n22, name="n22"),

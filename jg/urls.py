@@ -74,6 +74,8 @@ urlpatterns = [
 
     # cbt
     url(r'^cbtammain/$', views.CbtAmMain.cbtammain, name='cbtammain'),
+    url(r'^cbtam/$', views.CbtAm.cbtam, name='cbtam'),
+    url(r'^cbtamresult/$', views.CbtAmResult.cbtamresult, name='cbtamresult'),
     url(r'^cbtpmmain/$', views.CbtPmMain.cbtpmmain, name='cbtpmmain'),
     url(r'^cbtpm/$', views.CbtPm.cbtpm, name='cbtpm'),
     url(r'^cbtpmresult/$', views.CbtPmResult.cbtpmresult, name='cbtpmresult'),

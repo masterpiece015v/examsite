@@ -54,6 +54,7 @@ $(function(){
             //    $('#b_times').append( $option );
             //}
             $('#printlist').children().remove();
+            $('#qtable').children().remove();
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 $tr = $('<tr>');
                 $td1 = $("<td width='50px'>").text( data.qlist[i]['b_times'] );
@@ -74,7 +75,18 @@ $(function(){
         });
 
     });
-
+    //すべてのチェックを入れる
+    $('#chkon').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',true);
+        });
+    });
+    //すべてのチェックを入れる
+    $('#chkoff').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',false);
+        });
+    });
     //回の選択
     $("#print").on('click',function(){
         var array = [];
@@ -124,7 +136,7 @@ $(function(){
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 as_page = data.qlist[i].list[0].b_as_page;
                 console.log( as_page );
-                filename = "n_" + data.qlist[i].b_times + "_2_4_";
+                filename = "n_" + data.qlist[i].b_times + "_2_5_";
                 $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].list[0].b_que1 + "【解答用紙】");
                 $p.attr("style","font-size:14pt");
                 $('#qtable').append( $p );
@@ -142,7 +154,7 @@ $(function(){
             //解答
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 ans_page = data.qlist[i].list[0].b_ans_page;
-                filename = "n_" + data.qlist[i].b_times + "_2_4_";
+                filename = "n_" + data.qlist[i].b_times + "_2_5_";
                 $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].list[0].b_que1 + "【解答】");
                 $p.attr("style","font-size:14pt");
                 $('#qtable').append( $p );
@@ -161,7 +173,7 @@ $(function(){
             //解説
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 com_page = data.qlist[i].list[0].b_com_page;
-                filename = "n_" + data.qlist[i].b_times + "_2_4_";
+                filename = "n_" + data.qlist[i].b_times + "_2_5_";
                 $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].list[0].b_que1 + "【解説】");
                 $p.attr("style","font-size:14pt");
                 $('#qtable').append( $p );
