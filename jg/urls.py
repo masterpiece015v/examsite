@@ -72,6 +72,9 @@ urlpatterns = [
     url(r'^questionpm/$', views.Question_Pm.questionpm, name='questionpm'),
     url(r'^ajax_getquestionpm/$', views.Question_Pm.ajax_getquestionpm, name='ajax_questionpm'),
 
+    # QuestionPmFrame
+    url(r'^questionpmframe/$', views.QuestionPmFrame.questionpmframe, name='questionpmframe'),
+
     # cbt
     url(r'^cbtammain/$', views.CbtAmMain.cbtammain, name='cbtammain'),
     url(r'^cbtam/$', views.CbtAm.cbtam, name='cbtam'),

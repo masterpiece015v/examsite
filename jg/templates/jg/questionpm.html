@@ -33,7 +33,7 @@
             <thead><th>問題</th><th>解答</th></thead>
             <tbody id="questionpm">
             {% for q in question %}
-            <tr><td><a href="/static/jg/pdf/question_pm/{{ q.qfn }}">{{ q.qfn }}</a></td>
+            <tr><td><a href="{% url 'jg:questionpmframe' %}?pdf={{ q.qfn }}">{{ q.qfn }}</a></td>
                 {% if q.afn == "ファイルなし" %}
                 <td>{{ q.afn }}</td>
                 {% else %}
