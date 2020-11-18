@@ -34,7 +34,7 @@ $(function(){
                 console.log( value['qfn'] );
                 console.log( value['afn'] );
                 $tr = $( '<tr>' );
-                $td = $('<td>').append( $('<a href="/jg/questionpmframe/?pdf=' + value['qfn'] + '">').text( value['qfn']) );
+                $td = $('<td>').append( $('<a href="/jg/questionpmframe/?pdf=' + value['qfn'] + '&a_pdf=' + value['afn'] + '">').text( value['qfn']) );
                 $tr.append( $td );
                 if( value['afn'] != 'ファイルなし' ){
                     $td = $( '<td>' ).append( $('<a href=/static/jg/pdf/question_pm/' + value['afn'] + '>').text( value['afn']).attr('target','_blank') );

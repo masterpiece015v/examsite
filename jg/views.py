@@ -1323,8 +1323,10 @@ class CbtPmMain():
 class QuestionPmFrame():
     def questionpmframe( request ):
         pdf = request.GET.get("pdf")
+        a_pdf = request.GET.get("a_pdf")
         pdf = "/static/jg/pdf/question_pm/%s"%(pdf)
-        return render( request, 'jg/questionpmframe.html', {'u_admin': request.session['u_admin'],'pdf':pdf})
+        a_pdf = "/static/jg/pdf/question_pm/%s"%(a_pdf)
+        return render( request, 'jg/questionpmframe.html', {'u_admin': request.session['u_admin'],'pdf':pdf,'a_pdf':a_pdf})
 # cbtpm
 class CbtPm():
     def cbtpm(request):
