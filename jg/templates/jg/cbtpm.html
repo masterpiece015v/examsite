@@ -11,6 +11,12 @@
 
 <script>
 $(function($){
+    $(window).on('beforeunload',function(e){
+        //e.preventDefault();
+        //e.returnValue = '';
+        console.log('beforeunload');
+        return '更新しますか？';
+    });
     var res_list = ["","ア","イ","ウ","エ","オ","カ","キ","ク","ケ","コ","サ","シ","ス","セ"];
     var a_dict = {
         'r_id':'{{ r_id }}','q_test':'{{ dict.q_test }}','q_period':'{{ dict.q_period }}',

@@ -1309,10 +1309,16 @@ class CbtPmMain():
     def cbtpmmain(request):
         u_id = request.session['u_id']
         o_id = request.session['o_id']
+        u_admin = request.session['u_admin']
         questioncbtpm = QuestionCbtPm.objects.values('q_test','q_period').distinct()
-        questioncbtpmresult = QuestionCbtPmResult.objects.filter(u_id=u_id,o_id=o_id).values('r_id','q_test','q_period','a_datetime').order_by('-a_datetime')
-        print( questioncbtpmresult )
-        return render( request,'jg/cbtpmmain.html',{'u_admin':request.session['u_admin'] , 'questioncbtpm':questioncbtpm , 'questioncbtpmresult':questioncbtpmresult})
+        if u_admin == 0:
+            qcpr= QuestionCbtPmResult.objects.filter(u_id=u_id,o_id=o_id).values('r_id','q_test','q_period','a_datetime').order_by('-a_datetime')
+        else:
+            qcpr = QuestionCbtPmResult.objects.filter(o_id=o_id).values('u_id','r_id', 'q_test','q_period','a_datetime').order_by('u_id','-a_datetime')
+
+
+        print( u_admin )
+        return render( request,'jg/cbtpmmain.html',{'u_admin':u_admin , 'questioncbtpm':questioncbtpm , 'questioncbtpmresult':qcpr})
 
 # cbtpm
 class CbtPm():

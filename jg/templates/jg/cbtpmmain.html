@@ -19,7 +19,22 @@
             {% endfor %}
         </table>
     </div>
-
+    {% if u_admin == 1 %}
+    <div class="col-md-7">
+        <table class="table table-condensed">
+            <th>試験日時</th><th>ユーザ名</th><th>試験区分</th><th>年度期</th><th>試験ID</th>
+            {% for q in questioncbtpmresult %}
+            <tr>
+                <td>{{ q.a_datetime| date:"Y.n.j H:i" }}</td>
+                <td>{{ q.u_id }}</td>
+                <td>{{ q.q_test }}</td>
+                <td>{{ q.q_period }}</td>
+                <td><a href="{% url 'jg:cbtpmresultshow' %}?r_id={{ q.r_id }}"><button class="btn-primary">{{ q.r_id }}</button></a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% else %}
     <div class="col-md-6">
         <table class="table table-condensed">
             <th>試験日時</th><th>試験区分</th><th>年度期</th><th>試験ID</th>
@@ -33,6 +48,7 @@
             {% endfor %}
         </table>
     </div>
+    {% endif %}
 </div>
 {% csrf_token %}
 {% endblock %}
