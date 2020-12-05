@@ -28,10 +28,12 @@ class N21():
 
         field_list = []
         qb = QuestionBoki.objects.filter(b_que1='1').values('b_field').distinct()
-        for q in qb:
-            field_list.append( q['b_field'] )
+        for q0 in qb:
+            list = q0['b_field'].split(",")
+            for q in list:
+                field_list.append( q )
 
-        return render( request,'bk/n21.html',{'field_list':field_list,'u_admin':request.session['u_admin']})
+        return render( request,'bk/n21.html',{'field_list':set(field_list),'u_admin':request.session['u_admin']})
 
     #回を取得する
     def ajax_n21_gettimes(request):
@@ -39,15 +41,18 @@ class N21():
         o_id = request.session['o_id']
         b_field = body['b_field']
         print(b_field)
-        qb = QuestionBoki.objects.filter(b_field=b_field,b_que1='1').values('b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
+        qb = QuestionBoki.objects.filter(b_field__icontains=b_field,b_que1='1').values('b_field','b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
         #print( qb )
         data = {'qlist':[]}
+        fields = []
         for q in qb:
             dic = {}
             dic['b_times'] = q['b_times']
             dic['b_que2'] = q['b_que2']
             dic['b_ocr'] = q['b_ocr'][0:100]
             data['qlist'].append( dic )
+            for f in q['b_field'].split(','):
+                fields.append( f )
 
         #print( data )
         return HttpResponseJson( data )
