@@ -10,8 +10,8 @@
 <form action="{% url 'exam:mainpage' %}" method="POST">
     {% csrf_token %}
     <div class="form-group">
-        <label for="u_id">UserId or Email address</label>
-        <input type="text" class="form-control" id="u_id" placeholder="e-mailまたはユーザIDを入力してください。" name="u_id">
+        <label for="u_id">UserId</label>
+        <input type="text" class="form-control" id="u_id" placeholder="ユーザIDを入力してください。" name="u_id">
         <label for="u_pass">Password</label>
         <input type="password" class="form-control" id="u_pass" placeholder="Password" name="u_pass">
     </div>

@@ -88,7 +88,8 @@ $(function(){
             $(this).prop('checked',false);
         });
     });
-    //回の選択
+
+    //印刷表示ボタンクリック
     $("#print").on('click',function(){
         var array = [];
         $('input[type=checkbox]').each( function(index){
@@ -100,7 +101,7 @@ $(function(){
         });
         var query={};
         query['b_times'] = array;
-        console.log( getJsonStr( query ) );
+        //console.log( getJsonStr( query ) );
         query['b_field'] = $('#s_test').val()
         $.ajaxSetup({
             beforeSend : function(xhr,settings ){
@@ -117,11 +118,11 @@ $(function(){
         }).done( (data) => {
             $('#qtable').children().remove();
             $('#allow_field').children().remove();
-            console.log( data.qlist );
+            //console.log( data.qlist );
             //許容勘定科目の表示
-
-            $tr = $('<tr>');
+            /*$tr = $('<tr>');
             $td = $('<td>').text(data.b_allow_field[0]);
+            console.log( data.b_allow_field[0] )
             $tr.append( $td);
             for( var i = 1 ; i < data.b_allow_field.length ;i++){
                 if( i % 5 == 0 ){
@@ -135,10 +136,34 @@ $(function(){
                 }
 
             }
+            $("#allow_field").append( $tr );
+            */
             //問題の表示
             for( var i = 0 ;  i < data.qlist.length ; i++){
-                $p = $('<p>').text("第" + data.qlist[i]['b_times'] + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')');
+                qlist = data.qlist[i];
+                $p = $('<p>').text("第" +qlist['b_times'] + "回 問" + qlist.b_que1 + '(' + qlist.b_que2 + ') 分野:' + qlist['b_field']);
                 $p.attr("style","font-size:14pt;");
+
+                $table = $('<table>').attr('style','margin:10px;width:800px;text-align:center;').append( $('<caption>').attr('style','caption-side:top').text('許容勘定科目'));
+                $tr = $('<tr>');
+                b_allow_field = qlist.b_allow_field;
+                $td = $('<td>').text( b_allow_field[0] );
+                $tr.append( $td );
+
+                for( var j = 1 ; j < b_allow_field.length ; j++ ){
+                    if( j % 5 == 0 ){
+                        $table.append( $tr );
+                        $tr = $('<tr>');
+                        $td = $('<td>').text( b_allow_field[j] );
+                        $tr.append( $td );
+                    }else{
+                        $td = $('<td>').text( b_allow_field[j] );
+                        $tr.append( $td );
+                    }
+                }
+                $table.append( $tr );
+
+                $('#qtable').append( $table );
 
                 $img = $("<img src='/static/bk/question/" + data.qlist[i].b_id + ".png'>");
                 $img.attr("style","width:900px;");
@@ -146,6 +171,7 @@ $(function(){
                 $figure = $('<figure>').append($img);
 
                 $('#qtable').append( $p );
+
                 $('#qtable').append( $figure );
             }
             $('#qtable').append( $("<div>").attr("style","page-break-after: always"));

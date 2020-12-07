@@ -11,6 +11,12 @@
 
 <script>
 $(function($){
+
+    history.pushState(null, null, location.href);
+    $(window).on('popstate', function(){
+        history.go(1);
+    });
+
     $(window).on('beforeunload',function(e){
         //e.preventDefault();
         //e.returnValue = '';
@@ -232,20 +238,20 @@ $(function($){
 <body>
 {% csrf_token %}
 <div class="container-fluid">
-    <div class="row" style="margin-top:20px;margin-left:20px">
+    <div class="row" style="margin-top:0px;margin-left:80px;position:fixed;padding:5px;z-index:5;background-color:white;">
         <div class="col-md-12">
             <p>試験区分:<strong id="q_test">{{ dict.q_test }}</strong>
                 年度期:<strong id="q_period">{{ dict.q_period }}</strong>
                 受験ID:<strong id="{{ r_id }}">{{ r_id }}</strong>
 
-                <span><input type="button" value="戻る" id="review"></span>
-                <span><input type="button" value="次へ" id="nextview"></span>
+                <span><input type="button" value="戻る" id="review" style="margin-left:10px;"></span>
+                <span><input type="button" value="次へ" id="nextview" style="margin-left:10px"></span>
 
-                <spam><input type="button" value="終了" id="endbtn"></spam></p>
+                <spam><input type="button" value="終了" id="endbtn" style="margin-left:10px;"></spam></p>
         </div>
     </div>
 
-    <div class="row" style="margin-top:5px;margin-left:5px">
+    <div class="row" style="margin-top:0px;margin-left:5px;position:absolute;top:60px;width:80%;z-index:4;">
         <div class="col_md-1">
             {% for q in dict.list %}<p><input type="button" value="{{ q.q_num }}" class="q_q" class="btn"></p>{% endfor %}
         </div>

@@ -62,8 +62,9 @@ class N21():
         body = byteToDic( request.body )
         o_id = request.session['o_id']
         b_times = body['b_times']
-        b_field = body['b_field']
+        #b_fields = body['b_field']
         data = {'qlist':[]}
+
         for b in b_times:
             bt = b.split("_")[0]
             bq2 = b.split("_")[2]
@@ -74,14 +75,26 @@ class N21():
             dic2['b_times'] = q['b_times']
             dic2['b_que1'] = q['b_que1']
             dic2['b_que2'] = q['b_que2']
-
+            dic2['b_field'] = q['b_field']
+            #許容勘定科目
+            b_fields = q['b_field']
+            b_allow_field_list = []
+            for b_field in b_fields.split(","):
+                print( b_field )
+                qbaf = QuestionBokiQ1AllowField.objects.filter(b_field=b_field).values().first()
+                q1allow = qbaf['b_allow_field']
+                print( q1allow )
+                if q1allow is not None:
+                    for qa in q1allow.split(','):
+                        b_allow_field_list.append( qa )
+            dic2['b_allow_field'] = list(set(b_allow_field_list))
             data['qlist'].append( dic2 )
-        qbaf = QuestionBokiQ1AllowField.objects.filter(b_field=b_field).values().first()
-        q1allow = qbaf['b_allow_field']
-        if q1allow is not None:
-            data['b_allow_field'] = q1allow.split(',')
-        else:
-            data['b_allow_field'] = ''
+
+
+
+
+
+
 
         print( data )
         return HttpResponseJson( data )
