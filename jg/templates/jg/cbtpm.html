@@ -11,15 +11,23 @@
 
 <script>
 $(function($){
-
-    history.pushState(null, null, location.href);
-    $(window).on('popstate', function(){
-        history.go(1);
+    //アドレスバーの書き換え
+    history.replaceState('','','?q_id={{ dict.q_test }}{{ dict.q_period }}&r_id={{ r_id }}');
+    //ブラウザバックの無効
+    history.pushState(null, null, null);
+    $(window).on('popstate', function(event){
+        if(!event.originalEvent.state){
+            history.pushState( null,null,null);
+            return;
+        }
     });
 
+    //更新ボタンのクリック
     $(window).on('beforeunload',function(e){
         //e.preventDefault();
         //e.returnValue = '';
+
+
         console.log('beforeunload');
         return '更新しますか？';
     });
@@ -28,7 +36,7 @@ $(function($){
         'r_id':'{{ r_id }}','q_test':'{{ dict.q_test }}','q_period':'{{ dict.q_period }}',
         'list':[{% for q in dict.list %}{'q_q':'{{ q.q_num }}','list':[
         {% for q2 in q.list %}
-        {'q_question':'{{ q2.q_question }}','q_symbol':'{{ q2.q_symbol }}','u_answer':''},
+        {'q_question':'{{ q2.q_question }}','q_symbol':'{{ q2.q_symbol }}','u_answer':'{{ q2.u_answer }}'},
         {% endfor %}
         ]},{% endfor %}]
     };
@@ -38,7 +46,7 @@ $(function($){
                 {% for q in dict.list %}
                 {'q_q':'{{ q.q_num }}','pdf':'{{ q.pdf }}','list':[
                 {% for q2 in q.list %}
-                { 'q_question':'{{ q2.q_question }}','q_symbol':'{{ q2.q_symbol }}','q_lastanswer':'{{ q2.q_lastanswer }}','u_answer':''},
+                { 'q_question':'{{ q2.q_question }}','q_symbol':'{{ q2.q_symbol }}','q_lastanswer':'{{ q2.q_lastanswer }}','u_answer':'{{ q2.u_answer }}'},
                 {% endfor %}
                 ]},
                 {% endfor %}
@@ -58,6 +66,7 @@ $(function($){
         var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
         return csrftoken;
     }
+
     //解答を変更
     $(document).on("change", "select.answer", function(){
         var u_answer = $(this).val();
@@ -108,6 +117,7 @@ $(function($){
 
         $("#res").children().remove();
         $("#res").append( $('<p>').attr('id','q_q').text(q_q));
+
         for( var i = 0 ; i < dict['list'].length ; i++ ){
             var item = dict['list'][i];
             if( item['q_q'] == q_q ){
@@ -115,6 +125,7 @@ $(function($){
 
                 page = 1;
                 $("#iframe").attr('src','/static/jg/pdf/question_pm/' + pdf + '#zoom=100&page=1');
+
                 //$('#iframe')[0].contentDocument.location.reload(true)
                 //$("#pdf").attr('data','/static/jg/pdf/question_pm/' + pdf + '#page=1');
                 //console.log( $('#iframe').attr('src') );

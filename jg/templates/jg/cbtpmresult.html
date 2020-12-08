@@ -8,7 +8,7 @@
 
 <div class="row" style="margin-top:20px">
     <div class="col-md-6">
-        <p>試験ID:{{ a_dict.r_id }} 試験名:{{ a_dict.q_test }} 得点:{{ a_dict.g_total }}</p>
+        <p>試験ID:{{ a_dict.r_id }} 試験名:{{ a_dict.q_test }} 得点:{{ a_dict.g_total }} <a href="{% url 'jg:cbtpmmain' %}"><input type="button" value="戻る"></a></p>
         <p>※は順不同</p>
         <table class="table table-condensed">
             {% for l in a_dict.list %}

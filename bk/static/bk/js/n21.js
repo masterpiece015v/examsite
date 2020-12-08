@@ -142,7 +142,7 @@ $(function(){
             for( var i = 0 ;  i < data.qlist.length ; i++){
                 qlist = data.qlist[i];
                 $p = $('<p>').text("第" +qlist['b_times'] + "回 問" + qlist.b_que1 + '(' + qlist.b_que2 + ') 分野:' + qlist['b_field']);
-                $p.attr("style","font-size:14pt;");
+                $p.attr("style","font-size:14pt;border-top:solid 1px black");
 
                 $table = $('<table>').attr('style','margin:10px;width:800px;text-align:center;').append( $('<caption>').attr('style','caption-side:top').text('許容勘定科目'));
                 $tr = $('<tr>');
@@ -163,7 +163,7 @@ $(function(){
                 }
                 $table.append( $tr );
 
-                $('#qtable').append( $table );
+
 
                 $img = $("<img src='/static/bk/question/" + data.qlist[i].b_id + ".png'>");
                 $img.attr("style","width:900px;");
@@ -171,7 +171,7 @@ $(function(){
                 $figure = $('<figure>').append($img);
 
                 $('#qtable').append( $p );
-
+                $('#qtable').append( $table );
                 $('#qtable').append( $figure );
             }
             $('#qtable').append( $("<div>").attr("style","page-break-after: always"));
