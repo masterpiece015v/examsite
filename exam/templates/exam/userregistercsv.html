@@ -2,11 +2,22 @@
 {% block title %}
 新規ユーザファイルアップロード
 {% endblock %}
+{% block addhead%}
+<style type="text/css">
+    table { border : solid 1px black;margin:20px;}
+    th { border : solid 1px black;}
+    td { border : solid 1px black;}
+</style>
+{% endblock %}
 {% block header %}新規ユーザファイルアップロード{% endblock %}
 
 {% block main %}
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-7">
+        <table>
+            <tr><th>u_id</th><th>u_pass</th><th>u_name</th><th>u_email</th><th>u_admin</th><th>u_enable</th></tr>
+            <tr><td>20文字</td><td>20文字</td><td>名前</td><td>メールアドレス</td><td>管理者:1 一般:0</td><td>有効:1 無効:0</td></tr>
+        </table>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="input-group">

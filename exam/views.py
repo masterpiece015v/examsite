@@ -494,7 +494,7 @@ class UserRegisterCsv():
             users = []
 
             for i,row in enumerate(csv_file):
-                users.append({'u_id':o_id + code4(i+u_num+1),'u_name':row[0],'u_pass':row[1],'u_email':row[2],'u_admin':row[3],'u_enable':row[4]})
+                users.append({'u_id':row[0],'u_pass':row[1],'u_name':row[2],'u_email':row[3],'u_admin':row[4],'u_enable':row[5]})
 
             return render( request, 'exam/userregistercsv.html',{'o_id':o_id,'users':users,'u_admin':request.session['u_admin']})
 
@@ -518,7 +518,7 @@ class UserRegisterCsv():
 
                 create_date = timezone.now()
                 org_id = request.POST['o_id_%d'%i]
-                user = {'u_id':u_id,'u_pass':u_pass,'u_name':u_name,'u_email':u_email,'u_admin':u_admin,'u_enable':u_enable}
+                user = {'u_id':u_id,'u_name':u_name,'u_pass':u_pass,'u_email':u_email,'u_admin':u_admin,'u_enable':u_enable}
                 obj,created = User.objects.get_or_create(u_id=u_id,u_name=u_name,u_pass=u_pass,u_email=u_email,u_admin=u_admin,u_enable=u_enable,u_hidden=False,u_date=create_date,o_id=org_id)
                 print( created )
                 if created:
@@ -556,7 +556,7 @@ class UserRegisterWeb():
         #人数クリア追加可能
         if org.u_num_check(l_num=1):
             u_id = request.POST['u_id']
-            u_id = o_id + u_id
+            #u_id = o_id + u_id
             u_name = request.POST['u_name']
             u_pass = request.POST['u_pass']
             u_email = request.POST['u_email']

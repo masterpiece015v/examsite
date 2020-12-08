@@ -8,7 +8,7 @@
 
         {% if u_id_error %}<strong class="error">{{ u_id_error }}</strong><br>{% endif %}
         <label for="u_id">ユーザID：</label>
-        <input type="text" maxlength="8" name="u_id" id="u_id" class="form-control" placeholder="ユーザIDは数字4桁"><br>
+        <input type="text" maxlength="8" name="u_id" id="u_id" class="form-control" placeholder="ユーザIDは20文字以内"><br>
     </div>
     <div class="form-group">
         {% if u_pass_error %}<strong class="error">{{ u_pass_error }}</strong><br>{% endif %}
