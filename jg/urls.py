@@ -83,6 +83,7 @@ urlpatterns = [
     url(r'^cbtpm/$', views.CbtPm.cbtpm, name='cbtpm'),
     url(r'^cbtpmresult/$', views.CbtPmResult.cbtpmresult, name='cbtpmresult'),
     url(r'^cbtpmresultshow/$', views.CbtPmResultShow.cbtpmresultshow, name='cbtpmresultshow'),
+    url(r'^ajax_cbtpm_delete/$',views.CbtPmResultShow.ajax_cbtpm_delete,name='ajax_cbtpm_delete'),
     url(r'^ajax_cbtpm_update/$', views.CbtPm.ajax_cbtpm_update, name='ajax_cbtpm_update'),
 ]
 

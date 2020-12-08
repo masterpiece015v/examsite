@@ -319,7 +319,7 @@ class MainPage():
                 try:
                     user = User.objects.get(pk=u_id)
                 except:
-                    return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
+                    return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです:code1'})
                 # request.session['u_id'] = u_id
                 u_name = user.u_name
                 u_admin = user.u_admin
@@ -328,7 +328,7 @@ class MainPage():
 
         # u_idやパスワードを持っていない
         if request.method != "POST":
-            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
+            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです:code2'})
 
         u_id = request.POST["u_id"]
         u_pass = request.POST["u_pass"]
@@ -339,7 +339,7 @@ class MainPage():
             print(u_id)
             user = User.objects.get(pk=u_id)
         except:
-            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです。'})
+            return render(request, 'exam/errorpage.html', {'message': '不正なアクセスです:code3'})
 
         if user.u_enable == False:
             return render(request, 'exam/errorpage.html', {'message': 'アカウントが有効ではありません。管理者に問い合わせてください。'})

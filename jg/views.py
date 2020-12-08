@@ -1484,7 +1484,7 @@ class CbtPmResultShow():
     def cbtpmresultshow( request ):
         u_id = request.session['u_id']
         r_id = request.GET['r_id']
-        print( r_id )
+        #print( r_id )
         a_dict = {}
 
         qr = QuestionCbtPmResult.objects.filter(r_id=r_id).values().first()
@@ -1540,6 +1540,16 @@ class CbtPmResultShow():
         #print(a_dict)
         return render( request,'jg/cbtpmresultshow.html',{'u_admin':request.session['u_admin'],'a_dict':a_dict })
 
+    def ajax_cbtpm_delete( request ):
+        #dict = request.POST['dict']
+        dict = byteToDic(request.body)
+        r_id = dict['r_id']
+
+        QuestionCbtPmResultDetail.objects.filter(r_id=r_id).delete()
+        QuestionCbtPmResult.objects.filter(r_id=r_id).delete()
+
+        #print(dict['r_id'] )
+        return HttpResponseJson({'msg': 'ok'})
 # cbtam
 class CbtAmMain():
     def cbtammain(request):
