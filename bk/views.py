@@ -361,25 +361,59 @@ class N21CBT():
 
     #回を取得する
     def ajax_n21cbt_gettimes(request):
-        body = byteToDic( request.body )
+        body = byteToDic(request.body)
         o_id = request.session['o_id']
         b_field = body['b_field']
-        print(b_field)
-        qb = QuestionBoki.objects.filter(b_field__icontains=b_field,b_que1='1').values('b_field','b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
-        #print( qb )
-        data = {'qlist':[]}
+        b_field2 = ""
+        b_field3 = ""
+        if 'b_field2' in body:
+            b_field2 = body['b_field2']
+
+        if 'b_field3' in body:
+            b_field3 = body['b_field3']
+
+        # print(b_field)
+
+        if len(b_field3) > 0:
+            qb = QuestionBoki.objects.filter(b_field__icontains=b_field, b_field2=b_field2, b_field3=b_field3,
+                                             b_que1='1').values('b_field', 'b_field2', 'b_field3', 'b_times', 'b_que2',
+                                                                'b_ocr').distinct().order_by('b_times').reverse()
+        elif len(b_field2) > 0:
+            qb = QuestionBoki.objects.filter(b_field__icontains=b_field, b_field2=b_field2, b_que1='1').values(
+                'b_field', 'b_field2', 'b_field3', 'b_times', 'b_que2', 'b_ocr').distinct().order_by(
+                'b_times').reverse()
+        else:
+            qb = QuestionBoki.objects.filter(b_field__icontains=b_field, b_que1='1').values('b_field', 'b_field2',
+                                                                                            'b_field3', 'b_times',
+                                                                                            'b_que2',
+                                                                                            'b_ocr').distinct().order_by(
+                'b_times').reverse()
+
+        # print( qb )
+        data = {'qlist': []}
         fields = []
+        fields2 = []
+        fields3 = []
         for q in qb:
             dic = {}
             dic['b_times'] = q['b_times']
             dic['b_que2'] = q['b_que2']
             dic['b_ocr'] = q['b_ocr'][0:100]
-            data['qlist'].append( dic )
+            data['qlist'].append(dic)
             for f in q['b_field'].split(','):
-                fields.append( f )
+                fields.append(f)
 
-        #print( data )
-        return HttpResponseJson( data )
+            # print( q['b_field2'])
+            if q['b_field2'] is not None:
+                fields2.append(q['b_field2'])
+
+            if q['b_field3'] is not None:
+                fields3.append(q['b_field3'])
+
+        data['field2'] = list(set(fields2))
+        data['field3'] = list(set(fields3))
+        # print( data )
+        return HttpResponseJson(data)
 
     #テストの印刷用データをajaxで取得する
     def ajax_n21cbt_getquestion( request ):

@@ -37,10 +37,38 @@ $(function(){
         return csrftoken;
     }
 
+
     //分野の選択
     $("#s_test").on('change',function(){
+        getitem( 1 );
+    });
+    $('#field2').on('change',function(){
+        getitem( 2 );
+    });
+    $('#field3').on('change',function(){
+        getitem( 3 );
+    });
+    //分野の選択関数
+    function getitem( flg ){
 
-        var query = {'b_field':$(this).val() };
+        $s_test = $('#s_test');
+        $field2 = $('#field2');
+        $field3 = $('#field3');
+
+        var query = {};
+
+        if( $field3.val().length > 0 ){
+            query['b_field'] = $s_test.val();
+            query['b_field2'] = $field2.val();
+            query['b_field3'] = $field3.val();
+        }else if($field2.val().length > 0 ){
+            query['b_field'] = $s_test.val();
+            query['b_field2'] = $field2.val();
+        }else{
+            query['b_field'] = $s_test.val();
+        }
+
+        console.log( query );
 
         $("#t_id").text( "テストID:" + query['b_field'] );
 
@@ -52,7 +80,7 @@ $(function(){
 
         $.ajax({
             type:"POST",
-            url:"/bk/ajax_n21cbt_gettimes/",
+            url:"/bk/ajax_n21_gettimes/",
             dataType:'json',
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
@@ -60,6 +88,44 @@ $(function(){
             $('#printlist').children().remove();
             $('#qtable').children().remove();
             $('#allow_field').children().remove();
+
+            if( flg == 1 ){
+                item2 = $('#field2').val();
+                $('#field2').children().remove();
+                $('#field2').append( $('<option>') );
+                for( var i = 0 ; i < data.field2.length ; i++ ){
+                    if( item2 == data.field2[i] ){
+                        $option = $('<option>').text( data.field2[i] ).val( data.field2[i] ).prop('selected',true);
+                    }else{
+                        $option = $('<option>').text( data.field2[i] ).val( data.field2[i] );
+                    }
+                    $('#field2').append( $option );
+                }
+                item3 = $('#field3').val();
+                $('#field3').children().remove();
+                $('#field3').append( $('<option>') );
+                for( var i = 0 ; i < data.field3.length ; i++ ){
+                    if( item3 == data.field3[i] ){
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] ).prop('selected',true);
+                    }else{
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] );
+                    }
+                    $('#field3').append( $option );
+                }
+            }else if( flg == 2 ){
+                item3 = $('#field3').val();
+                $('#field3').children().remove();
+                $('#field3').append( $('<option>') );
+                for( var i = 0 ; i < data.field3.length ; i++ ){
+                    if( item3 == data.field3[i] ){
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] ).prop('selected',true);
+                    }else{
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] );
+                    }
+                    $('#field3').append( $option );
+                }
+            }
+
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 $tr = $('<tr>');
                 $td1 = $("<td width='50px'>").text( data.qlist[i]['b_times'] );
@@ -78,8 +144,7 @@ $(function(){
         }).always( (data) => {
 
         });
-
-    });
+    }
     //すべてのチェックを入れる
     $('#chkon').on('click',function(){
         $('input[type=checkbox]').each( function(index){
@@ -226,12 +291,20 @@ $(function(){
             <div class="col">
                 <form class="form-inline">
                     <div class="form-group">
-                        分野選択：
+                        分野1：
                         <select class="form-control d-print-none" id="s_test" style="width:150px;">
                             <option></option>
                             {% for field in field_list %}
                                 <option value="{{ field }}">{{ field }}</option>
                             {% endfor %}
+                        </select>
+                        分野2：
+                        <select class="form-control d-print-none" id="field2" style="width:150px;">
+                            <option></option>
+                        </select>
+                        分野3：
+                        <select class="form-control d-print-none" id="field3" style="width:150px;">
+                            <option></option>
                         </select>
                     </div>
                     <!--すべてチェックボタン-->
