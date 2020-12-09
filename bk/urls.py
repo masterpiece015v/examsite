@@ -26,6 +26,10 @@ urlpatterns = [
     url(r'^n25/$', views.N25.n25, name="n25"),
     url(r'^ajax_n25_gettimes/$', views.N25.ajax_n25_gettimes, name="ajax_n25_gettimes"),
     url(r'^ajax_n25_getquestion/$', views.N25.ajax_n25_getquestion, name="ajax_n25_getquestion"),
+
+    url(r'^n21cbt/$', views.N21CBT.n21cbt, name="n21cbt"),
+    url(r'^ajax_n21cbt_gettimes/$', views.N21CBT.ajax_n21cbt_gettimes, name="ajax_n21cbt_gettimes"),
+    url(r'^ajax_n21cbt_getquestion/$', views.N21CBT.ajax_n21cbt_getquestion, name="ajax_n21cbt_getquestion"),
 ]
 
 from django.conf import settings

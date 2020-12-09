@@ -194,6 +194,8 @@ class QuestionBoki( models.Model ):
     b_que2 = models.CharField( max_length=1)    #設問
     b_ocr = models.CharField( max_length=255,blank=True,null=True) #OCRで読み込んだ内容
     b_field = models.CharField( max_length=40,blank=True,null=True) #分野
+    b_field2 = models.CharField( max_length=40,blank=True,null=True) #分野2
+    b_field3 = models.CharField( max_length=40,blank=True,null=True) #分野3
     b_ans_page = models.IntegerField( default=1 )   #解答の枚数
     b_as_page = models.IntegerField( default=1 )    #解答用紙の枚数
     b_com_page = models.IntegerField( default=0 )   #解説の枚数

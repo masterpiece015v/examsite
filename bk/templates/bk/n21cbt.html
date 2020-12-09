@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>日商簿記２級問１CBT</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!--
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <!-- jQuery Modal -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+    <style type="text/css">
+    nav {
+        margin-bottom : 10px;
+    }
+    p.allow_field{ margin : 0px;}
+    .modal .rect1{
+        width : 700px;
+    }
+</style>
+<script>
+$(function(){
+    //JSONオブジェクトを文字列に変える
+    function getJsonStr(json){
+        return JSON.stringify(json);
+    }
+
+    //CSRF Tokenを取得する
+    function getCSRFToken(){
+        var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+        return csrftoken;
+    }
+
+    //分野の選択
+    $("#s_test").on('change',function(){
+
+        var query = {'b_field':$(this).val() };
+
+        $("#t_id").text( "テストID:" + query['b_field'] );
+
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+
+        $.ajax({
+            type:"POST",
+            url:"/bk/ajax_n21cbt_gettimes/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( query ),
+        }).done( (data) => {
+            $('#printlist').children().remove();
+            $('#qtable').children().remove();
+            $('#allow_field').children().remove();
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                $tr = $('<tr>');
+                $td1 = $("<td width='50px'>").text( data.qlist[i]['b_times'] );
+                $td4 = $("<td width='50px'>").text( '(' + data.qlist[i]['b_que2'] + ')' );
+                $td3 = $("<td>").text( data.qlist[i]['b_ocr']);
+                $td2 = $("<td width='30px'>").append( $('<input>').attr('type','checkbox').attr('name','chktimes').val(data.qlist[i]['b_times'] + '_1_' + data.qlist[i]['b_que2']) );
+                $tr.append( $td1 );
+                $tr.append( $td4 );
+                $tr.append( $td2 );
+                $tr.append( $td3 );
+                $('#printlist').append( $tr );
+            }
+
+        }).fail( (data)=>{
+            alert('fail');
+        }).always( (data) => {
+
+        });
+
+    });
+    //すべてのチェックを入れる
+    $('#chkon').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',true);
+        });
+    });
+    //すべてのチェックを入れる
+    $('#chkoff').on('click',function(){
+        $('input[type=checkbox]').each( function(index){
+            $(this).prop('checked',false);
+        });
+    });
+
+    //印刷表示ボタンクリック
+    $("#print").on('click',function(){
+        var array = [];
+        $('input[type=checkbox]').each( function(index){
+            if( $(this).prop('checked') ){
+                array.push( $(this).val() );
+            }else{
+
+            }
+        });
+        var query={};
+        query['b_times'] = array;
+        //console.log( getJsonStr( query ) );
+        query['b_field'] = $('#s_test').val()
+        $.ajaxSetup({
+            beforeSend : function(xhr,settings ){
+                xhr.setRequestHeader( "X-CSRFToken" , getCSRFToken() );
+            }
+        });
+
+        $.ajax({
+            type:"POST",
+            url:"/bk/ajax_n21cbt_getquestion/",
+            dataType:'json',
+            contentType: 'charset=utf-8',
+            data: getJsonStr( query ),
+        }).done( (data) => {
+            $('#qtable').children().remove();
+
+            for( var i = 0 ;  i < data.qlist.length ; i++){
+                //問題の表示
+                qlist = data.qlist[i];
+                $p = $('<p>').text("第" +qlist['b_times'] + "回 問" + qlist.b_que1 + '(' + qlist.b_que2 + ') 分野:' + qlist['b_field']);
+                $p.attr("style","font-size:14pt;border-top:solid 1px black;margin-top:20px;");
+
+                $img = $("<img src='/static/bk/question/" + data.qlist[i].b_id + ".png'>");
+                $img.attr("style","width:900px;");
+                $img.attr("class","q_img");
+                $figure = $('<figure>').append($img);
+
+                $('#qtable').append( $p );
+                $('#qtable').append( $figure );
+
+                //許容勘定科目
+                b_allow_field = qlist.b_allow_field;
+                $select = $('<select>').append( $('<option>') );
+                for( var j = 0 ; j < b_allow_field.length ; j++ ){
+                    $option = $('<option>').text( b_allow_field[j] ).val( b_allow_field[j]);
+                    $select.append( $option );
+                }
+
+                //解答用紙
+                $tables = $("<div>").attr('class','row');
+                //借方,貸方
+                $left = $('<div>').attr('class','col');
+                $right = $('<div>').attr('class','col');
+                id = data.qlist[i].b_times + "_" + data.qlist[i].b_que1 + "_" + data.qlist[i].b_que2;
+                for( var k = 0 ; k < 5 ; k++ ){
+                    $row = $("<div>").attr('class','row');
+                    $td1 = $("<div>").attr('class','col');
+                    $td1.append( $('<p>').append( $select.clone().attr('id',id + "_d_k_" + k) ).attr('class','allow_field') );
+                    $td2 = $("<div>").attr('class','col');
+                    $td2.append( $('<p>').attr('class','allow_field').append( $('<input>').attr('type','text').attr('id', id + "_d_m_" + k ) ) );
+                    $row.append( $td1 );
+                    $row.append( $td2 );
+                    $left.append( $row );
+                }
+                for( var k = 0 ; k < 5 ; k++ ){
+                    $row = $("<div>").attr('class','row');
+                    $td1 = $("<div>").attr('class','col');
+                    $td1.append( $('<p>').append( $select.clone().attr('id',id + "_c_k_" + k) ).attr('class','allow_field') );
+                    $td2 = $("<div>").attr('class','col');
+                    $td2.append( $('<p>').attr('class','allow_field').append( $('<input>').attr('type','text').attr('id', id + "_c_m_" + k ) ) );
+                    $row.append( $td1 );
+                    $row.append( $td2 );
+                    $right.append( $row );
+                }
+                $tables.append( $left );
+                $tables.append( $right );
+
+                $('#qtable').append( $tables );
+                filename = "n_" + data.qlist[i].b_times + "_2_1_" + data.qlist[i].b_que2 + "_ans.png";
+                $a = $('<a>').attr('rel','modal:open').attr('href','#ex1').text(filename);
+                $('#qtable').append( $a );
+
+            }
+
+            //解答
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                filename = "n_" + data.qlist[i].b_times + "_2_1_";
+                $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解答】");
+                $p.attr("style","font-size:14pt;width:900px;");
+                $('#qtable').append( $p );
+                $img = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_ans.png'>" );
+                $img.attr("style","width:900px;");
+                $img.attr("class","q_img");
+                $figure = $('<figure>').append($img);
+            //    $('#ex1').append( $p );
+            //   $('#ex1').append( $figure );
+            }
+
+            //解説
+            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                filename = "n_" + data.qlist[i].b_times + "_2_1_";
+                $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解説】");
+                $p.attr("style","font-size:14pt");
+                $('#qtable').append( $p );
+                $img = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_com.png'>" );
+                $img.attr("style","width:900px;");
+                $img.attr("class","q_img");
+                $figure = $('<figure>').append($img);
+                //$('#ex1').append( $p );
+                //$('#ex1').append( $figure );
+            }
+        }).fail( (data)=>{
+            alert('fail');
+        }).always( (data) => {
+
+        });
+
+    });
+
+});
+</script>
+</head>
+
+<body>
+<div class="container">
+    <div id="header">
+        <div class="row">
+            <div class="col">
+                <form class="form-inline">
+                    <div class="form-group">
+                        分野選択：
+                        <select class="form-control d-print-none" id="s_test" style="width:150px;">
+                            <option></option>
+                            {% for field in field_list %}
+                                <option value="{{ field }}">{{ field }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!--すべてチェックボタン-->
+                    <div class="form-group">
+                        <input type="button" class="form-contral" value="chkOn" id="chkon" style="margin-left:5px;">
+                        <input type="button" class="form-contral" value="chkOff" id="chkoff" style="margin-left:5px;">
+                        <input type="button" class="form-contral" value="印刷表示" id="print" style="margin-left:10px;">
+                        <a href="{% url 'bk:mainpage' %}"><input type="button" class="form-contral" value="戻る" style="margin-left:15px;"></a>
+                    </div>
+                    <!--すべてチェックオフボタン-->
+                    <div class="form-group">
+
+                    </div>
+                    <!--問題表示ボタン-->
+                    <div class="form-group">
+
+                    </div>
+                    <!--戻る-->
+                    <div class="form-group">
+
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- 印刷リスト -->
+        <div class="row" style="margin-top:10px;">
+            <table id="printlist" class="table table-border">
+
+            </table>
+        </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col">
+            <p id="t_id"></p>
+        </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+        <div id="qtable">
+
+        </div>
+    </div>
+
+    <!--モーダル用-->
+    <div id="ex1" class="modal">
+
+        <a href="#" rel="modal:close">Close</a>
+    </div>
+{% csrf_token %}
+</div>
+</body>
+</html>

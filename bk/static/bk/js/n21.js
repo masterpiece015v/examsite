@@ -28,8 +28,35 @@ $(function(){
 
     //分野の選択
     $("#s_test").on('change',function(){
+        getitem( 1 );
+    });
+    $('#field2').on('change',function(){
+        getitem( 2 );
+    });
+    $('#field3').on('change',function(){
+        getitem( 3 );
+    });
+    //分野の選択関数
+    function getitem( flg ){
 
-        var query = {'b_field':$(this).val() };
+        $s_test = $('#s_test');
+        $field2 = $('#field2');
+        $field3 = $('#field3');
+
+        var query = {};
+
+        if( $field3.val().length > 0 ){
+            query['b_field'] = $s_test.val();
+            query['b_field2'] = $field2.val();
+            query['b_field3'] = $field3.val();
+        }else if($field2.val().length > 0 ){
+            query['b_field'] = $s_test.val();
+            query['b_field2'] = $field2.val();
+        }else{
+            query['b_field'] = $s_test.val();
+        }
+
+        console.log( query );
 
         $("#t_id").text( "テストID:" + query['b_field'] );
 
@@ -46,16 +73,47 @@ $(function(){
             contentType: 'charset=utf-8',
             data: getJsonStr( query ),
         }).done( (data) => {
-            //$('#b_times').children().remove();
-            //$('#b_times').append( $('<option>') );
-            //for( var i = 0 ;  i < data.qlist.length ; i++){
-            //    console.log( i );
-            //    $option = $('<option>').val(data.qlist[i]['b_times']).text(data.qlist[i]['b_times']);
-            //    $('#b_times').append( $option );
-            //}
             $('#printlist').children().remove();
             $('#qtable').children().remove();
             $('#allow_field').children().remove();
+
+            if( flg == 1 ){
+                item2 = $('#field2').val();
+                $('#field2').children().remove();
+                $('#field2').append( $('<option>') );
+                for( var i = 0 ; i < data.field2.length ; i++ ){
+                    if( item2 == data.field2[i] ){
+                        $option = $('<option>').text( data.field2[i] ).val( data.field2[i] ).prop('selected',true);
+                    }else{
+                        $option = $('<option>').text( data.field2[i] ).val( data.field2[i] );
+                    }
+                    $('#field2').append( $option );
+                }
+                item3 = $('#field3').val();
+                $('#field3').children().remove();
+                $('#field3').append( $('<option>') );
+                for( var i = 0 ; i < data.field3.length ; i++ ){
+                    if( item3 == data.field3[i] ){
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] ).prop('selected',true);
+                    }else{
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] );
+                    }
+                    $('#field3').append( $option );
+                }
+            }else if( flg == 2 ){
+                item3 = $('#field3').val();
+                $('#field3').children().remove();
+                $('#field3').append( $('<option>') );
+                for( var i = 0 ; i < data.field3.length ; i++ ){
+                    if( item3 == data.field3[i] ){
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] ).prop('selected',true);
+                    }else{
+                        $option = $('<option>').text( data.field3[i] ).val( data.field3[i] );
+                    }
+                    $('#field3').append( $option );
+                }
+            }
+
             for( var i = 0 ; i < data.qlist.length ; i++ ){
                 $tr = $('<tr>');
                 $td1 = $("<td width='50px'>").text( data.qlist[i]['b_times'] );
@@ -74,8 +132,7 @@ $(function(){
         }).always( (data) => {
 
         });
-
-    });
+    }
     //すべてのチェックを入れる
     $('#chkon').on('click',function(){
         $('input[type=checkbox]').each( function(index){
@@ -88,7 +145,6 @@ $(function(){
             $(this).prop('checked',false);
         });
     });
-
     //印刷表示ボタンクリック
     $("#print").on('click',function(){
         var array = [];
@@ -118,26 +174,6 @@ $(function(){
         }).done( (data) => {
             $('#qtable').children().remove();
             $('#allow_field').children().remove();
-            //console.log( data.qlist );
-            //許容勘定科目の表示
-            /*$tr = $('<tr>');
-            $td = $('<td>').text(data.b_allow_field[0]);
-            console.log( data.b_allow_field[0] )
-            $tr.append( $td);
-            for( var i = 1 ; i < data.b_allow_field.length ;i++){
-                if( i % 5 == 0 ){
-                    $("#allow_field").append( $tr );
-                    $tr = $('<tr>');
-                    $td = $('<td>').text(data.b_allow_field[i]);
-                    $tr.append( $td);
-                }else{
-                    $td = $('<td>').text(data.b_allow_field[i]);
-                    $tr.append( $td);
-                }
-
-            }
-            $("#allow_field").append( $tr );
-            */
             //問題の表示
             for( var i = 0 ;  i < data.qlist.length ; i++){
                 qlist = data.qlist[i];
@@ -229,7 +265,6 @@ $(function(){
         });
 
     });
-
     //解答用紙印刷画面へ
     $('#btnKaitou').on('click',function(){
         t_id = $('#s_test').val();

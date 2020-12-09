@@ -40,11 +40,28 @@ class N21():
         body = byteToDic( request.body )
         o_id = request.session['o_id']
         b_field = body['b_field']
-        print(b_field)
-        qb = QuestionBoki.objects.filter(b_field__icontains=b_field,b_que1='1').values('b_field','b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
+        b_field2 = ""
+        b_field3 = ""
+        if 'b_field2' in body:
+            b_field2 = body['b_field2']
+
+        if 'b_field3' in body:
+            b_field3 = body['b_field3']
+
+        #print(b_field)
+
+        if len( b_field3 ) > 0:
+            qb = QuestionBoki.objects.filter(b_field__icontains=b_field,b_field2=b_field2,b_field3=b_field3,b_que1='1').values('b_field','b_field2','b_field3','b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
+        elif len( b_field2 ) > 0:
+            qb = QuestionBoki.objects.filter(b_field__icontains=b_field,b_field2=b_field2,b_que1='1').values('b_field', 'b_field2','b_field3','b_times', 'b_que2','b_ocr').distinct().order_by('b_times').reverse()
+        else:
+            qb = QuestionBoki.objects.filter(b_field__icontains=b_field, b_que1='1').values('b_field', 'b_field2','b_field3','b_times', 'b_que2','b_ocr').distinct().order_by('b_times').reverse()
+
         #print( qb )
         data = {'qlist':[]}
         fields = []
+        fields2 = []
+        fields3 = []
         for q in qb:
             dic = {}
             dic['b_times'] = q['b_times']
@@ -54,6 +71,15 @@ class N21():
             for f in q['b_field'].split(','):
                 fields.append( f )
 
+            #print( q['b_field2'])
+            if q['b_field2'] is not None:
+                fields2.append( q['b_field2'])
+
+            if q['b_field3'] is not None:
+                fields3.append( q['b_field3'])
+
+        data['field2'] = list(set(fields2))
+        data['field3'] = list(set(fields3))
         #print( data )
         return HttpResponseJson( data )
 
@@ -210,7 +236,6 @@ class N23():
         print( data )
         return HttpResponseJson( data )
 
-
 #テスト印刷画面
 class N24():
     #ページを表示する
@@ -284,7 +309,7 @@ class N25():
         o_id = request.session['o_id']
         b_field = body['b_field']
         qb = QuestionBoki.objects.filter(b_field=b_field,b_que1='5').values('b_times','b_ocr').distinct().order_by('b_times').reverse()
-        print( qb )
+        #print( qb )
         data = {'qlist':[]}
         for q in qb:
             dic = {}
@@ -315,6 +340,79 @@ class N25():
                 dic2['b_com_page'] = q['b_com_page']
                 dic1['list'].append( dic2 )
             data['qlist'].append( dic1 )
+
+        print( data )
+        return HttpResponseJson( data )
+
+class N21CBT():
+    #ページを表示する
+    def n21cbt( request ):
+        user = request.session['u_id']
+        o_id = request.session['o_id']
+
+        field_list = []
+        qb = QuestionBoki.objects.filter(b_que1='1').values('b_field').distinct()
+        for q0 in qb:
+            list = q0['b_field'].split(",")
+            for q in list:
+                field_list.append( q )
+
+        return render( request,'bk/n21cbt.html',{'field_list':set(field_list),'u_admin':request.session['u_admin']})
+
+    #回を取得する
+    def ajax_n21cbt_gettimes(request):
+        body = byteToDic( request.body )
+        o_id = request.session['o_id']
+        b_field = body['b_field']
+        print(b_field)
+        qb = QuestionBoki.objects.filter(b_field__icontains=b_field,b_que1='1').values('b_field','b_times','b_que2','b_ocr').distinct().order_by('b_times').reverse()
+        #print( qb )
+        data = {'qlist':[]}
+        fields = []
+        for q in qb:
+            dic = {}
+            dic['b_times'] = q['b_times']
+            dic['b_que2'] = q['b_que2']
+            dic['b_ocr'] = q['b_ocr'][0:100]
+            data['qlist'].append( dic )
+            for f in q['b_field'].split(','):
+                fields.append( f )
+
+        #print( data )
+        return HttpResponseJson( data )
+
+    #テストの印刷用データをajaxで取得する
+    def ajax_n21cbt_getquestion( request ):
+        body = byteToDic( request.body )
+        o_id = request.session['o_id']
+        b_times = body['b_times']
+        #b_fields = body['b_field']
+        data = {'qlist':[]}
+
+        for b in b_times:
+            bt = b.split("_")[0]
+            bq2 = b.split("_")[2]
+
+            q = QuestionBoki.objects.filter(b_times=bt,b_que1='1',b_que2=bq2).values().first()
+            dic2 = {}
+            dic2['b_id'] = q['b_id']
+            dic2['b_times'] = q['b_times']
+            dic2['b_que1'] = q['b_que1']
+            dic2['b_que2'] = q['b_que2']
+            dic2['b_field'] = q['b_field']
+            #許容勘定科目
+            b_fields = q['b_field']
+            b_allow_field_list = []
+            for b_field in b_fields.split(","):
+                print( b_field )
+                qbaf = QuestionBokiQ1AllowField.objects.filter(b_field=b_field).values().first()
+                q1allow = qbaf['b_allow_field']
+                print( q1allow )
+                if q1allow is not None:
+                    for qa in q1allow.split(','):
+                        b_allow_field_list.append( qa )
+            dic2['b_allow_field'] = list(set(b_allow_field_list))
+            data['qlist'].append( dic2 )
 
         print( data )
         return HttpResponseJson( data )
