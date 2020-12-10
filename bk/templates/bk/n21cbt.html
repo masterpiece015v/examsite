@@ -12,20 +12,53 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <!-- jQuery Modal -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>-->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />-->
 
     <style type="text/css">
     nav {
         margin-bottom : 10px;
     }
+    div.container{
+        margin-top : 20px;
+    }
     p.allow_field{ margin : 0px;}
-    .modal .rect1{
-        width : 700px;
+    .modal{
+        display:none;
+        height:100vh;
+        position:fixed;
+        top:0;
+        width:100%;
+    }
+    .modal__bg{
+        background:rgba(0,0,0,0.8);
+        height:100vh;
+        position:absolute;
+        width:100%;
+    }
+    .modal__content{
+        background:#fff;
+        left:50%;
+        padding:40px;
+        position:absolute;
+        top:50%;
+        transform:translate(-50%,-50%);
+        width:60%;
     }
 </style>
 <script>
 $(function(){
+    //modal-open
+    $('.js-modal-open').on('click',function(){
+        alert('modal-open');
+        $('.js-modal').fadeIn();
+        return false;
+    });
+    $('.js-modal-close').on('click',function(){
+        $('.js-modal').fadeOut();
+        return false;
+    });
+
     //JSONオブジェクトを文字列に変える
     function getJsonStr(json){
         return JSON.stringify(json);
@@ -186,7 +219,7 @@ $(function(){
             data: getJsonStr( query ),
         }).done( (data) => {
             $('#qtable').children().remove();
-
+            $('#modal_container').children().remove();
             for( var i = 0 ;  i < data.qlist.length ; i++){
                 //問題の表示
                 qlist = data.qlist[i];
@@ -240,38 +273,50 @@ $(function(){
 
                 $('#qtable').append( $tables );
                 filename = "n_" + data.qlist[i].b_times + "_2_1_" + data.qlist[i].b_que2 + "_ans.png";
-                $a = $('<a>').attr('rel','modal:open').attr('href','#ex1').text(filename);
-                $('#qtable').append( $a );
 
-            }
 
-            //解答
-            for( var i = 0 ; i < data.qlist.length ; i++ ){
+                //モダール表示のボタン
+                if( i < 10 ){
+                    modal_id = "modal0" + i;
+                }else{
+                    modal_id = "modal" + i;
+                }
+                $modalbtn = $('<input>').attr('type','button').attr('class','btn btn-primary').attr('data-toggle',"modal").attr('data-target','#' + modal_id).val('解答・解説');
+                $('#qtable').append( $modalbtn );
+
+                //モーダルの追加
+                $modal = $('<div>').attr('id',modal_id).attr('class','modal fade').attr('tabindex','-1').attr('role','dialog').attr('aria-labelledby','label1').attr('aria-hidden','true');
+                $modal_dialog =$('<div>').attr('class','modal-dialog modal-lg').attr('role','document');
+                $modal_content = $('<div>').attr('class','modal-content');
+                $modal_header = $('<div>').attr('class','modal-header');
+                $modal_title = $('<p>').attr('class','modal-title').attr('id','label1').text('解答・解説');
+                $close = $('<button>').attr('type','button').attr('class','close').attr('data-dismiss','modal').attr('aria-label','close').append( $('<span>').attr('aria-hidden','true').text('close'));
+                $modal_header.append( $modal_title );
+                $modal_header.append( $close );
+                $modal_body = $('<div>').attr('class','modal-body');
                 filename = "n_" + data.qlist[i].b_times + "_2_1_";
-                $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解答】");
-                $p.attr("style","font-size:14pt;width:900px;");
-                $('#qtable').append( $p );
                 $img = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_ans.png'>" );
-                $img.attr("style","width:900px;");
+                $img.attr("style","width:700px;");
                 $img.attr("class","q_img");
                 $figure = $('<figure>').append($img);
-            //    $('#ex1').append( $p );
-            //   $('#ex1').append( $figure );
+                $img2 = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_com.png'>" );
+                $img2.attr("style","width:700px;");
+                $img2.attr("class","q_img");
+                $figure2 = $('<figure>').append($img2);
+
+                $modal_body.append( $figure );
+                $modal_body.append( $figure2 );
+
+                $modal_footer = $('<div>').attr('class','modal-footer');
+                $modal_content.append( $modal_header );
+                $modal_content.append( $modal_body );
+
+                $modal_content.append( $modal_footer );
+                $modal_dialog.append( $modal_content );
+                $modal.append( $modal_dialog );
+                $('#modal_container').append( $modal );
             }
 
-            //解説
-            for( var i = 0 ; i < data.qlist.length ; i++ ){
-                filename = "n_" + data.qlist[i].b_times + "_2_1_";
-                $p = $('<p>').text("第" + data.qlist[i].b_times + "回 問" + data.qlist[i].b_que1 + '(' + data.qlist[i].b_que2 + ')' + "【解説】");
-                $p.attr("style","font-size:14pt");
-                $('#qtable').append( $p );
-                $img = $("<img src='/static/bk/question/" + filename + data.qlist[i].b_que2 + "_com.png'>" );
-                $img.attr("style","width:900px;");
-                $img.attr("class","q_img");
-                $figure = $('<figure>').append($img);
-                //$('#ex1').append( $p );
-                //$('#ex1').append( $figure );
-            }
         }).fail( (data)=>{
             alert('fail');
         }).always( (data) => {
@@ -347,12 +392,32 @@ $(function(){
         </div>
     </div>
 
-    <!--モーダル用-->
-    <div id="ex1" class="modal">
 
-        <a href="#" rel="modal:close">Close</a>
-    </div>
 {% csrf_token %}
+</div>
+
+<!--モーダル用-->
+
+<div id="modal_container"></div>
+
+<div class="modal fade" id="modal01" tabindex="-1" role="dialog" aria-labelledby="label1" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="label1">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Modal body
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>
