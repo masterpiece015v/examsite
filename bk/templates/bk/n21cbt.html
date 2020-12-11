@@ -333,56 +333,42 @@ $(function(){
 <div class="container">
     <div id="header">
         <div class="row">
-            <div class="col">
-                <form class="form-inline">
-                    <div class="form-group">
-                        分野1：
-                        <select class="form-control d-print-none" id="s_test" style="width:150px;">
-                            <option></option>
-                            {% for field in field_list %}
-                                <option value="{{ field }}">{{ field }}</option>
-                            {% endfor %}
-                        </select>
-                        分野2：
-                        <select class="form-control d-print-none" id="field2" style="width:150px;">
-                            <option></option>
-                        </select>
-                        分野3：
-                        <select class="form-control d-print-none" id="field3" style="width:150px;">
-                            <option></option>
-                        </select>
-                    </div>
+            <form class="form-inline">
+                <div class="form-group">
+                    分野1：
+                    <select class="form-control d-print-none" id="s_test" style="width:150px;">
+                        <option></option>
+                        {% for field in field_list %}
+                        <option value="{{ field }}">{{ field }}</option>
+                        {% endfor %}
+                    </select>
+                    分野2：
+                    <select class="form-control d-print-none" id="field2" style="width:150px;">
+                        <option></option>
+                    </select>
+                    分野3：
+                    <select class="form-control d-print-none" id="field3" style="width:150px;">
+                        <option></option>
+                    </select>
                     <!--すべてチェックボタン-->
-                    <div class="form-group">
-                        <input type="button" class="form-contral" value="chkOn" id="chkon" style="margin-left:5px;">
-                        <input type="button" class="form-contral" value="chkOff" id="chkoff" style="margin-left:5px;">
-                        <input type="button" class="form-contral" value="印刷表示" id="print" style="margin-left:10px;">
-                        <a href="{% url 'bk:mainpage' %}"><input type="button" class="form-contral" value="戻る" style="margin-left:15px;"></a>
-                    </div>
-                    <!--すべてチェックオフボタン-->
-                    <div class="form-group">
-
-                    </div>
-                    <!--問題表示ボタン-->
-                    <div class="form-group">
-
-                    </div>
-                    <!--戻る-->
-                    <div class="form-group">
-
-                    </div>
-                </form>
-            </div>
+                    <input type="button" class="btn btn-primary" value="chkOn" id="chkon" style="margin-left:5px;">
+                    <input type="button" class="btn btn-primary" value="chkOff" id="chkoff" style="margin-left:5px;">
+                    <input type="button" class="btn btn-primary" value="印刷表示" id="print" style="margin-left:10px;">
+                    <a href="{% url 'bk:mainpage' %}"><input type="button" class="btn btn-primary" value="戻る" style="margin-left:15px;"></a>
+                </div>
+            </form>
         </div>
         <!-- 印刷リスト -->
         <div class="row" style="margin-top:10px;">
-            <table id="printlist" class="table table-border">
+            <div class="col-lg-12">
+                <table id="printlist" class="table table-border">
 
-            </table>
+                </table>
+            </div>
         </div>
     </div>
     <div class="row" style="margin-top:10px;">
-        <div class="col">
+        <div class="col-lg-12">
             <p id="t_id"></p>
         </div>
     </div>
