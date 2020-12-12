@@ -57,10 +57,104 @@ $(function($){
 
 });
 </script>
+    <style>
+        .carousel-control-next, .carousel-control-prev {
+            width: 5%;
+            background-color: #000;
+        }
+        .carousel-item img{
+            margin-left:80px;
+        }
+        .carousel{
+            height : 600px;
+        }
+        .radiogroup{
+            margin-left:80px;
+            margin-top:10px;
+        }
+        .radiogroup input[type="radio"]{
+            display:none;
+        }
+        .radiogroup label{
+            border:solid 1px #999999;
+            background-color : #cccccc;
+            width:100px;
+            height:40px;
+            text-align:center;
+
+            padding-top:8px;
+
+            margin:0px;
+        }
+
+        .radiogroup input[type="radio"]:checked + label{
+            background-color:#ffffff;
+        }
+    </style>
 </head>
 <body>
 {% csrf_token %}
-<div class="container-fluid">
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <!--div id="carousel-2" class="carousel slide" data-interval="10000"-->
+            <div id="carousel-2" class="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel-2" data-slide-to="0" class="active"></li>
+                    <li data-target="#carousel-2" data-slide-to="1"></li>
+                    <li data-target="#carousel-2" data-slide-to="2"></li>
+                </ol>
+                <div class="carousel-inner">
+                    {% for q in question.q %}
+                    {% if forloop.counter == 1 %}
+                    <div class="carousel-item active">
+                         <p class="radiogroup">
+                            <input type="radio" id="{{ q.q_id }}_1" name="{{ q.q_id }}" value="ア" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_1">ア</label>
+                            <input type="radio" id="{{ q.q_id }}_2" name="{{ q.q_id }}" value="イ" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_2">イ</label>
+                            <input type="radio" id="{{ q.q_id }}_3" name="{{ q.q_id }}" value="ウ" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_3">ウ</label>
+                            <input type="radio" id="{{ q.q_id }}_4" name="{{ q.q_id }}" value="エ" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_4">エ</label>
+                        </p>
+
+                        <img class="d-block w-70" src="/static/jg/image/question/{{ q.q_id }}.png" alt="p{{ forloop.counter }}">
+
+                    </div>
+                    {% else %}
+                    <div class="carousel-item">
+                        <p class="radiogroup">
+                            <input type="radio" id="{{ q.q_id }}_1" name="{{ q.q_id }}" value="ア" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_1">ア</label>
+                            <input type="radio" id="{{ q.q_id }}_2" name="{{ q.q_id }}" value="イ" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_2">イ</label>
+                            <input type="radio" id="{{ q.q_id }}_3" name="{{ q.q_id }}" value="ウ" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_3">ウ</label>
+                            <input type="radio" id="{{ q.q_id }}_4" name="{{ q.q_id }}" value="エ" style="margin-left:30px;" class="answer">
+                            <label for="{{ q.q_id }}_4">エ</label>
+                        </p>
+
+                        <img class="d-block w-70" src="/static/jg/image/question/{{ q.q_id }}.png" alt="p{{ forloop.counter }}">
+
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <a class="carousel-control-prev" href="#carousel-2" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carousel-2" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <!--
     <div class="row" style="margin-top:20px;margin-left:100px">
         <div class="col-md-12">
             <p>
@@ -105,6 +199,7 @@ $(function($){
         </tr>
         {% endfor %}
     </table>
+    -->
 </div>
 
 <form id="form1" action="{% url 'jg:cbtamresult' %}" method="post">
