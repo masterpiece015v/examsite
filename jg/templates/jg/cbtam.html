@@ -90,24 +90,49 @@ $(function($){
         .radiogroup input[type="radio"]:checked + label{
             background-color:#ffffff;
         }
+
+        ol.carousel-indicators{
+            background-color : #ccc;
+            height:15px;
+        }
+        ol.carousel-indicators li{
+            height:15px;
+            font-color : black;
+        }
     </style>
 </head>
 <body>
 {% csrf_token %}
 <div class="container">
+    <div class="row" style="margin-top:20px;margin-left:100px">
+        <div class="col-md-12">
+            <p>
+                試験区分:<strong id="q_test">{{ question.q_test }}</strong>
+                年度期:<strong id="q_period">{{ question.q_period }}</strong>
+                受験ID:<strong id="{{ question.r_id }}">{{ question.r_id }}</strong>
+                <a name="top"><input type="button" value="終了" id="endbtn"></a>
+            </p>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <!--div id="carousel-2" class="carousel slide" data-interval="10000"-->
             <div id="carousel-2" class="carousel">
                 <ol class="carousel-indicators">
-                    <li data-target="#carousel-2" data-slide-to="0" class="active"></li>
-                    <li data-target="#carousel-2" data-slide-to="1"></li>
-                    <li data-target="#carousel-2" data-slide-to="2"></li>
+                    <li data-target="#carousel-2" data-slide-to="0" class="active">1</li>
+                    <li data-target="#carousel-2" data-slide-to="10">11</li>
+                    <li data-target="#carousel-2" data-slide-to="20">21</li>
+                    <li data-target="#carousel-2" data-slide-to="30">31</li>
+                    <li data-target="#carousel-2" data-slide-to="40">41</li>
+                    <li data-target="#carousel-2" data-slide-to="50">51</li>
+                    <li data-target="#carousel-2" data-slide-to="60">61</li>
+                    <li data-target="#carousel-2" data-slide-to="70">71</li>
                 </ol>
                 <div class="carousel-inner">
                     {% for q in question.q %}
                     {% if forloop.counter == 1 %}
-                    <div class="carousel-item active">
+                    <div class="carousel-item active" id="{{ q.q_id }}">
+
                          <p class="radiogroup">
                             <input type="radio" id="{{ q.q_id }}_1" name="{{ q.q_id }}" value="ア" style="margin-left:30px;" class="answer">
                             <label for="{{ q.q_id }}_1">ア</label>
@@ -123,7 +148,7 @@ $(function($){
 
                     </div>
                     {% else %}
-                    <div class="carousel-item">
+                    <div class="carousel-item" id="{{ q.q_id }}">
                         <p class="radiogroup">
                             <input type="radio" id="{{ q.q_id }}_1" name="{{ q.q_id }}" value="ア" style="margin-left:30px;" class="answer">
                             <label for="{{ q.q_id }}_1">ア</label>
