@@ -203,3 +203,14 @@ class QuestionBoki( models.Model ):
 class QuestionBokiQ1AllowField( models.Model ):
     b_field = models.CharField( max_length=40 ) #分野
     b_allow_field = models.CharField( max_length=255,blank=True,null=True)  #分野ごとの許容勘定科目をカンマ区切りで
+
+class QuestionIp( models.Model ):
+    ip_id = models.CharField( max_length=8,primary_key=True)
+    ip_period = models.CharField(max_length=5)
+    ip_num = models.IntegerField(default=1)
+    ip_content = models.CharField(max_length=40,blank=True,null=True)
+    ip_l_field = models.CharField(max_length=20,blank=True,null=True)
+    ip_m_field = models.CharField(max_length=20,blank=True,null=True)
+    ip_s_field = models.CharField(max_length=20,blank=True,null=True)
+    ip_answer = models.CharField(max_length=3,blank=True,null=True)
+

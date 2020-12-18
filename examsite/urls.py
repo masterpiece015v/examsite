@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^jg/', include('jg.urls')),
     url(r'^bk/', include('bk.urls')),
     url(r'^jk/', include('jk.urls')),
+    url(r'^ip/',include('ip.urls')),
     url(r'^manager/',include('manager.urls')),
 ]

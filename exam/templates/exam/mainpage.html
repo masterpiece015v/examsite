@@ -24,7 +24,7 @@ h3 {font-size :12pt;}
         <a href="{% url 'jg:mainpage' %}" class="list-group-item list-group-item-action">情報処理技術者試験</a>
         <a href="{% url 'jk:questionjs' %}" class="list-group-item list-group-item-action">情報システム試験</a>
         <a href="{% url 'bk:mainpage' %}" class="list-group-item list-group-item-action">簿記検定</a>
-        <a href="#" class="list-group-item list-group-item-action">List #3</a>
+        <a href="{% url 'ip:mainpage' %}" class="list-group-item list-group-item-action">ITパスポート</a>
     </div>
 </div>
 {% csrf_token %}

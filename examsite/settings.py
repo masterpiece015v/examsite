@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'bk.apps.BkConfig',
     'jg.apps.JgConfig',
     'jk.apps.JkConfig',
+    'ip.apps.IpConfig',
     'manager.apps.ManagerConfig',
     'django.contrib.admin',
     'django.contrib.auth',
