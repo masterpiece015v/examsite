@@ -46,9 +46,11 @@ $(function(){
                 $p = $('<p>').append( $('<spam>').text('【' + data['question_list'][i]['ip_period'] + '】'))
                         .append( $('<spam>').text(' 大分類:' + data['question_list'][i]['ip_l_field']))
                         .append( $('<spam>').text(' 中分類:' + data['question_list'][i]['ip_m_field']))
-                        .append( $('<spam>').text(' 小分類:' + data['question_list'][i]['ip_s_field']))
+                        .append( $('<spam>').text(' 小分類:' + data['question_list'][i]['ip_s_field']));
 
                 $div = $('<div>').append( $p ).append( $img ).attr('style','margin-bottom:40px;');
+                $pa = $('<p>').text( "答え：【" + data['question_list'][i]['ip_answer'] + "】");
+                $div.append( $pa );
                 $('#question').append( $div );
             }
 
@@ -92,9 +94,11 @@ $(function(){
                 $p = $('<p>').append( $('<spam>').text('【' + data['question_list'][i]['ip_period'] + '】'))
                         .append( $('<spam>').text(' 大分類:' + data['question_list'][i]['ip_l_field']))
                         .append( $('<spam>').text(' 中分類:' + data['question_list'][i]['ip_m_field']))
-                        .append( $('<spam>').text(' 小分類:' + data['question_list'][i]['ip_s_field']))
+                        .append( $('<spam>').text(' 小分類:' + data['question_list'][i]['ip_s_field']));
 
                 $div = $('<div>').append( $p ).append( $img ).attr('style','margin-bottom:40px;');
+                $pa = $('<p>').text( "答え：【" + data['question_list'][i]['ip_answer'] + "】" );
+                $div.append( $pa );
                 $('#question').append( $div );
             }
 
@@ -134,9 +138,11 @@ $(function(){
                 $p = $('<p>').append( $('<spam>').text('【' + data['question_list'][i]['ip_period'] + '】'))
                         .append( $('<spam>').text(' 大分類:' + data['question_list'][i]['ip_l_field']))
                         .append( $('<spam>').text(' 中分類:' + data['question_list'][i]['ip_m_field']))
-                        .append( $('<spam>').text(' 小分類:' + data['question_list'][i]['ip_s_field']))
+                        .append( $('<spam>').text(' 小分類:' + data['question_list'][i]['ip_s_field']));
 
                 $div = $('<div>').append( $p ).append( $img ).attr('style','margin-bottom:40px;');
+                $pa = $('<p>').text( "答え：【" + data['question_list'][i]['ip_answer'] + "】" );
+                $div.append( $pa );
                 $('#question').append( $div );
             }
 
